@@ -6,6 +6,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable
 {
@@ -21,6 +23,24 @@ class User extends Authenticatable
         'name', 'email', 'password', 'role', 'matricula', 'telefono', 'direccion'
 
     ];
+
+    // Relaciones
+    public function cursosComoMaestro(): HasMany
+    {
+        return $this->hasMany(Curso::class, 'maestro_id');
+    }
+
+    public function cursosComoEstudiante(): BelongsToMany
+    {
+        return $this->belongsToMany(Curso::class, 'curso_estudiante', 'estudiante_id', 'curso_id')
+                    ->withPivot('fecha_inscripcion', 'calificacion_final', 'estado')
+                    ->withTimestamps();
+    }
+
+    public function calificaciones(): HasMany
+    {
+        return $this->hasMany(Calificacion::class, 'estudiante_id');
+    }
 
     // Método para verificar si es administrador
     public function isAdmin()
@@ -40,6 +60,21 @@ class User extends Authenticatable
         return $this->role === 'alumno';
     }
 
+    // Scopes
+    public function scopeAdministradores($query)
+    {
+        return $query->where('role', 'administrador');
+    }
+
+    public function scopeMaestros($query)
+    {
+        return $query->where('role', 'maestro');
+    }
+
+    public function scopeAlumnos($query)
+    {
+        return $query->where('role', 'alumno');
+    }
     /**
      * The attributes that should be hidden for serialization.
      *
