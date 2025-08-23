@@ -34,16 +34,16 @@ Route::middleware('auth')->group(function () {
     
     Route::middleware('role:maestro')->group(function () {
         Route::get('/dashboard/maestro', [DashboardController::class, 'maestro'])->name('dashboard.maestro');
-        Route::get('/mis-cursos', [MaestroController::class, 'cursos'])->name('maestro.cursos');
-        Route::get('/calificaciones', [MaestroController::class, 'calificaciones'])->name('maestro.calificaciones');
+        Route::get('/maestro/cursos', [MaestroController::class, 'cursos'])->name('maestro.cursos');
+        Route::get('/maestro/calificaciones', [MaestroController::class, 'calificaciones'])->name('maestro.calificaciones');
         Route::post('/calificaciones', [MaestroController::class, 'registrarCalificacion'])->name('maestro.calificaciones.store');
     });
     
     Route::middleware('role:alumno')->group(function () {
         Route::get('/dashboard/alumno', [DashboardController::class, 'alumno'])->name('dashboard.alumno');
-        Route::get('/mi-informacion', [AlumnoController::class, 'perfil'])->name('alumno.perfil');
-        Route::get('/mis-calificaciones', [AlumnoController::class, 'calificaciones'])->name('alumno.calificaciones');
-        Route::get('/mis-cursos', [AlumnoController::class, 'cursos'])->name('alumno.cursos');
+        Route::get('/alumno/perfil', [AlumnoController::class, 'perfil'])->name('alumno.perfil');
+        Route::get('/alumno/calificaciones', [AlumnoController::class, 'calificaciones'])->name('alumno.calificaciones');
+        Route::get('/alumno/cursos', [AlumnoController::class, 'cursos'])->name('alumno.cursos');
     });
 });
 
