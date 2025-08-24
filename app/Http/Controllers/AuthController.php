@@ -17,6 +17,12 @@ class AuthController extends Controller
     // Procesar login
     public function login(Request $request)
     {
+        // Validar el token CSRF
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required'
+        ]);
+        
         $credentials = $request->validate([
             'email' => 'required|email',
             'password' => 'required'
@@ -41,7 +47,7 @@ class AuthController extends Controller
 
         return back()->withErrors([
             'email' => 'Las credenciales no coinciden.',
-        ]);
+        ])->withInput($request->except('password'));
     }
 
     // Cerrar sesión
