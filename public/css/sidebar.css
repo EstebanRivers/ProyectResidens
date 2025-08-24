@@ -1,0 +1,133 @@
+/* Sidebar Styles */
+.dashboard-container {
+    display: flex;
+    height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.sidebar {
+    width: 280px;
+    background: #e8e8e8;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+}
+
+.sidebar-header {
+    padding: 2rem 1.5rem;
+    text-align: center;
+    background: #e8e8e8;
+    border-bottom: 1px solid #d0d0d0;
+}
+
+.sidebar-header img {
+    width: 120px;
+    height: auto;
+    margin-bottom: 1rem;
+}
+
+.sidebar-nav {
+    flex: 1;
+    padding: 0;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    color: #333;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid #d0d0d0;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.nav-item:hover {
+    background: #d0d0d0;
+    color: #000;
+}
+
+.nav-item.active {
+    background: #c8860d;
+    color: white;
+}
+
+.nav-item i {
+    margin-right: 0.75rem;
+    width: 20px;
+    font-size: 1.1rem;
+}
+
+/* Iconos personalizados usando pseudo-elementos */
+.nav-item.info::before {
+    content: "👤";
+    margin-right: 0.75rem;
+    font-size: 1.1rem;
+}
+
+.nav-item.courses::before {
+    content: "💻";
+    margin-right: 0.75rem;
+    font-size: 1.1rem;
+}
+
+.nav-item.billing::before {
+    content: "📷";
+    margin-right: 0.75rem;
+    font-size: 1.1rem;
+}
+
+.nav-item.admin::before {
+    content: "📋";
+    margin-right: 0.75rem;
+    font-size: 1.1rem;
+}
+
+.nav-item.settings::before {
+    content: "👥";
+    margin-right: 0.75rem;
+    font-size: 1.1rem;
+}
+
+.sidebar-footer {
+    padding: 1.5rem;
+    border-top: 1px solid #d0d0d0;
+    background: #e8e8e8;
+}
+
+.logout-btn {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0.75rem;
+    background: transparent;
+    color: #333;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.logout-btn::before {
+    content: "🚪";
+    margin-right: 0.75rem;
+    font-size: 1.1rem;
+}
+
+.logout-btn:hover {
+    background: #d0d0d0;
+    color: #000;
+}
+
+.footer-logo {
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.footer-logo img {
+    width: 150px;
+    height: auto;
+    opacity: 0.8;
+}

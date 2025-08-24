@@ -3,34 +3,32 @@
 
 @section('title', 'Panel Administrador')
 
+@section('styles')
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+@endsection
+
 @section('content')
 <div class="dashboard-container">
     <div class="sidebar">
         <div class="sidebar-header">
             <img src="{{ asset('images/uhta-logo.png') }}" alt="UHTA">
-            <h3>UHTA</h3>
         </div>
         
         <nav class="sidebar-nav">
-            <a href="{{ route('dashboard.admin') }}" class="nav-item active">
-                <i class="icon-info"></i>
+            <a href="#" class="nav-item info active" data-section="mi-informacion">
                 Mi información
             </a>
-            <a href="{{ route('admin.cursos') }}" class="nav-item">
-                <i class="icon-courses"></i>
+            <a href="#" class="nav-item courses" data-section="cursos">
                 Cursos
             </a>
-            <a href="{{ route('admin.usuarios') }}" class="nav-item">
-                <i class="icon-users"></i>
+            <a href="#" class="nav-item billing" data-section="facturacion">
                 Facturación
             </a>
-            <a href="{{ route('admin.reportes') }}" class="nav-item">
-                <i class="icon-admin"></i>
+            <a href="#" class="nav-item admin" data-section="control-administrativo">
                 Control Administrativo
             </a>
-            <a href="#" class="nav-item">
-                <i class="icon-students"></i>
-                Alumnos
+            <a href="#" class="nav-item settings" data-section="ajustes">
+                Ajustes
             </a>
         </nav>
         
@@ -38,39 +36,168 @@
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" class="logout-btn">
-                    <i class="icon-logout"></i>
                     Cerrar sesión
                 </button>
             </form>
+            <div class="footer-logo">
+                <img src="{{ asset('images/uhta-logo.png') }}" alt="Mundo Imperial">
+            </div>
         </div>
     </div>
     
     <div class="main-content">
-        <div class="content-header">
-            <div class="welcome-message">
-                <img src="{{ asset('images/uhta-logo.png') }}" alt="UHTA">
-                <div>
-                    <h3>UMI</h3>
-                    <p>SISTEMA DE GESTIÓN ESCOLAR</p>
-                    <h2>¡Bienvenido(a) Usuario {{ Auth::user()->name }}!</h2>
-                </div>
+        <div class="settings-icon"></div>
+        
+        <div class="content-area">
+            <div class="welcome-section">
+                <img src="{{ asset('images/uhta-logo.png') }}" alt="UMI" class="main-logo">
+                <p class="welcome-text">¡Bienvenido(a) Usuario Master!</p>
             </div>
         </div>
         
-        <div class="dashboard-stats">
-            <div class="stat-card">
-                <h3>Total Estudiantes</h3>
-                <p class="stat-number">1,245</p>
+        <!-- Mi Información Section -->
+        <div id="mi-informacion" class="section-content">
+            <div class="section-header">
+                <h1 class="section-title">Mi Información</h1>
+                <p class="section-subtitle">Información personal y datos del usuario</p>
             </div>
-            <div class="stat-card">
-                <h3>Total Maestros</h3>
-                <p class="stat-number">87</p>
+            <div class="mi-informacion-content">
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h3>Datos Personales</h3>
+                        <div class="info-item">
+                            <div class="info-label">Nombre:</div>
+                            <div class="info-value">{{ Auth::user()->name }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Email:</div>
+                            <div class="info-value">{{ Auth::user()->email }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Rol:</div>
+                            <div class="info-value">{{ ucfirst(Auth::user()->role) }}</div>
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <h3>Estadísticas</h3>
+                        <div class="info-item">
+                            <div class="info-label">Total Estudiantes:</div>
+                            <div class="info-value">{{ $stats['total_estudiantes'] ?? 0 }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Total Maestros:</div>
+                            <div class="info-value">{{ $stats['total_maestros'] ?? 0 }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Cursos Activos:</div>
+                            <div class="info-value">{{ $stats['cursos_activos'] ?? 0 }}</div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="stat-card">
-                <h3>Cursos Activos</h3>
-                <p class="stat-number">156</p>
+        </div>
+
+        <!-- Cursos Section -->
+        <div id="cursos" class="section-content">
+            <div class="section-header">
+                <h1 class="section-title">Cursos</h1>
+                <p class="section-subtitle">Gestión de cursos y materias</p>
+            </div>
+            <div class="cursos-content">
+                <p>Contenido de la sección de cursos...</p>
+            </div>
+        </div>
+
+        <!-- Facturación Section -->
+        <div id="facturacion" class="section-content">
+            <div class="section-header">
+                <h1 class="section-title">Facturación</h1>
+                <p class="section-subtitle">Gestión de pagos y facturación</p>
+            </div>
+            <div class="facturacion-content">
+                <p>Contenido de la sección de facturación...</p>
+            </div>
+        </div>
+
+        <!-- Control Administrativo Section -->
+        <div id="control-administrativo" class="section-content">
+            <div class="section-header">
+                <h1 class="section-title">Control Administrativo</h1>
+                <p class="section-subtitle">Herramientas administrativas y reportes</p>
+            </div>
+            <div class="control-administrativo-content">
+                <p>Contenido de la sección de control administrativo...</p>
+            </div>
+        </div>
+
+        <!-- Ajustes Section -->
+        <div id="ajustes" class="section-content">
+            <div class="section-header">
+                <h1 class="section-title">Ajustes</h1>
+                <p class="section-subtitle">Configuración del sistema y preferencias</p>
+            </div>
+            <div class="ajustes-content">
+                <div class="ajustes-tabs">
+                    <button class="ajustes-tab active" data-tab="perfil-tab">Perfil</button>
+                    <button class="ajustes-tab" data-tab="seguridad-tab">Seguridad</button>
+                    <button class="ajustes-tab" data-tab="notificaciones-tab">Notificaciones</button>
+                </div>
+                
+                <div id="perfil-tab" class="ajustes-section active">
+                    <form id="perfil-form" class="ajustes-form">
+                        <div class="form-group">
+                            <label class="form-label">Nombre completo</label>
+                            <input type="text" class="form-input" value="{{ Auth::user()->name }}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-input" value="{{ Auth::user()->email }}">
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary">Guardar cambios</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div id="seguridad-tab" class="ajustes-section">
+                    <form id="seguridad-form" class="ajustes-form">
+                        <div class="form-group">
+                            <label class="form-label">Contraseña actual</label>
+                            <input type="password" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Nueva contraseña</label>
+                            <input type="password" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Confirmar contraseña</label>
+                            <input type="password" class="form-input">
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary">Cambiar contraseña</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div id="notificaciones-tab" class="ajustes-section">
+                    <form id="notificaciones-form" class="ajustes-form">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="email-notifications" class="form-checkbox" checked>
+                            <label for="email-notifications" class="checkbox-label">Recibir notificaciones por email</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="sms-notifications" class="form-checkbox">
+                            <label for="sms-notifications" class="checkbox-label">Recibir notificaciones por SMS</label>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary">Guardar preferencias</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<script src="{{ asset('js/dashboard.js') }}"></script>
 @endsection

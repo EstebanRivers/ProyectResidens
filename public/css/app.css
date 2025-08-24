@@ -2,8 +2,17 @@
 html, body {
     height: 100%;
     margin: 0;
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
+
+/* Importar estilos de componentes */
+@import url('sidebar.css');
+@import url('main-content.css');
+@import url('sections/mi-informacion.css');
+@import url('sections/cursos.css');
+@import url('sections/facturacion.css');
+@import url('sections/control-administrativo.css');
+@import url('sections/ajustes.css');
 
 /* Contenedor principal con dos columnas */
 .login-container {
@@ -84,151 +93,4 @@ html, body {
 
 .login-btn:hover {
     background-color: #003366;
-}
-
-
-
-/* Agregar al public/css/app.css */
-
-.dashboard-container {
-    display: flex;
-    height: 100vh;
-}
-
-.sidebar {
-    width: 280px;
-    background: #f8f9fa;
-    border-right: 1px solid #e9ecef;
-    display: flex;
-    flex-direction: column;
-}
-
-.sidebar-header {
-    padding: 1.5rem;
-    text-align: center;
-    border-bottom: 1px solid #e9ecef;
-}
-
-.sidebar-header img {
-    width: 60px;
-    height: 60px;
-    margin-bottom: 0.5rem;
-}
-
-.sidebar-header h3 {
-    color: #2c3e50;
-    font-size: 1.5rem;
-}
-
-.sidebar-nav {
-    flex: 1;
-    padding: 1rem 0;
-}
-
-.nav-item {
-    display: block;
-    padding: 1rem 1.5rem;
-    color: #6c757d;
-    text-decoration: none;
-    transition: all 0.3s;
-    border-left: 3px solid transparent;
-}
-
-.nav-item:hover,
-.nav-item.active {
-    background: #e3f2fd;
-    color: #1976d2;
-    border-left-color: #1976d2;
-}
-
-.nav-item i {
-    margin-right: 0.75rem;
-    width: 20px;
-}
-
-.sidebar-footer {
-    padding: 1rem;
-    border-top: 1px solid #e9ecef;
-}
-
-.logout-btn {
-    width: 100%;
-    padding: 0.75rem;
-    background: #dc3545;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.logout-btn:hover {
-    background: #c82333;
-}
-
-.main-content {
-    flex: 1;
-    padding: 2rem;
-    background: #ffffff;
-}
-
-.content-header {
-    margin-bottom: 2rem;
-}
-
-.welcome-message {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1.5rem;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 12px;
-    color: white;
-}
-
-.welcome-message img {
-    width: 80px;
-    height: 80px;
-}
-
-.welcome-message h3 {
-    font-size: 1.8rem;
-    margin-bottom: 0.25rem;
-}
-
-.welcome-message p {
-    font-size: 0.9rem;
-    opacity: 0.9;
-    margin-bottom: 0.5rem;
-}
-
-.welcome-message h2 {
-    font-size: 1.4rem;
-    font-weight: normal;
-}
-
-.dashboard-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1.5rem;
-}
-
-.stat-card {
-    background: white;
-    padding: 2rem;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    text-align: center;
-}
-
-.stat-card h3 {
-    color: #6c757d;
-    font-size: 1rem;
-    margin-bottom: 1rem;
-}
-
-.stat-number {
-    font-size: 2.5rem;
-    font-weight: bold;
-    color: #1976d2;
 }

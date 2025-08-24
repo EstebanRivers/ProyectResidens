@@ -1,0 +1,93 @@
+/* Main Content Styles */
+.main-content {
+    flex: 1;
+    background: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.settings-icon {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 30px;
+    height: 30px;
+    background: #666;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.settings-icon:hover {
+    background: #555;
+}
+
+.settings-icon::before {
+    content: "⚙️";
+    color: white;
+    font-size: 16px;
+}
+
+.content-area {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 2rem;
+}
+
+.welcome-section {
+    text-align: center;
+    max-width: 500px;
+}
+
+.main-logo {
+    width: 200px;
+    height: auto;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+.welcome-text {
+    font-size: 1.5rem;
+    color: #333;
+    font-weight: 500;
+    margin: 0;
+}
+
+/* Contenido específico para cada sección */
+.section-content {
+    display: none;
+    width: 100%;
+    height: 100%;
+    padding: 2rem;
+    overflow-y: auto;
+}
+
+.section-content.active {
+    display: block;
+}
+
+.section-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #ddd;
+}
+
+.section-title {
+    font-size: 2rem;
+    color: #333;
+    margin: 0;
+    font-weight: 600;
+}
+
+.section-subtitle {
+    font-size: 1rem;
+    color: #666;
+    margin: 0.5rem 0 0 0;
+}

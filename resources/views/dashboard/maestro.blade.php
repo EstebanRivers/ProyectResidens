@@ -3,26 +3,32 @@
 
 @section('title', 'Panel Maestro')
 
+@section('styles')
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+@endsection
+
 @section('content')
 <div class="dashboard-container">
     <div class="sidebar">
         <div class="sidebar-header">
             <img src="{{ asset('images/uhta-logo.png') }}" alt="UHTA">
-            <h3>UHTA</h3>
         </div>
         
         <nav class="sidebar-nav">
-            <a href="{{ route('dashboard.maestro') }}" class="nav-item active">
-                <i class="icon-info"></i>
+            <a href="#" class="nav-item info active" data-section="mi-informacion">
                 Mi información
             </a>
-            <a href="{{ route('maestro.cursos') }}" class="nav-item">
-                <i class="icon-courses"></i>
-                Mis Cursos
+            <a href="#" class="nav-item courses" data-section="cursos">
+                Cursos
             </a>
-            <a href="{{ route('maestro.calificaciones') }}" class="nav-item">
-                <i class="icon-grades"></i>
-                Calificaciones
+            <a href="#" class="nav-item billing" data-section="facturacion">
+                Facturación
+            </a>
+            <a href="#" class="nav-item admin" data-section="control-administrativo">
+                Control Administrativo
+            </a>
+            <a href="#" class="nav-item settings" data-section="ajustes">
+                Ajustes
             </a>
         </nav>
         
@@ -30,40 +36,79 @@
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" class="logout-btn">
-                    <i class="icon-logout"></i>
                     Cerrar sesión
                 </button>
             </form>
+            <div class="footer-logo">
+                <img src="{{ asset('images/uhta-logo.png') }}" alt="Mundo Imperial">
+            </div>
         </div>
     </div>
     
     <div class="main-content">
-        <div class="content-header">
-            <div class="welcome-message">
-                <img src="{{ asset('images/uhta-logo.png') }}" alt="UHTA">
-                <div>
-                    <h3>UMI</h3>
-                    <p>SISTEMA DE GESTIÓN ESCOLAR</p>
-                    <h2>¡Bienvenido(a) Maestro {{ Auth::user()->name }}!</h2>
-                </div>
+        <div class="settings-icon"></div>
+        
+        <div class="content-area">
+            <div class="welcome-section">
+                <img src="{{ asset('images/uhta-logo.png') }}" alt="UMI" class="main-logo">
+                <p class="welcome-text">¡Bienvenido(a) Usuario Master!</p>
             </div>
         </div>
         
-        <div class="dashboard-stats">
-            <div class="stat-card">
-                <h3>Mis Cursos</h3>
-                <p class="stat-number">{{ $stats['total_cursos'] }}</p>
+        <!-- Mi Información Section -->
+        <div id="mi-informacion" class="section-content">
+            <div class="section-header">
+                <h1 class="section-title">Mi Información</h1>
+                <p class="section-subtitle">Información personal y datos del maestro</p>
             </div>
-            <div class="stat-card">
-                <h3>Total Estudiantes</h3>
-                <p class="stat-number">{{ $stats['total_estudiantes'] }}</p>
+            <div class="mi-informacion-content">
+                <div class="info-grid">
+                    <div class="info-card">
+                        <h3>Datos Personales</h3>
+                        <div class="info-item">
+                            <div class="info-label">Nombre:</div>
+                            <div class="info-value">{{ Auth::user()->name }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Email:</div>
+                            <div class="info-value">{{ Auth::user()->email }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Rol:</div>
+                            <div class="info-value">{{ ucfirst(Auth::user()->role) }}</div>
+                        </div>
+                    </div>
+                    <div class="info-card">
+                        <h3>Estadísticas</h3>
+                        <div class="info-item">
+                            <div class="info-label">Mis Cursos:</div>
+                            <div class="info-value">{{ $stats['total_cursos'] ?? 0 }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Total Estudiantes:</div>
+                            <div class="info-value">{{ $stats['total_estudiantes'] ?? 0 }}</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Cursos Activos:</div>
+                            <div class="info-value">{{ $stats['cursos_activos'] ?? 0 }}</div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="stat-card">
-                <h3>Cursos Activos</h3>
-                <p class="stat-number">{{ $stats['cursos_activos'] }}</p>
+        </div>
             </div>
         </div>
 
+        <!-- Cursos Section -->
+        <div id="cursos" class="section-content">
+            <div class="section-header">
+                <h1 class="section-title">Mis Cursos</h1>
+                <p class="section-subtitle">Gestión de cursos y calificaciones</p>
+            </div>
+            <div class="cursos-content">
+                <p>Contenido de la sección de cursos del maestro...</p>
+            </div>
+        </div>
         @if($cursos->count() > 0)
         <div class="recent-courses" style="margin-top: 2rem;">
             <h3 style="margin-bottom: 1rem; color: #2c3e50;">Mis Cursos Recientes</h3>
@@ -77,11 +122,79 @@
                     <span style="padding: 0.25rem 0.75rem; background: {{ $curso->activo ? '#d4edda' : '#f8d7da' }}; color: {{ $curso->activo ? '#155724' : '#721c24' }}; border-radius: 20px; font-size: 0.8rem;">
                         {{ $curso->activo ? 'Activo' : 'Inactivo' }}
                     </span>
-                </div>
-                @endforeach
+        <!-- Facturación Section -->
+        <div id="facturacion" class="section-content">
+            <div class="section-header">
+                <h1 class="section-title">Facturación</h1>
+                <p class="section-subtitle">Información de pagos y nómina</p>
+            </div>
+            <div class="facturacion-content">
+                <p>Contenido de la sección de facturación...</p>
             </div>
         </div>
-        @endif
+                </div>
+        <!-- Control Administrativo Section -->
+        <div id="control-administrativo" class="section-content">
+            <div class="section-header">
+                <h1 class="section-title">Control Administrativo</h1>
+                <p class="section-subtitle">Herramientas administrativas</p>
+            </div>
+            <div class="control-administrativo-content">
+                <p>Contenido de la sección de control administrativo...</p>
+            </div>
+        </div>
+                @endforeach
+        <!-- Ajustes Section -->
+        <div id="ajustes" class="section-content">
+            <div class="section-header">
+                <h1 class="section-title">Ajustes</h1>
+                <p class="section-subtitle">Configuración personal</p>
+            </div>
+            <div class="ajustes-content">
+                <div class="ajustes-tabs">
+                    <button class="ajustes-tab active" data-tab="perfil-tab">Perfil</button>
+                    <button class="ajustes-tab" data-tab="seguridad-tab">Seguridad</button>
+                    <button class="ajustes-tab" data-tab="notificaciones-tab">Notificaciones</button>
+                </div>
+                
+                <div id="perfil-tab" class="ajustes-section active">
+                    <form id="perfil-form" class="ajustes-form">
+                        <div class="form-group">
+                            <label class="form-label">Nombre completo</label>
+                            <input type="text" class="form-input" value="{{ Auth::user()->name }}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-input" value="{{ Auth::user()->email }}">
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary">Guardar cambios</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div id="seguridad-tab" class="ajustes-section">
+                    <form id="seguridad-form" class="ajustes-form">
+                        <div class="form-group">
+                            <label class="form-label">Contraseña actual</label>
+                            <input type="password" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Nueva contraseña</label>
+                            <input type="password" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Confirmar contraseña</label>
+                            <input type="password" class="form-input">
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary">Cambiar contraseña</button>
+                        </div>
+                    </form>
+                </div>
+                
     </div>
 </div>
+
+<script src="{{ asset('js/dashboard.js') }}"></script>
 @endsection
