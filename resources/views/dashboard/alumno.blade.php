@@ -40,7 +40,7 @@
                 </button>
             </form>
             <div class="footer-logo">
-                <img src="{{ asset('images/uhta-logo.png') }}" alt="Mundo Imperial">
+                <img src="{{ asset('images/uhta-logo.png') }}" alt="UHTA">
             </div>
         </div>
     </div>
@@ -109,19 +109,15 @@
                 <p>Contenido de la sección de cursos del alumno...</p>
             </div>
         </div>
-        @if($calificaciones->count() > 0)
-        <div class="recent-grades" style="margin-top: 2rem;">
-            <h3 style="margin-bottom: 1rem; color: #2c3e50;">Calificaciones Recientes</h3>
-            <div style="background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-                @foreach($calificaciones as $calificacion)
-                <div style="padding: 1rem; border-bottom: 1px solid #e9ecef; display: flex; justify-content: between; align-items: center;">
-                    <div>
-                        <h4 style="color: #2c3e50; margin-bottom: 0.5rem;">{{ $calificacion->curso->nombre }}</h4>
-                        <p style="color: #6c757d; font-size: 0.9rem;">{{ $calificacion->tipo_evaluacion }} - {{ $calificacion->fecha_evaluacion->format('d/m/Y') }}</p>
-                    </div>
-                    <span style="padding: 0.5rem 1rem; background: {{ $calificacion->calificacion >= 70 ? '#d4edda' : '#f8d7da' }}; color: {{ $calificacion->calificacion >= 70 ? '#155724' : '#721c24' }}; border-radius: 20px; font-weight: bold;">
-                        {{ $calificacion->calificacion }}
-                    </span>
+        </div>
+    </div>
+</div>
+
+        <!-- Cursos Section -->
+        <div id="cursos" class="section-content">
+            <div class="section-header">
+                <h1 class="section-title">Mis Cursos</h1>
+                <p class="section-subtitle">Cursos inscritos y calificaciones</p>
         <!-- Facturación Section -->
         <div id="facturacion" class="section-content">
             <div class="section-header">
@@ -132,7 +128,7 @@
                 <p>Contenido de la sección de facturación...</p>
             </div>
         </div>
-                </div>
+            </div>
         <!-- Control Administrativo Section -->
         <div id="control-administrativo" class="section-content">
             <div class="section-header">
@@ -143,7 +139,7 @@
                 <p>Contenido de la sección de control administrativo...</p>
             </div>
         </div>
-                @endforeach
+            <div class="cursos-content">
         <!-- Ajustes Section -->
         <div id="ajustes" class="section-content">
             <div class="section-header">
@@ -158,7 +154,8 @@
                 </div>
                 
                 <div id="perfil-tab" class="ajustes-section active">
-                    <form id="perfil-form" class="ajustes-form">
+                    <form id="perfil-form" class="ajustes-form" method="POST" action="#">
+                        @csrf
                         <div class="form-group">
                             <label class="form-label">Nombre completo</label>
                             <input type="text" class="form-input" value="{{ Auth::user()->name }}">
@@ -174,7 +171,8 @@
                 </div>
                 
                 <div id="seguridad-tab" class="ajustes-section">
-                    <form id="seguridad-form" class="ajustes-form">
+                    <form id="seguridad-form" class="ajustes-form" method="POST" action="#">
+                        @csrf
                         <div class="form-group">
                             <label class="form-label">Contraseña actual</label>
                             <input type="password" class="form-input">
@@ -193,8 +191,26 @@
                     </form>
                 </div>
                 
-    </div>
-</div>
-
+                <div id="notificaciones-tab" class="ajustes-section">
+                    <form id="notificaciones-form" class="ajustes-form" method="POST" action="#">
+                        @csrf
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="email-notifications" class="form-checkbox" checked>
+                            <label for="email-notifications" class="checkbox-label">Recibir notificaciones por email</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="sms-notifications" class="form-checkbox">
+                            <label for="sms-notifications" class="checkbox-label">Recibir notificaciones por SMS</label>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary">Guardar preferencias</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+                <p>Contenido de la sección de cursos del alumno...</p>
+            </div>
+        </div>
 <script src="{{ asset('js/dashboard.js') }}"></script>
 @endsection

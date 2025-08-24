@@ -40,7 +40,7 @@
                 </button>
             </form>
             <div class="footer-logo">
-                <img src="{{ asset('images/uhta-logo.png') }}" alt="Mundo Imperial">
+                <img src="{{ asset('images/uhta-logo.png') }}" alt="UHTA">
             </div>
         </div>
     </div>
@@ -144,7 +144,8 @@
                 </div>
                 
                 <div id="perfil-tab" class="ajustes-section active">
-                    <form id="perfil-form" class="ajustes-form">
+                    <form id="perfil-form" class="ajustes-form" method="POST" action="#">
+                        @csrf
                         <div class="form-group">
                             <label class="form-label">Nombre completo</label>
                             <input type="text" class="form-input" value="{{ Auth::user()->name }}">
@@ -160,7 +161,8 @@
                 </div>
                 
                 <div id="seguridad-tab" class="ajustes-section">
-                    <form id="seguridad-form" class="ajustes-form">
+                    <form id="seguridad-form" class="ajustes-form" method="POST" action="#">
+                        @csrf
                         <div class="form-group">
                             <label class="form-label">Contraseña actual</label>
                             <input type="password" class="form-input">
@@ -180,7 +182,8 @@
                 </div>
                 
                 <div id="notificaciones-tab" class="ajustes-section">
-                    <form id="notificaciones-form" class="ajustes-form">
+                    <form id="notificaciones-form" class="ajustes-form" method="POST" action="#">
+                        @csrf
                         <div class="checkbox-group">
                             <input type="checkbox" id="email-notifications" class="form-checkbox" checked>
                             <label for="email-notifications" class="checkbox-label">Recibir notificaciones por email</label>
