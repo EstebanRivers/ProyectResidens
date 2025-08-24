@@ -1,4 +1,4 @@
-{{-- resources/views/dashboard/admin.blade.php --}}
+
 @extends('layouts.app')
 
 @section('title', 'Panel Administrador')
@@ -40,7 +40,7 @@
                 </button>
             </form>
             <div class="footer-logo">
-                <img src="{{ asset('images/uhta-logo.png') }}" alt="UHTA">
+                <img src="{{ asset('images/uhta-logo.png') }}" alt="Mundo Imperial">
             </div>
         </div>
     </div>
@@ -144,8 +144,7 @@
                 </div>
                 
                 <div id="perfil-tab" class="ajustes-section active">
-                    <form id="perfil-form" class="ajustes-form" method="POST" action="#">
-                        @csrf
+                    <form id="perfil-form" class="ajustes-form">
                         <div class="form-group">
                             <label class="form-label">Nombre completo</label>
                             <input type="text" class="form-input" value="{{ Auth::user()->name }}">
@@ -161,8 +160,7 @@
                 </div>
                 
                 <div id="seguridad-tab" class="ajustes-section">
-                    <form id="seguridad-form" class="ajustes-form" method="POST" action="#">
-                        @csrf
+                    <form id="seguridad-form" class="ajustes-form">
                         <div class="form-group">
                             <label class="form-label">Contraseña actual</label>
                             <input type="password" class="form-input">
@@ -182,8 +180,7 @@
                 </div>
                 
                 <div id="notificaciones-tab" class="ajustes-section">
-                    <form id="notificaciones-form" class="ajustes-form" method="POST" action="#">
-                        @csrf
+                    <form id="notificaciones-form" class="ajustes-form">
                         <div class="checkbox-group">
                             <input type="checkbox" id="email-notifications" class="form-checkbox" checked>
                             <label for="email-notifications" class="checkbox-label">Recibir notificaciones por email</label>
