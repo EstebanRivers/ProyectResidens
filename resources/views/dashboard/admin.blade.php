@@ -1,10 +1,9 @@
-
 @extends('layouts.app')
 
 @section('title', 'Panel Administrador')
 
 @section('styles')
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
 @endsection
 
 @section('content')
@@ -15,19 +14,19 @@
         </div>
         
         <nav class="sidebar-nav">
-            <a href="#" class="nav-item info active" data-section="mi-informacion">
+            <a href="#" class="nav-item active" data-section="mi-informacion">
                 Mi información
             </a>
-            <a href="#" class="nav-item courses" data-section="cursos">
+            <a href="#" class="nav-item" data-section="cursos">
                 Cursos
             </a>
-            <a href="#" class="nav-item billing" data-section="facturacion">
+            <a href="#" class="nav-item" data-section="facturacion">
                 Facturación
             </a>
-            <a href="#" class="nav-item admin" data-section="control-administrativo">
+            <a href="#" class="nav-item" data-section="control-administrativo">
                 Control Administrativo
             </a>
-            <a href="#" class="nav-item settings" data-section="ajustes">
+            <a href="#" class="nav-item" data-section="ajustes">
                 Ajustes
             </a>
         </nav>
@@ -40,7 +39,7 @@
                 </button>
             </form>
             <div class="footer-logo">
-                <img src="{{ asset('images/uhta-logo.png') }}" alt="Mundo Imperial">
+                <img src="{{ asset('images/uhta-logo.png') }}" alt="UHTA">
             </div>
         </div>
     </div>
@@ -144,7 +143,8 @@
                 </div>
                 
                 <div id="perfil-tab" class="ajustes-section active">
-                    <form id="perfil-form" class="ajustes-form">
+                    <form id="perfil-form" class="ajustes-form" method="POST" action="#">
+                        @csrf
                         <div class="form-group">
                             <label class="form-label">Nombre completo</label>
                             <input type="text" class="form-input" value="{{ Auth::user()->name }}">
@@ -160,7 +160,8 @@
                 </div>
                 
                 <div id="seguridad-tab" class="ajustes-section">
-                    <form id="seguridad-form" class="ajustes-form">
+                    <form id="seguridad-form" class="ajustes-form" method="POST" action="#">
+                        @csrf
                         <div class="form-group">
                             <label class="form-label">Contraseña actual</label>
                             <input type="password" class="form-input">
@@ -180,7 +181,8 @@
                 </div>
                 
                 <div id="notificaciones-tab" class="ajustes-section">
-                    <form id="notificaciones-form" class="ajustes-form">
+                    <form id="notificaciones-form" class="ajustes-form" method="POST" action="#">
+                        @csrf
                         <div class="checkbox-group">
                             <input type="checkbox" id="email-notifications" class="form-checkbox" checked>
                             <label for="email-notifications" class="checkbox-label">Recibir notificaciones por email</label>
@@ -198,6 +200,8 @@
         </div>
     </div>
 </div>
+@endsection
 
-<script src="{{ asset('js/dashboard.js') }}"></script>
+@section('scripts')
+    <script src="{{ asset('js/dashboard.js') }}"></script>
 @endsection
