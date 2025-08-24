@@ -1,128 +1,92 @@
-/* public/css/app.css */
-* {
+/* Que ocupe toda la pantalla */
+html, body {
+    height: 100%;
     margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+    font-family: Arial, sans-serif;
 }
 
-body {
-    font-family: 'Arial', sans-serif;
-    background: #f5f5f5;
-}
-
+/* Contenedor principal con dos columnas */
 .login-container {
     display: flex;
     height: 100vh;
-}
-
-.login-left {
-    flex: 1;
-    background: linear-gradient(135deg, #87CEEB, #4682B4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-}
-
-.building-image {
     width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
-.building-image img {
-    max-width: 90%;
-    max-height: 90%;
-    object-fit: cover;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+/* Mitad izquierda (imagen) */
+.login-left {
+    flex: 1.3;
+    background: url('/images/building.png') no-repeat center center;
+    background-size: cover;
+    border-right: 3px solid #004080; /* línea azul */
 }
 
+/* Mitad derecha (login) */
 .login-right {
     flex: 1;
-    background: white;
     display: flex;
-    align-items: center;
+    flex-direction: column;
     justify-content: center;
-    padding: 2rem;
+    align-items: center;
+    padding: 40px;
+    background-color: #fff;
 }
 
 .login-form {
     width: 100%;
-    max-width: 400px;
+
+    max-width: 350px;
     text-align: center;
 }
 
-.logo {
-    margin-bottom: 1rem;
-}
-
+/* Logo */
 .logo img {
-    width: 80px;
-    height: 80px;
+    max-width: 200px;
+    margin-bottom: 30px;
 }
 
-.login-form h2 {
-    font-size: 2rem;
-    color: #2c3e50;
-    margin-bottom: 0.5rem;
-}
-
-.subtitle {
-    color: #7f8c8d;
-    font-size: 0.9rem;
-    margin-bottom: 2rem;
-}
-
+/* Inputs */
 .form-group {
-    margin-bottom: 1.5rem;
-    text-align: left;
+    width: 100%;
+    max-width: 350px;
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 0.5rem;
-    color: #2c3e50;
-    font-weight: 500;
+    font-size: 14px;
+    margin-bottom: 5px;
 }
 
 .form-group input {
     width: 100%;
-    padding: 12px;
-    border: 2px solid #ecf0f1;
-    border-radius: 8px;
-    font-size: 1rem;
-    transition: border-color 0.3s;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: none;
+    border-bottom: 2px solid #999;
+    outline: none;
+    font-size: 14px;
 }
 
 .form-group input:focus {
-    outline: none;
-    border-color: #3498db;
+    border-bottom: 2px solid #004080;
 }
 
+/* Botón */
 .login-btn {
     width: 100%;
     padding: 12px;
-    background: #2c3e50;
-    color: white;
+    background-color: #004080;
     border: none;
-    border-radius: 8px;
-    font-size: 1rem;
+    border-radius: 20px;
+    color: white;
+    font-size: 16px;
     cursor: pointer;
-    transition: background-color 0.3s;
 }
 
 .login-btn:hover {
-    background: #34495e;
+    background-color: #003366;
 }
 
-.error {
-    color: #e74c3c;
-    font-size: 0.8rem;
-    margin-top: 0.25rem;
-}
+
 
 /* Agregar al public/css/app.css */
 
