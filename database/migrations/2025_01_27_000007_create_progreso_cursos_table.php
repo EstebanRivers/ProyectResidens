@@ -10,18 +10,22 @@ return new class extends Migration
     {
         Schema::create('progreso_cursos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('curso_id')->constrained()->onDelete('cascade');
+            $table->foreignId('curso_id')->constrained('cursos')->onDelete('cascade');
             $table->foreignId('estudiante_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('contenido_id')->nullable()->constrained()->onDelete('cascade');
-            $table->foreignId('actividad_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('contenido_id')->nullable()->constrained('contenidos')->onDelete('cascade');
+            $table->foreignId('actividad_id')->nullable()->constrained('actividades')->onDelete('cascade');
             $table->enum('tipo', ['contenido', 'actividad']);
             $table->boolean('completado')->default(false);
             $table->integer('tiempo_dedicado')->default(0); // en minutos
             $table->timestamp('fecha_inicio')->nullable();
             $table->timestamp('fecha_completado')->nullable();
             $table->timestamps();
-            
-            $table->unique(['curso_id', 'estudiante_id', 'contenido_id', 'actividad_id']);
+
+            // Nombre personalizado para evitar límite de longitud
+            $table->unique(
+                ['curso_id', 'estudiante_id', 'contenido_id', 'actividad_id'],
+                'progreso_cursos_unique'
+            );
         });
     }
 
@@ -30,3 +34,4 @@ return new class extends Migration
         Schema::dropIfExists('progreso_cursos');
     }
 };
+

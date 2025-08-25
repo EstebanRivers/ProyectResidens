@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('respuestas_actividades', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('actividad_id')->constrained()->onDelete('cascade');
+            $table->foreignId('actividad_id')->constrained('actividades')->onDelete('cascade');
             $table->foreignId('estudiante_id')->constrained('users')->onDelete('cascade');
             $table->json('respuesta'); // Respuesta del estudiante
             $table->boolean('es_correcta')->default(false);
