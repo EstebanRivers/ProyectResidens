@@ -50,6 +50,37 @@ Route::middleware('auth')->group(function () {
         Route::get('/alumno/calificaciones', [AlumnoController::class, 'calificaciones'])->name('alumno.calificaciones');
         Route::get('/alumno/cursos', [AlumnoController::class, 'cursos'])->name('alumno.cursos');
     });
+    
+    // Rutas de cursos (accesibles según rol)
+    Route::resource('cursos', \App\Http\Controllers\CursoController::class);
+    Route::post('/cursos/{curso}/inscribir', [\App\Http\Controllers\CursoController::class, 'inscribir'])->name('cursos.inscribir');
+    
+    // Rutas de contenido (solo admin y maestros)
+    Route::middleware('role:administrador,maestro')->group(function () {
+        Route::get('/cursos/{curso}/contenidos/create', [\App\Http\Controllers\ContenidoController::class, 'create'])->name('contenidos.create');
+        Route::post('/cursos/{curso}/contenidos', [\App\Http\Controllers\ContenidoController::class, 'store'])->name('contenidos.store');
+        Route::get('/cursos/{curso}/contenidos/{contenido}/edit', [\App\Http\Controllers\ContenidoController::class, 'edit'])->name('contenidos.edit');
+        Route::put('/cursos/{curso}/contenidos/{contenido}', [\App\Http\Controllers\ContenidoController::class, 'update'])->name('contenidos.update');
+        Route::delete('/cursos/{curso}/contenidos/{contenido}', [\App\Http\Controllers\ContenidoController::class, 'destroy'])->name('contenidos.destroy');
+    });
+    
+    // Rutas de contenido (todos los roles autenticados)
+    Route::get('/cursos/{curso}/contenidos/{contenido}', [\App\Http\Controllers\ContenidoController::class, 'show'])->name('contenidos.show');
+    Route::post('/cursos/{curso}/contenidos/{contenido}/completar', [\App\Http\Controllers\ContenidoController::class, 'marcarCompletado'])->name('contenidos.completar');
+    
+    // Rutas de actividades (solo admin y maestros)
+    Route::middleware('role:administrador,maestro')->group(function () {
+        Route::get('/cursos/{curso}/actividades/create', [\App\Http\Controllers\ActividadController::class, 'create'])->name('actividades.create');
+        Route::post('/cursos/{curso}/actividades', [\App\Http\Controllers\ActividadController::class, 'store'])->name('actividades.store');
+        Route::get('/cursos/{curso}/actividades/{actividad}/edit', [\App\Http\Controllers\ActividadController::class, 'edit'])->name('actividades.edit');
+        Route::put('/cursos/{curso}/actividades/{actividad}', [\App\Http\Controllers\ActividadController::class, 'update'])->name('actividades.update');
+        Route::delete('/cursos/{curso}/actividades/{actividad}', [\App\Http\Controllers\ActividadController::class, 'destroy'])->name('actividades.destroy');
+    });
+    
+    // Rutas de actividades (todos los roles autenticados)
+    Route::get('/cursos/{curso}/actividades/{actividad}', [\App\Http\Controllers\ActividadController::class, 'show'])->name('actividades.show');
+    Route::post('/cursos/{curso}/actividades/{actividad}/responder', [\App\Http\Controllers\ActividadController::class, 'responder'])->name('actividades.responder');
+    Route::get('/cursos/{curso}/actividades/{actividad}/resultado', [\App\Http\Controllers\ActividadController::class, 'resultado'])->name('actividades.resultado');
 });
 
 require __DIR__.'/auth.php';
