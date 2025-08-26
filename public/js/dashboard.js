@@ -131,3 +131,74 @@ document.addEventListener('DOMContentLoaded', function() {
     handleFormSubmit('seguridad-form');
     handleFormSubmit('notificaciones-form');
 });
+
+// Funciones para gestión de cursos
+function showCreateCourseForm() {
+    document.getElementById('create-course-form').style.display = 'block';
+}
+
+function hideCreateCourseForm() {
+    document.getElementById('create-course-form').style.display = 'none';
+}
+
+function loadAllCourses() {
+    alert('Cargando todos los cursos...');
+}
+
+function showCourseContent() {
+    document.getElementById('course-content-modal').style.display = 'block';
+}
+
+function hideCourseContent() {
+    document.getElementById('course-content-modal').style.display = 'none';
+}
+
+function showContentTab(tabName) {
+    // Ocultar todos los tabs
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.style.display = 'none';
+    });
+    
+    // Remover clase activa de todos los botones
+    document.querySelectorAll('.content-tab').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Mostrar tab seleccionado
+    document.getElementById(tabName + '-content').style.display = 'block';
+    
+    // Activar botón correspondiente
+    event.target.classList.add('active');
+}
+
+function showAddContentForm() {
+    alert('Formulario para agregar contenido (video, PDF, texto, etc.)');
+}
+
+function showAddActivityForm() {
+    alert('Formulario para crear actividad (quiz, tarea, etc.)');
+}
+
+// Funciones para alumnos
+function showMyCourses() {
+    document.getElementById('available-courses').style.display = 'none';
+    document.getElementById('my-courses').style.display = 'block';
+}
+
+function enrollInCourse(courseId) {
+    if (confirm('¿Estás seguro de que quieres inscribirte en este curso?')) {
+        alert('Te has inscrito exitosamente en el curso!');
+    }
+}
+
+function previewCourse(courseId) {
+    alert('Vista previa del curso - Mostrando contenido disponible');
+}
+
+function continueCourse(courseId) {
+    alert('Continuando con el curso...');
+}
+
+function viewGrades(courseId) {
+    alert('Mostrando calificaciones del curso');
+}

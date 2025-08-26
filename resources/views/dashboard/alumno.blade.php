@@ -105,8 +105,129 @@
                 <h1 class="section-title">Mis Cursos</h1>
                 <p class="section-subtitle">Cursos inscritos y calificaciones</p>
             </div>
-            <div class="cursos-content">
-                <p>Contenido de la sección de cursos del alumno...</p>
+            <div class="course-management">
+                <div class="course-header">
+                    <h2 style="color: #2c3e50; margin: 0;">Cursos Disponibles</h2>
+                    <div class="course-actions">
+                        <a href="#" class="btn-secondary" onclick="showMyCourses()">
+                            📚 Mis Cursos Inscritos
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Cursos disponibles para inscripción -->
+                <div id="available-courses">
+                    <h3 style="color: #2c3e50; margin-bottom: 1rem;">Cursos Disponibles para Inscripción</h3>
+                    <div class="courses-grid">
+                        <div class="course-card">
+                            <div class="course-card-header">
+                                <div>
+                                    <h3 class="course-title">Matemáticas I</h3>
+                                    <p class="course-code">MAT101</p>
+                                </div>
+                                <span class="course-status active">Disponible</span>
+                            </div>
+                            <p class="course-description">Curso básico de matemáticas que cubre álgebra, geometría y trigonometría fundamental.</p>
+                            <div class="course-stats">
+                                <div class="course-stat">
+                                    <div class="course-stat-number">25/30</div>
+                                    <div class="course-stat-label">Cupo</div>
+                                </div>
+                                <div class="course-stat">
+                                    <div class="course-stat-number">4</div>
+                                    <div class="course-stat-label">Créditos</div>
+                                </div>
+                                <div class="course-stat">
+                                    <div class="course-stat-number">12</div>
+                                    <div class="course-stat-label">Lecciones</div>
+                                </div>
+                            </div>
+                            <div style="margin: 1rem 0; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+                                <strong>Profesor:</strong> Juan Pérez<br>
+                                <strong>Período:</strong> 2025-1
+                            </div>
+                            <div class="course-actions-card">
+                                <button class="btn-small btn-primary" onclick="enrollInCourse(1)">Inscribirse</button>
+                                <a href="#" class="btn-small btn-outline" onclick="previewCourse(1)">Vista Previa</a>
+                            </div>
+                        </div>
+                        
+                        <div class="course-card">
+                            <div class="course-card-header">
+                                <div>
+                                    <h3 class="course-title">Física General</h3>
+                                    <p class="course-code">FIS101</p>
+                                </div>
+                                <span class="course-status active">Disponible</span>
+                            </div>
+                            <p class="course-description">Introducción a los conceptos fundamentales de la física: mecánica, termodinámica y ondas.</p>
+                            <div class="course-stats">
+                                <div class="course-stat">
+                                    <div class="course-stat-number">18/30</div>
+                                    <div class="course-stat-label">Cupo</div>
+                                </div>
+                                <div class="course-stat">
+                                    <div class="course-stat-number">4</div>
+                                    <div class="course-stat-label">Créditos</div>
+                                </div>
+                                <div class="course-stat">
+                                    <div class="course-stat-number">8</div>
+                                    <div class="course-stat-label">Lecciones</div>
+                                </div>
+                            </div>
+                            <div style="margin: 1rem 0; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
+                                <strong>Profesor:</strong> Juan Pérez<br>
+                                <strong>Período:</strong> 2025-1
+                            </div>
+                            <div class="course-actions-card">
+                                <button class="btn-small btn-primary" onclick="enrollInCourse(2)">Inscribirse</button>
+                                <a href="#" class="btn-small btn-outline" onclick="previewCourse(2)">Vista Previa</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mis cursos inscritos -->
+                <div id="my-courses" style="display: none;">
+                    <h3 style="color: #2c3e50; margin-bottom: 1rem;">Mis Cursos Inscritos</h3>
+                    <div class="courses-grid">
+                        <div class="course-card">
+                            <div class="course-card-header">
+                                <div>
+                                    <h3 class="course-title">Programación I</h3>
+                                    <p class="course-code">PRG101</p>
+                                </div>
+                                <span class="course-status active">Inscrito</span>
+                            </div>
+                            <p class="course-description">Introducción a la programación con conceptos fundamentales y práctica.</p>
+                            <div class="course-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 65%"></div>
+                                </div>
+                                <div class="progress-text">65% completado</div>
+                            </div>
+                            <div class="course-stats">
+                                <div class="course-stat">
+                                    <div class="course-stat-number">8.5</div>
+                                    <div class="course-stat-label">Promedio</div>
+                                </div>
+                                <div class="course-stat">
+                                    <div class="course-stat-number">7/10</div>
+                                    <div class="course-stat-label">Lecciones</div>
+                                </div>
+                                <div class="course-stat">
+                                    <div class="course-stat-number">3/5</div>
+                                    <div class="course-stat-label">Actividades</div>
+                                </div>
+                            </div>
+                            <div class="course-actions-card">
+                                <a href="#" class="btn-small btn-primary" onclick="continueCourse(3)">Continuar</a>
+                                <a href="#" class="btn-small btn-outline" onclick="viewGrades(3)">Ver Calificaciones</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             </div>
         </div>
         </div>

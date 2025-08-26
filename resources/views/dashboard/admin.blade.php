@@ -102,8 +102,120 @@
                 <h1 class="section-title">Cursos</h1>
                 <p class="section-subtitle">Gestión de cursos y materias</p>
             </div>
-            <div class="cursos-content">
-                <p>Contenido de la sección de cursos...</p>
+            <div class="course-management">
+                <div class="course-header">
+                    <h2 style="color: #2c3e50; margin: 0;">Gestión de Cursos</h2>
+                    <div class="course-actions">
+                        <a href="#" class="btn-primary" onclick="showCreateCourseForm()">
+                            ➕ Crear Nuevo Curso
+                        </a>
+                        <a href="#" class="btn-secondary" onclick="loadAllCourses()">
+                            📚 Ver Todos los Cursos
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Formulario para crear curso -->
+                <div id="create-course-form" style="display: none; background: #f8f9fa; padding: 2rem; border-radius: 12px; margin: 2rem 0;">
+                    <h3 style="color: #2c3e50; margin-bottom: 1.5rem;">Crear Nuevo Curso</h3>
+                    <form id="course-form" method="POST" action="/cursos">
+                        @csrf
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Nombre del Curso</label>
+                                <input type="text" name="nombre" class="form-input" required placeholder="Ej: Matemáticas Básicas">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Código del Curso</label>
+                                <input type="text" name="codigo" class="form-input" required placeholder="Ej: MAT101">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Créditos</label>
+                                <select name="creditos" class="form-select" required>
+                                    <option value="">Seleccionar créditos</option>
+                                    <option value="1">1 Crédito</option>
+                                    <option value="2">2 Créditos</option>
+                                    <option value="3">3 Créditos</option>
+                                    <option value="4">4 Créditos</option>
+                                    <option value="5">5 Créditos</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Maestro Asignado</label>
+                                <select name="maestro_id" class="form-select" required>
+                                    <option value="">Seleccionar maestro</option>
+                                    <option value="{{ Auth::id() }}">{{ Auth::user()->name }} (Yo)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Cupo Máximo</label>
+                                <input type="number" name="cupo_maximo" class="form-input" value="30" min="1" max="100">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Período Académico</label>
+                                <input type="text" name="periodo_academico" class="form-input" value="2025-1" placeholder="Ej: 2025-1">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Descripción</label>
+                            <textarea name="descripcion" class="form-textarea" rows="4" placeholder="Describe el contenido y objetivos del curso..."></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary">Crear Curso</button>
+                            <button type="button" class="btn-secondary" onclick="hideCreateCourseForm()">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Lista de cursos -->
+                <div id="courses-list">
+                    <div class="courses-grid">
+                        <!-- Curso de ejemplo -->
+                        <div class="course-card">
+                            <div class="course-card-header">
+                                <div>
+                                    <h3 class="course-title">Matemáticas I</h3>
+                                    <p class="course-code">MAT101</p>
+                                </div>
+                                <span class="course-status active">Activo</span>
+                            </div>
+                            <p class="course-description">Curso básico de matemáticas que cubre álgebra, geometría y trigonometría fundamental.</p>
+                            <div class="course-stats">
+                                <div class="course-stat">
+                                    <div class="course-stat-number">25</div>
+                                    <div class="course-stat-label">Estudiantes</div>
+                                </div>
+                                <div class="course-stat">
+                                    <div class="course-stat-number">4</div>
+                                    <div class="course-stat-label">Créditos</div>
+                                </div>
+                                <div class="course-stat">
+                                    <div class="course-stat-number">12</div>
+                                    <div class="course-stat-label">Lecciones</div>
+                                </div>
+                            </div>
+                            <div class="course-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 75%"></div>
+                                </div>
+                                <div class="progress-text">75% completado por los estudiantes</div>
+                            </div>
+                            <div class="course-actions-card">
+                                <a href="#" class="btn-small btn-primary">Ver Curso</a>
+                                <a href="#" class="btn-small btn-outline">Editar</a>
+                            </div>
+                        </div>
+                        
+                        <!-- Tarjeta para crear nuevo curso -->
+                        <div class="course-card" style="border: 2px dashed #ddd; display: flex; align-items: center; justify-content: center; min-height: 300px; cursor: pointer;" onclick="showCreateCourseForm()">
+                            <div style="text-align: center; color: #6c757d;">
+                                <div style="font-size: 3rem; margin-bottom: 1rem;">➕</div>
+                                <h3>Crear Nuevo Curso</h3>
+                                <p>Haz clic para agregar un nuevo curso</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 

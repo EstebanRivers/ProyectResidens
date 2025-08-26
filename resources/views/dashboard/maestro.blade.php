@@ -105,8 +105,187 @@
                 <h1 class="section-title">Mis Cursos</h1>
                 <p class="section-subtitle">Gestión de cursos y calificaciones</p>
             </div>
-            <div class="cursos-content">
-                <p>Contenido de la sección de cursos del maestro...</p>
+            <div class="course-management">
+                <div class="course-header">
+                    <h2 style="color: #2c3e50; margin: 0;">Mis Cursos</h2>
+                    <div class="course-actions">
+                        <a href="#" class="btn-primary" onclick="showCreateCourseForm()">
+                            ➕ Crear Nuevo Curso
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Formulario para crear curso -->
+                <div id="create-course-form" style="display: none; background: #f8f9fa; padding: 2rem; border-radius: 12px; margin: 2rem 0;">
+                    <h3 style="color: #2c3e50; margin-bottom: 1.5rem;">Crear Nuevo Curso</h3>
+                    <form id="course-form" method="POST" action="/cursos">
+                        @csrf
+                        <input type="hidden" name="maestro_id" value="{{ Auth::id() }}">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label class="form-label">Nombre del Curso</label>
+                                <input type="text" name="nombre" class="form-input" required placeholder="Ej: Física General">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Código del Curso</label>
+                                <input type="text" name="codigo" class="form-input" required placeholder="Ej: FIS101">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Créditos</label>
+                                <select name="creditos" class="form-select" required>
+                                    <option value="">Seleccionar créditos</option>
+                                    <option value="1">1 Crédito</option>
+                                    <option value="2">2 Créditos</option>
+                                    <option value="3">3 Créditos</option>
+                                    <option value="4">4 Créditos</option>
+                                    <option value="5">5 Créditos</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Cupo Máximo</label>
+                                <input type="number" name="cupo_maximo" class="form-input" value="30" min="1" max="100">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Período Académico</label>
+                                <input type="text" name="periodo_academico" class="form-input" value="2025-1" placeholder="Ej: 2025-1">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Descripción</label>
+                            <textarea name="descripcion" class="form-textarea" rows="4" placeholder="Describe el contenido y objetivos del curso..."></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary">Crear Curso</button>
+                            <button type="button" class="btn-secondary" onclick="hideCreateCourseForm()">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Lista de cursos del maestro -->
+                <div id="courses-list">
+                    <div class="courses-grid">
+                        <!-- Curso de ejemplo -->
+                        <div class="course-card">
+                            <div class="course-card-header">
+                                <div>
+                                    <h3 class="course-title">Física General</h3>
+                                    <p class="course-code">FIS101</p>
+                                </div>
+                                <span class="course-status active">Activo</span>
+                            </div>
+                            <p class="course-description">Introducción a los conceptos fundamentales de la física: mecánica, termodinámica y ondas.</p>
+                            <div class="course-stats">
+                                <div class="course-stat">
+                                    <div class="course-stat-number">18</div>
+                                    <div class="course-stat-label">Estudiantes</div>
+                                </div>
+                                <div class="course-stat">
+                                    <div class="course-stat-number">4</div>
+                                    <div class="course-stat-label">Créditos</div>
+                                </div>
+                                <div class="course-stat">
+                                    <div class="course-stat-number">8</div>
+                                    <div class="course-stat-label">Lecciones</div>
+                                </div>
+                            </div>
+                            <div class="course-actions-card">
+                                <a href="#" class="btn-small btn-primary" onclick="showCourseContent()">Gestionar Contenido</a>
+                                <a href="#" class="btn-small btn-outline">Editar Curso</a>
+                            </div>
+                        </div>
+                        
+                        <!-- Tarjeta para crear nuevo curso -->
+                        <div class="course-card" style="border: 2px dashed #ddd; display: flex; align-items: center; justify-content: center; min-height: 300px; cursor: pointer;" onclick="showCreateCourseForm()">
+                            <div style="text-align: center; color: #6c757d;">
+                                <div style="font-size: 3rem; margin-bottom: 1rem;">➕</div>
+                                <h3>Crear Nuevo Curso</h3>
+                                <p>Haz clic para agregar un nuevo curso</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Modal para gestionar contenido del curso -->
+                <div id="course-content-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+                    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 12px; padding: 2rem; max-width: 800px; width: 90%; max-height: 80%; overflow-y: auto;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                            <h2 style="color: #2c3e50; margin: 0;">Gestionar Contenido - Física General</h2>
+                            <button onclick="hideCourseContent()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">✕</button>
+                        </div>
+                        
+                        <div class="content-tabs">
+                            <button class="content-tab active" onclick="showContentTab('lessons')">📚 Lecciones</button>
+                            <button class="content-tab" onclick="showContentTab('activities')">📝 Actividades</button>
+                            <button class="content-tab" onclick="showContentTab('students')">👥 Estudiantes</button>
+                        </div>
+                        
+                        <div id="lessons-content" class="tab-content">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                <h3>Lecciones del Curso</h3>
+                                <button class="btn-primary" onclick="showAddContentForm()">➕ Agregar Contenido</button>
+                            </div>
+                            
+                            <div class="content-list">
+                                <div class="content-item">
+                                    <div class="content-icon">🎥</div>
+                                    <div class="content-info">
+                                        <div class="content-title">Introducción a la Mecánica</div>
+                                        <div class="content-description">Video explicativo sobre conceptos básicos</div>
+                                    </div>
+                                    <div class="content-status">
+                                        <span class="status-badge status-completed">Publicado</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="content-item">
+                                    <div class="content-icon">📄</div>
+                                    <div class="content-info">
+                                        <div class="content-title">Leyes de Newton</div>
+                                        <div class="content-description">Documento PDF con ejercicios</div>
+                                    </div>
+                                    <div class="content-status">
+                                        <span class="status-badge status-pending">Borrador</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="activities-content" class="tab-content" style="display: none;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                <h3>Actividades y Evaluaciones</h3>
+                                <button class="btn-primary" onclick="showAddActivityForm()">➕ Crear Actividad</button>
+                            </div>
+                            
+                            <div class="content-list">
+                                <div class="content-item">
+                                    <div class="content-icon">☑️</div>
+                                    <div class="content-info">
+                                        <div class="content-title">Quiz: Conceptos Básicos</div>
+                                        <div class="content-description">10 preguntas de opción múltiple</div>
+                                    </div>
+                                    <div class="content-status">
+                                        <span class="status-badge status-completed">Activo</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="students-content" class="tab-content" style="display: none;">
+                            <h3>Estudiantes Inscritos (18)</h3>
+                            <div style="margin-top: 1rem;">
+                                <div style="padding: 1rem; background: #f8f9fa; border-radius: 8px; margin-bottom: 0.5rem;">
+                                    <strong>María González</strong> - Progreso: 75%
+                                </div>
+                                <div style="padding: 1rem; background: #f8f9fa; border-radius: 8px; margin-bottom: 0.5rem;">
+                                    <strong>Juan Pérez</strong> - Progreso: 60%
+                                </div>
+                                <div style="padding: 1rem; background: #f8f9fa; border-radius: 8px; margin-bottom: 0.5rem;">
+                                    <strong>Ana López</strong> - Progreso: 90%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         </div>
