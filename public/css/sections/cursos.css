@@ -13,7 +13,7 @@
     margin-top: 2rem;
 }
 
-.curso-card {
+.course-card {
     background: #f8f9fa;
     border-radius: 8px;
     padding: 1.5rem;
@@ -21,62 +21,62 @@
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.curso-card:hover {
+.course-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
-.curso-header {
+.course-header {
     display: flex;
     justify-content: space-between;
     align-items: start;
     margin-bottom: 1rem;
 }
 
-.curso-title {
+.course-title {
     font-size: 1.3rem;
     color: #333;
     margin: 0;
     font-weight: 600;
 }
 
-.curso-code {
+.course-code {
     font-size: 0.9rem;
     color: #666;
     margin: 0.25rem 0 0 0;
 }
 
-.curso-status {
+.course-status {
     padding: 0.25rem 0.75rem;
     border-radius: 20px;
     font-size: 0.8rem;
     font-weight: 500;
 }
 
-.curso-status.active {
+.course-status.active {
     background: #d4edda;
     color: #155724;
 }
 
-.curso-status.inactive {
+.course-status.inactive {
     background: #f8d7da;
     color: #721c24;
 }
 
-.curso-description {
+.course-description {
     color: #666;
     margin-bottom: 1rem;
     line-height: 1.5;
 }
 
-.curso-stats {
+.course-stats {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1rem;
     margin-top: 1rem;
 }
 
-.stat-item {
+.course-stat {
     text-align: center;
     padding: 0.75rem;
     background: white;
@@ -84,19 +84,19 @@
     border: 1px solid #e9ecef;
 }
 
-.stat-number {
+.course-stat-number {
     font-size: 1.5rem;
     font-weight: bold;
     color: #c8860d;
     margin-bottom: 0.25rem;
 }
 
-.stat-label {
+.course-stat-label {
     font-size: 0.8rem;
     color: #666;
 }
 
-/* Estilos para el sistema de cursos estilo Khan Academy */
+/* Estilos para el sistema de cursos */
 .course-management {
     background: white;
     border-radius: 12px;

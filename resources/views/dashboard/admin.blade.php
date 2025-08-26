@@ -10,7 +10,7 @@
 <div class="dashboard-container">
     <div class="sidebar">
         <div class="sidebar-header">
-            <img src="{{ asset('images/uhta-logo.png') }}" alt="UHTA">
+            <img src="{{ asset('images/LOGO2.png') }}" alt="UHTA">
         </div>
         
         <nav class="sidebar-nav">
@@ -39,7 +39,7 @@
                 </button>
             </form>
             <div class="footer-logo">
-                <img src="{{ asset('images/uhta-logo.png') }}" alt="UHTA">
+                <img src="{{ asset('images/LOGO3.png') }}" alt="UHTA2">
             </div>
         </div>
     </div>
