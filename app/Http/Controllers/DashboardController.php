@@ -12,63 +12,38 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $user = auth()->user();
-        
-        // Redirigir según el rol
+        $stats = $this->getStatsForUser(auth()->user());
+        return view('dashboard.index', compact('stats'));
+    }
+    
+    private function getStatsForUser($user)
+    {
         switch($user->role) {
             case 'administrador':
-                return redirect()->route('dashboard.admin');
+                return [
+                    'total_estudiantes' => User::alumnos()->count(),
+                    'total_maestros' => User::maestros()->count(),
+                    'cursos_activos' => Curso::activos()->count(),
+                    'total_calificaciones' => Calificacion::count()
+                ];
+                
             case 'maestro':
-                return redirect()->route('dashboard.maestro');
+                $cursos = $user->cursosComoMaestro()->with('estudiantes')->get();
+                return [
+                    'total_cursos' => $cursos->count(),
+                    'total_estudiantes' => $cursos->sum(fn($curso) => $curso->estudiantes->count()),
+                    'cursos_activos' => $cursos->where('activo', true)->count()
+                ];
+                
             case 'alumno':
-                return redirect()->route('dashboard.alumno');
+                return [
+                    'cursos_inscritos' => $user->cursosComoEstudiante->count(),
+                    'promedio_general' => round($user->calificaciones()->avg('calificacion'), 2),
+                    'calificaciones_recientes' => $user->calificaciones()->count()
+                ];
+                
             default:
-                return view('dashboard.general');
+                return [];
         }
-    }
-    
-    public function admin()
-    {
-        $stats = [
-            'total_estudiantes' => User::alumnos()->count(),
-            'total_maestros' => User::maestros()->count(),
-            'cursos_activos' => Curso::activos()->count(),
-            'total_calificaciones' => Calificacion::count()
-        ];
-        
-        return view('dashboard.admin', compact('stats'));
-    }
-    
-    public function maestro()
-    {
-        $maestro = auth()->user();
-        $cursos = $maestro->cursosComoMaestro()->with('estudiantes')->get();
-        $totalEstudiantes = $cursos->sum(function($curso) {
-            return $curso->estudiantes->count();
-        });
-        
-        $stats = [
-            'total_cursos' => $cursos->count(),
-            'total_estudiantes' => $totalEstudiantes,
-            'cursos_activos' => $cursos->where('activo', true)->count()
-        ];
-        
-        return view('dashboard.maestro', compact('stats', 'cursos'));
-    }
-    
-    public function alumno()
-    {
-        $alumno = auth()->user();
-        $cursosInscritos = $alumno->cursosComoEstudiante;
-        $calificaciones = $alumno->calificaciones()->with('curso')->latest()->take(5)->get();
-        $promedioGeneral = $alumno->calificaciones()->avg('calificacion');
-        
-        $stats = [
-            'cursos_inscritos' => $cursosInscritos->count(),
-            'promedio_general' => round($promedioGeneral, 2),
-            'calificaciones_recientes' => $calificaciones->count()
-        ];
-        
-        return view('dashboard.alumno', compact('stats', 'cursosInscritos', 'calificaciones'));
     }
 }

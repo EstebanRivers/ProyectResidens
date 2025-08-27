@@ -29,28 +29,6 @@ Route::middleware('auth')->group(function () {
     // Dashboard general
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
-    // Dashboard específicos por rol
-    Route::middleware('role:administrador')->group(function () {
-        Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->name('dashboard.admin');
-        Route::get('/usuarios', [AdminController::class, 'usuarios'])->name('admin.usuarios');
-        Route::get('/cursos', [AdminController::class, 'cursos'])->name('admin.cursos');
-        Route::get('/reportes', [AdminController::class, 'reportes'])->name('admin.reportes');
-    });
-    
-    Route::middleware('role:maestro')->group(function () {
-        Route::get('/dashboard/maestro', [DashboardController::class, 'maestro'])->name('dashboard.maestro');
-        Route::get('/maestro/cursos', [MaestroController::class, 'cursos'])->name('maestro.cursos');
-        Route::get('/maestro/calificaciones', [MaestroController::class, 'calificaciones'])->name('maestro.calificaciones');
-        Route::post('/calificaciones', [MaestroController::class, 'registrarCalificacion'])->name('maestro.calificaciones.store');
-    });
-    
-    Route::middleware('role:alumno')->group(function () {
-        Route::get('/dashboard/alumno', [DashboardController::class, 'alumno'])->name('dashboard.alumno');
-        Route::get('/alumno/perfil', [AlumnoController::class, 'perfil'])->name('alumno.perfil');
-        Route::get('/alumno/calificaciones', [AlumnoController::class, 'calificaciones'])->name('alumno.calificaciones');
-        Route::get('/alumno/cursos', [AlumnoController::class, 'cursos'])->name('alumno.cursos');
-    });
-    
     // Rutas de cursos (accesibles según rol)
     Route::resource('cursos', \App\Http\Controllers\CursoController::class);
     Route::post('/cursos/{curso}/inscribir', [\App\Http\Controllers\CursoController::class, 'inscribir'])->name('cursos.inscribir');
@@ -81,6 +59,19 @@ Route::middleware('auth')->group(function () {
     Route::get('/cursos/{curso}/actividades/{actividad}', [\App\Http\Controllers\ActividadController::class, 'show'])->name('actividades.show');
     Route::post('/cursos/{curso}/actividades/{actividad}/responder', [\App\Http\Controllers\ActividadController::class, 'responder'])->name('actividades.responder');
     Route::get('/cursos/{curso}/actividades/{actividad}/resultado', [\App\Http\Controllers\ActividadController::class, 'resultado'])->name('actividades.resultado');
+    
+    // Rutas específicas por rol
+    Route::middleware('role:maestro')->group(function () {
+        Route::get('/maestro/cursos', [MaestroController::class, 'cursos'])->name('maestro.cursos');
+        Route::get('/maestro/calificaciones', [MaestroController::class, 'calificaciones'])->name('maestro.calificaciones');
+        Route::post('/calificaciones', [MaestroController::class, 'registrarCalificacion'])->name('maestro.calificaciones.store');
+    });
+    
+    Route::middleware('role:alumno')->group(function () {
+        Route::get('/alumno/perfil', [AlumnoController::class, 'perfil'])->name('alumno.perfil');
+        Route::get('/alumno/calificaciones', [AlumnoController::class, 'calificaciones'])->name('alumno.calificaciones');
+        Route::get('/alumno/cursos', [AlumnoController::class, 'cursos'])->name('alumno.cursos');
+    });
 });
 
 require __DIR__.'/auth.php';
