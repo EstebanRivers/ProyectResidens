@@ -21,98 +21,119 @@ body {
 /* Sidebar Styles */
 .sidebar {
     width: 280px;
-    background: #e8e8e8;
+    background: #f8f9fa;
     display: flex;
     flex-direction: column;
     box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    padding: 1rem;
 }
 
 .sidebar-header {
-    padding: 2rem 1.5rem;
+    padding: 1.5rem 0;
     text-align: center;
-    border-bottom: 1px solid #d0d0d0;
+    margin-bottom: 1rem;
 }
 
 .sidebar-logo {
-    width: 120px;
+    width: 100px;
     height: auto;
 }
 
 .sidebar-nav {
     flex: 1;
-    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
 .nav-item {
     display: flex;
     align-items: center;
-    padding: 1rem 1.5rem;
-    color: #333;
+    padding: 1rem;
+    color: #4a5568;
     text-decoration: none;
-    transition: all 0.3s ease;
-    border-bottom: 1px solid #d0d0d0;
+    transition: all 0.2s ease;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border: 1px solid #e2e8f0;
     font-size: 0.95rem;
     font-weight: 500;
+    margin-bottom: 0.25rem;
     cursor: pointer;
 }
 
 .nav-item:hover {
-    background: #d0d0d0;
-    color: #000;
+    background: #f7fafc;
+    transform: translateX(2px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
 .nav-item.active {
-    background: #c8860d;
+    background: #4299e1;
     color: white;
+    box-shadow: 0 2px 8px rgba(66, 153, 225, 0.3);
 }
 
 .nav-icon {
     margin-right: 0.75rem;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
+    width: 20px;
+    text-align: center;
 }
 
 .sidebar-footer {
-    padding: 1.5rem;
-    border-top: 1px solid #d0d0d0;
-    background: #1c0764;
+    margin-top: auto;
+    padding: 0;
 }
 
 .logout-form {
     margin: 0;
+    margin-bottom: 1rem;
 }
 
 .logout-btn {
     display: flex;
     align-items: center;
     width: 100%;
-    padding: 0.75rem;
-    background: transparent;
-    color: white;
-    border: none;
+    padding: 1rem;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    color: #4a5568;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     font-size: 0.95rem;
     font-weight: 500;
 }
 
 .logout-btn:hover {
-    background: rgba(255,255,255,0.1);
+    background: #f7fafc;
+    transform: translateX(2px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
 .logout-icon {
     margin-right: 0.75rem;
-    font-size: 1.1rem;
-}
-
-.footer-logo {
-    margin-top: 1rem;
+    font-size: 1.2rem;
+    width: 20px;
     text-align: center;
 }
 
+.footer-logo {
+    margin-top: 0;
+    text-align: center;
+    background: #2d3748;
+    padding: 1.5rem 1rem;
+    border-radius: 8px;
+    margin: 0 -1rem -1rem -1rem;
+}
+
 .footer-logo img {
-    width: 150px;
+    width: 120px;
     height: auto;
-    opacity: 0.8;
+    opacity: 1;
 }
 
 /* Main Content */

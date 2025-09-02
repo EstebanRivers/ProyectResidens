@@ -4,35 +4,43 @@
     </div>
     
     <nav class="sidebar-nav">
-        @php
-            $menuItems = [
-                'mi-informacion' => ['icon' => '👤', 'label' => 'Mi información'],
-                'cursos' => ['icon' => '💻', 'label' => 'Cursos'],
-                'facturacion' => ['icon' => '📷', 'label' => 'Facturación'],
-                'control-administrativo' => ['icon' => '📋', 'label' => 'Control Administrativo'],
-                'ajustes' => ['icon' => '👥', 'label' => 'Ajustes']
-            ];
-        @endphp
+        <a href="#" class="nav-item" data-section="mi-informacion">
+            <span class="nav-icon">👤</span>
+            <span class="nav-label">Mi información</span>
+        </a>
         
-        @foreach($menuItems as $section => $item)
-            <a href="#" class="nav-item" data-section="{{ $section }}">
-                <span class="nav-icon">{{ $item['icon'] }}</span>
-                <span class="nav-label">{{ $item['label'] }}</span>
-            </a>
-        @endforeach
+        <a href="#" class="nav-item" data-section="cursos">
+            <span class="nav-icon">💻</span>
+            <span class="nav-label">Cursos</span>
+        </a>
+        
+        <a href="#" class="nav-item" data-section="facturacion">
+            <span class="nav-icon">📷</span>
+            <span class="nav-label">Facturación</span>
+        </a>
+        
+        <a href="#" class="nav-item" data-section="control-administrativo">
+            <span class="nav-icon">📋</span>
+            <span class="nav-label">Control Administrativo</span>
+        </a>
+        
+        <a href="#" class="nav-item" data-section="ajustes">
+            <span class="nav-icon">👥</span>
+            <span class="nav-label">Ajustes</span>
+        </a>
     </nav>
     
     <div class="sidebar-footer">
         <form method="POST" action="{{ route('logout') }}" class="logout-form">
             @csrf
             <button type="submit" class="logout-btn">
-                <span class="logout-icon">🚪</span>
+                <span class="logout-icon">🔓</span>
                 <span class="logout-label">Cerrar sesión</span>
             </button>
         </form>
         
         <div class="footer-logo">
-            <img src="{{ asset('images/LOGO3.png') }}" alt="Mundo Imperial">
+            <img src="{{ asset('images/LOGO3.png') }}" alt="Mundo Imperial" style="filter: brightness(0) invert(1);">
         </div>
     </div>
 </div>
