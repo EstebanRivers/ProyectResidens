@@ -40,7 +40,7 @@
         </form>
         
         <div class="footer-logo">
-            <img src="{{ asset('images/LOGO3.png') }}" alt="Mundo Imperial" style="filter: brightness(0) invert(1);">
+            <img src="{{ asset('images/LOGO3.png') }}" alt="Mundo Imperial">
         </div>
     </div>
 </div>

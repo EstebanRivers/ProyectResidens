@@ -2,10 +2,10 @@
     <div class="courses-management">
         <div class="courses-header">
             <div class="header-actions">
-                <button class="btn btn-primary" onclick="showCreateCourseForm()">
+                <a href="{{ route('cursos.create') }}" class="btn btn-primary">
                     <span class="btn-icon">➕</span>
                     Crear Nuevo Curso
-                </button>
+                </a>
             </div>
         </div>
 

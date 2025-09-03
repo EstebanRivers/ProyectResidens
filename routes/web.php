@@ -31,6 +31,7 @@ Route::middleware('auth')->group(function () {
     
     // Rutas de cursos (accesibles según rol)
     Route::resource('cursos', \App\Http\Controllers\CursoController::class);
+    Route::post('/cursos/store-wizard', [\App\Http\Controllers\CursoController::class, 'storeWizard'])->name('cursos.store-wizard');
     Route::post('/cursos/{curso}/inscribir', [\App\Http\Controllers\CursoController::class, 'inscribir'])->name('cursos.inscribir');
     
     // Rutas de contenido (solo admin y maestros)
