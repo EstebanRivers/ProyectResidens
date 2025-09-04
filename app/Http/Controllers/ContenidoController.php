@@ -1,169 +1,346 @@
-<?php
+/* Dashboard Main Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-namespace App\Http\Controllers;
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f5f5f5;
+    height: 100vh;
+    overflow: hidden;
+}
 
-use App\Models\Curso;
-use App\Models\Contenido;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
+.dashboard-container {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+}
 
-class ContenidoController extends Controller
-{
-    public function create(Curso $curso)
-    {
-        $this->authorize('update', $curso);
-        return view('contenidos.create', compact('curso'));
+/* Sidebar Styles - Nuevo diseño según imagen */
+.sidebar {
+    width: 300px;
+    background: #f1f1f1;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    min-height: 100vh;
+    min-height: 100vh;
+}
+
+.sidebar-header {
+    background: #f1f1f1;
+    padding: 2rem 1rem 1rem 1rem;
+    text-align: center;
+    border-bottom: none;
+    border-bottom: none;
+}
+
+.sidebar-logo {
+    width: 140px;
+    height: auto;
+    margin-bottom: 0;
+    margin-bottom: 0;
+}
+
+.sidebar-nav {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    padding: 1rem;
+    gap: 0.5rem;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    color: #333;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    font-size: 0.95rem;
+    font-weight: 400;
+    cursor: pointer;
+    border: none;
+    margin-bottom: 0.25rem;
+}
+
+.nav-item:hover {
+    background: #f8f9fa;
+    transform: translateX(2px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.nav-item.active {
+    background: #4299e1;
+    color: white;
+    box-shadow: 0 2px 8px rgba(66, 153, 225, 0.3);
+}
+
+.nav-icon {
+    margin-right: 0.75rem;
+    font-size: 1.1rem;
+    width: 20px;
+    text-align: center;
+}
+
+.sidebar-footer {
+    margin-top: auto;
+    padding: 1rem;
+    padding: 1rem;
+}
+
+    margin-bottom: 1rem;
+    margin-bottom: 1rem;
+}
+
+.logout-btn {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    padding: 1rem 1.5rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    color: #333;
+    color: #333;
+    transition: all 0.2s ease;
+    transition: all 0.2s ease;
+    font-weight: 400;
+    font-weight: 400;
+}
+
+    background: #f8f9fa;
+    transform: translateX(2px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.logout-icon {
+    font-size: 1.1rem;
+    font-size: 1.1rem;
+    width: 20px;
+    text-align: center;
+}
+
+    background: #2d3748;
+    padding: 1.5rem 1rem;
+    border-radius: 8px;
+    border-radius: 8px;
+    margin: 0;
+    margin: 0;
+}
+
+.footer-logo img {
+    width: 140px;
+    height: auto;
+    filter: brightness(0) invert(1);
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    background: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.content-header {
+    padding: 2rem;
+    border-bottom: 1px solid #e0e0e0;
+    background: white;
+}
+
+.page-title {
+    font-size: 2rem;
+    color: #333;
+    margin: 0;
+    font-weight: 600;
+}
+
+.page-subtitle {
+    font-size: 1rem;
+    color: #666;
+    margin: 0.5rem 0 0 0;
+}
+
+.content-body {
+    flex: 1;
+    padding: 2rem;
+    overflow-y: auto;
+}
+
+/* Dashboard Sections */
+.dashboard-sections {
+    position: relative;
+    height: 100%;
+}
+
+.section-content {
+    display: none;
+    height: 100%;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.section-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Welcome Section */
+.welcome-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.welcome-content {
+    text-align: center;
+    max-width: 500px;
+}
+
+.welcome-logo {
+    width: 200px;
+    height: auto;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+.welcome-text {
+    font-size: 1.5rem;
+    color: #333;
+    font-weight: 500;
+    margin: 0;
+}
+
+/* Info Grid */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    height: fit-content;
+}
+
+.info-card {
+    transition: all 0.2s ease;
+    padding: 2rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border-left: 4px solid #ffa726;
+}
+
+.info-card h3 {
+    color: #333;
+    margin-bottom: 1.5rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.info-items {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+}
+
+    background: #f8f9fa;
+    transform: translateX(2px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    font-size: 1rem;
+    font-weight: 400;
+}
+    background: #4299e1;
+/* Stats Grid */
+    box-shadow: 0 2px 8px rgba(66, 153, 225, 0.3);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+}
+    font-size: 1.1rem;
+.stat-item {
+    text-align: center;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.stat-number {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #ffa726;
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .dashboard-container {
+        flex-direction: column;
     }
-
-    public function store(Request $request, Curso $curso)
-    {
-        $this->authorize('update', $curso);
-        
-        $validated = $request->validate([
-            'titulo' => 'required|string|max:255',
-            'descripcion' => 'nullable|string',
-            'tipo' => 'required|in:video,texto,pdf,imagen,audio',
-            'archivo' => 'nullable|file|max:100000', // 100MB max
-            'contenido_texto' => 'nullable|string',
-            'orden' => 'required|integer|min:0'
-        ]);
-
-        $contenido = new Contenido($validated);
-        $contenido->curso_id = $curso->id;
-
-        // Manejar archivo subido
-        if ($request->hasFile('archivo')) {
-            $archivo = $request->file('archivo');
-            $path = $archivo->store('contenidos/' . $curso->id, 'public');
-            $contenido->archivo_url = Storage::url($path);
-            
-            // Guardar metadata del archivo
-            $contenido->metadata = [
-                'nombre_original' => $archivo->getClientOriginalName(),
-                'tamaño' => $archivo->getSize(),
-                'tipo_mime' => $archivo->getMimeType()
-            ];
-        }
-
-        $contenido->save();
-
-        return redirect()->route('cursos.show', $curso)
-                        ->with('success', 'Contenido agregado exitosamente');
+    
+    .sidebar {
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        overflow-x: auto;
+        padding: 1rem;
     }
-
-    public function show(Curso $curso, Contenido $contenido)
-    {
-        $user = Auth::user();
-        
-        // Verificar acceso
-        if ($user->isAlumno() && !$user->cursosComoEstudiante()->where('curso_id', $curso->id)->exists()) {
-            abort(403, 'No tienes acceso a este contenido');
-        }
-
-        // Registrar progreso para alumnos
-        if ($user->isAlumno()) {
-            $progreso = $curso->progreso()
-                             ->where('estudiante_id', $user->id)
-                             ->where('contenido_id', $contenido->id)
-                             ->where('tipo', 'contenido')
-                             ->first();
-
-            if (!$progreso) {
-                $curso->progreso()->create([
-                    'estudiante_id' => $user->id,
-                    'contenido_id' => $contenido->id,
-                    'tipo' => 'contenido',
-                    'fecha_inicio' => now()
-                ]);
-            }
-        }
-
-        return view('contenidos.show', compact('curso', 'contenido'));
+    
+    .sidebar-nav {
+        display: flex;
+        flex-direction: row;
+        gap: 0.5rem;
     }
-
-    public function marcarCompletado(Curso $curso, Contenido $contenido)
-    {
-        $user = Auth::user();
-        
-        if (!$user->isAlumno()) {
-            return response()->json(['error' => 'Solo los alumnos pueden marcar contenido como completado'], 403);
-        }
-
-        $progreso = $curso->progreso()
-                         ->where('estudiante_id', $user->id)
-                         ->where('contenido_id', $contenido->id)
-                         ->where('tipo', 'contenido')
-                         ->first();
-
-        if ($progreso && !$progreso->completado) {
-            $progreso->update([
-                'completado' => true,
-                'fecha_completado' => now()
-            ]);
-        }
-
-        return response()->json(['success' => true]);
+    
+    .nav-item {
+        white-space: nowrap;
+        min-width: 150px;
     }
-
-    public function edit(Curso $curso, Contenido $contenido)
-    {
-        $this->authorize('update', $curso);
-        return view('contenidos.edit', compact('curso', 'contenido'));
+    
+    .content-header {
+        padding: 1rem;
     }
-
-    public function update(Request $request, Curso $curso, Contenido $contenido)
-    {
-        $this->authorize('update', $curso);
-        
-        $validated = $request->validate([
-            'titulo' => 'required|string|max:255',
-            'descripcion' => 'nullable|string',
-            'tipo' => 'required|in:video,texto,pdf,imagen,audio',
-            'archivo' => 'nullable|file|max:100000',
-            'contenido_texto' => 'nullable|string',
-            'orden' => 'required|integer|min:0',
-            'activo' => 'boolean'
-        ]);
-
-        // Manejar nuevo archivo
-        if ($request->hasFile('archivo')) {
-            // Eliminar archivo anterior si existe
-            if ($contenido->archivo_url) {
-                $oldPath = str_replace('/storage/', '', $contenido->archivo_url);
-                Storage::disk('public')->delete($oldPath);
-            }
-
-            $archivo = $request->file('archivo');
-            $path = $archivo->store('contenidos/' . $curso->id, 'public');
-            $validated['archivo_url'] = Storage::url($path);
-            
-            $validated['metadata'] = [
-                'nombre_original' => $archivo->getClientOriginalName(),
-                'tamaño' => $archivo->getSize(),
-                'tipo_mime' => $archivo->getMimeType()
-            ];
-        }
-
-        $contenido->update($validated);
-
-        return redirect()->route('cursos.show', $curso)
-                        ->with('success', 'Contenido actualizado exitosamente');
+    
+    .content-body {
+        padding: 1rem;
     }
-
-    public function destroy(Curso $curso, Contenido $contenido)
-    {
-        $this->authorize('update', $curso);
-        
-        // Eliminar archivo si existe
-        if ($contenido->archivo_url) {
-            $path = str_replace('/storage/', '', $contenido->archivo_url);
-            Storage::disk('public')->delete($path);
-        }
-
-        $contenido->delete();
-
-        return redirect()->route('cursos.show', $curso)
-                        ->with('success', 'Contenido eliminado exitosamente');
+    
+    .info-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
     }
 }

@@ -1,78 +1,346 @@
-<?php
+/* Dashboard Main Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-use App\Http\Controllers\ProfileController;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\MaestroController;
-use App\Http\Controllers\AlumnoController;
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f5f5f5;
+    height: 100vh;
+    overflow: hidden;
+}
 
+.dashboard-container {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+}
 
-Route::get('/', function () {
-    return redirect()->route('login');
-});
+/* Sidebar Styles - Nuevo diseño según imagen */
+.sidebar {
+    width: 300px;
+    background: #f1f1f1;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    min-height: 100vh;
+    min-height: 100vh;
+}
 
-// Rutas de autenticación
-Route::middleware('guest')->group(function () {
-    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-    Route::post('/login', [AuthController::class, 'login']);
-});
+.sidebar-header {
+    background: #f1f1f1;
+    padding: 2rem 1rem 1rem 1rem;
+    text-align: center;
+    border-bottom: none;
+    border-bottom: none;
+}
 
-Route::middleware('auth')->group(function () {
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-});
+.sidebar-logo {
+    width: 140px;
+    height: auto;
+    margin-bottom: 0;
+    margin-bottom: 0;
+}
 
-// Rutas protegidas por autenticación
-Route::middleware('auth')->group(function () {
-    
-    // Dashboard general
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    
-    // Rutas de cursos (accesibles según rol)
-    Route::resource('cursos', \App\Http\Controllers\CursoController::class);
-    Route::post('/cursos/store-wizard', [\App\Http\Controllers\CursoController::class, 'storeWizard'])->name('cursos.store-wizard');
-    Route::post('/cursos/{curso}/inscribir', [\App\Http\Controllers\CursoController::class, 'inscribir'])->name('cursos.inscribir');
-    
-    // Rutas de contenido (solo admin y maestros)
-    Route::middleware('role:administrador,maestro')->group(function () {
-        Route::get('/cursos/{curso}/contenidos/create', [\App\Http\Controllers\ContenidoController::class, 'create'])->name('contenidos.create');
-        Route::post('/cursos/{curso}/contenidos', [\App\Http\Controllers\ContenidoController::class, 'store'])->name('contenidos.store');
-        Route::get('/cursos/{curso}/contenidos/{contenido}/edit', [\App\Http\Controllers\ContenidoController::class, 'edit'])->name('contenidos.edit');
-        Route::put('/cursos/{curso}/contenidos/{contenido}', [\App\Http\Controllers\ContenidoController::class, 'update'])->name('contenidos.update');
-        Route::delete('/cursos/{curso}/contenidos/{contenido}', [\App\Http\Controllers\ContenidoController::class, 'destroy'])->name('contenidos.destroy');
-    });
-    
-    // Rutas de contenido (todos los roles autenticados)
-    Route::get('/cursos/{curso}/contenidos/{contenido}', [\App\Http\Controllers\ContenidoController::class, 'show'])->name('contenidos.show');
-    Route::post('/cursos/{curso}/contenidos/{contenido}/completar', [\App\Http\Controllers\ContenidoController::class, 'marcarCompletado'])->name('contenidos.completar');
-    
-    // Rutas de actividades (solo admin y maestros)
-    Route::middleware('role:administrador,maestro')->group(function () {
-        Route::get('/cursos/{curso}/actividades/create', [\App\Http\Controllers\ActividadController::class, 'create'])->name('actividades.create');
-        Route::post('/cursos/{curso}/actividades', [\App\Http\Controllers\ActividadController::class, 'store'])->name('actividades.store');
-        Route::get('/cursos/{curso}/actividades/{actividad}/edit', [\App\Http\Controllers\ActividadController::class, 'edit'])->name('actividades.edit');
-        Route::put('/cursos/{curso}/actividades/{actividad}', [\App\Http\Controllers\ActividadController::class, 'update'])->name('actividades.update');
-        Route::delete('/cursos/{curso}/actividades/{actividad}', [\App\Http\Controllers\ActividadController::class, 'destroy'])->name('actividades.destroy');
-    });
-    
-    // Rutas de actividades (todos los roles autenticados)
-    Route::get('/cursos/{curso}/actividades/{actividad}', [\App\Http\Controllers\ActividadController::class, 'show'])->name('actividades.show');
-    Route::post('/cursos/{curso}/actividades/{actividad}/responder', [\App\Http\Controllers\ActividadController::class, 'responder'])->name('actividades.responder');
-    Route::get('/cursos/{curso}/actividades/{actividad}/resultado', [\App\Http\Controllers\ActividadController::class, 'resultado'])->name('actividades.resultado');
-    
-    // Rutas específicas por rol
-    Route::middleware('role:maestro')->group(function () {
-        Route::get('/maestro/cursos', [MaestroController::class, 'cursos'])->name('maestro.cursos');
-        Route::get('/maestro/calificaciones', [MaestroController::class, 'calificaciones'])->name('maestro.calificaciones');
-        Route::post('/calificaciones', [MaestroController::class, 'registrarCalificacion'])->name('maestro.calificaciones.store');
-    });
-    
-    Route::middleware('role:alumno')->group(function () {
-        Route::get('/alumno/perfil', [AlumnoController::class, 'perfil'])->name('alumno.perfil');
-        Route::get('/alumno/calificaciones', [AlumnoController::class, 'calificaciones'])->name('alumno.calificaciones');
-        Route::get('/alumno/cursos', [AlumnoController::class, 'cursos'])->name('alumno.cursos');
-    });
-});
+.sidebar-nav {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    padding: 1rem;
+    gap: 0.5rem;
+}
 
-require __DIR__.'/auth.php';
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    color: #333;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    font-size: 0.95rem;
+    font-weight: 400;
+    cursor: pointer;
+    border: none;
+    margin-bottom: 0.25rem;
+}
+
+.nav-item:hover {
+    background: #f8f9fa;
+    transform: translateX(2px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.nav-item.active {
+    background: #4299e1;
+    color: white;
+    box-shadow: 0 2px 8px rgba(66, 153, 225, 0.3);
+}
+
+.nav-icon {
+    margin-right: 0.75rem;
+    font-size: 1.1rem;
+    width: 20px;
+    text-align: center;
+}
+
+.sidebar-footer {
+    margin-top: auto;
+    padding: 1rem;
+    padding: 1rem;
+}
+
+    margin-bottom: 1rem;
+    margin-bottom: 1rem;
+}
+
+.logout-btn {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    padding: 1rem 1.5rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    color: #333;
+    color: #333;
+    transition: all 0.2s ease;
+    transition: all 0.2s ease;
+    font-weight: 400;
+    font-weight: 400;
+}
+
+    background: #f8f9fa;
+    transform: translateX(2px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.logout-icon {
+    font-size: 1.1rem;
+    font-size: 1.1rem;
+    width: 20px;
+    text-align: center;
+}
+
+    background: #2d3748;
+    padding: 1.5rem 1rem;
+    border-radius: 8px;
+    border-radius: 8px;
+    margin: 0;
+    margin: 0;
+}
+
+.footer-logo img {
+    width: 140px;
+    height: auto;
+    filter: brightness(0) invert(1);
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    background: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.content-header {
+    padding: 2rem;
+    border-bottom: 1px solid #e0e0e0;
+    background: white;
+}
+
+.page-title {
+    font-size: 2rem;
+    color: #333;
+    margin: 0;
+    font-weight: 600;
+}
+
+.page-subtitle {
+    font-size: 1rem;
+    color: #666;
+    margin: 0.5rem 0 0 0;
+}
+
+.content-body {
+    flex: 1;
+    padding: 2rem;
+    overflow-y: auto;
+}
+
+/* Dashboard Sections */
+.dashboard-sections {
+    position: relative;
+    height: 100%;
+}
+
+.section-content {
+    display: none;
+    height: 100%;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.section-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Welcome Section */
+.welcome-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.welcome-content {
+    text-align: center;
+    max-width: 500px;
+}
+
+.welcome-logo {
+    width: 200px;
+    height: auto;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+.welcome-text {
+    font-size: 1.5rem;
+    color: #333;
+    font-weight: 500;
+    margin: 0;
+}
+
+/* Info Grid */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    height: fit-content;
+}
+
+.info-card {
+    transition: all 0.2s ease;
+    padding: 2rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border-left: 4px solid #ffa726;
+}
+
+.info-card h3 {
+    color: #333;
+    margin-bottom: 1.5rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.info-items {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+}
+
+    background: #f8f9fa;
+    transform: translateX(2px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    font-size: 1rem;
+    font-weight: 400;
+}
+    background: #4299e1;
+/* Stats Grid */
+    box-shadow: 0 2px 8px rgba(66, 153, 225, 0.3);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+}
+    font-size: 1.1rem;
+.stat-item {
+    text-align: center;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.stat-number {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #ffa726;
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .dashboard-container {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        overflow-x: auto;
+        padding: 1rem;
+    }
+    
+    .sidebar-nav {
+        display: flex;
+        flex-direction: row;
+        gap: 0.5rem;
+    }
+    
+    .nav-item {
+        white-space: nowrap;
+        min-width: 150px;
+    }
+    
+    .content-header {
+        padding: 1rem;
+    }
+    
+    .content-body {
+        padding: 1rem;
+    }
+    
+    .info-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}

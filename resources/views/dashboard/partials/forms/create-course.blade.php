@@ -1,63 +1,346 @@
-<div id="create-course-form" class="form-container" style="display: none; margin-bottom: 2rem;">
-    <h3 style="color: #2c3e50; margin-bottom: 1.5rem;">Crear Nuevo Curso</h3>
-    <form method="POST" action="{{ route('cursos.store') }}">
-        @csrf
-        <div class="form-grid">
-            <div class="form-group">
-                <label class="form-label">Nombre del Curso</label>
-                <input type="text" name="nombre" class="form-input" required placeholder="Ej: Matemáticas I">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Código del Curso</label>
-                <input type="text" name="codigo" class="form-input" required placeholder="Ej: MAT101">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Créditos</label>
-                <select name="creditos" class="form-select" required>
-                    <option value="">Seleccionar créditos</option>
-                    <option value="1">1 Crédito</option>
-                    <option value="2">2 Créditos</option>
-                    <option value="3">3 Créditos</option>
-                    <option value="4">4 Créditos</option>
-                    <option value="5">5 Créditos</option>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Cupo Máximo</label>
-                <input type="number" name="cupo_maximo" class="form-input" required min="1" max="100" value="30">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Período Académico</label>
-                <input type="text" name="periodo_academico" class="form-input" required placeholder="Ej: 2025-1">
-            </div>
-            
-            @if(Auth::user()->isAdmin())
-            <div class="form-group">
-                <label class="form-label">Maestro Asignado</label>
-                <select name="maestro_id" class="form-select" required>
-                    <option value="">Seleccionar maestro</option>
-                    @foreach(\App\Models\User::maestros()->get() as $maestro)
-                        <option value="{{ $maestro->id }}">{{ $maestro->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-            @else
-                <input type="hidden" name="maestro_id" value="{{ Auth::id() }}">
-            @endif
-        </div>
-        
-        <div class="form-group">
-            <label class="form-label">Descripción del Curso</label>
-            <textarea name="descripcion" class="form-textarea" rows="4" placeholder="Describe el contenido y objetivos del curso..."></textarea>
-        </div>
-        
-        <div class="form-actions">
-            <button type="submit" class="btn-primary">Crear Curso</button>
-            <button type="button" class="btn-secondary" onclick="hideCreateCourseForm()">Cancelar</button>
-        </div>
-    </form>
-</div>
+/* Dashboard Main Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #f5f5f5;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.dashboard-container {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+}
+
+/* Sidebar Styles - Nuevo diseño según imagen */
+.sidebar {
+    width: 300px;
+    background: #f1f1f1;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    min-height: 100vh;
+    min-height: 100vh;
+}
+
+.sidebar-header {
+    background: #f1f1f1;
+    padding: 2rem 1rem 1rem 1rem;
+    text-align: center;
+    border-bottom: none;
+    border-bottom: none;
+}
+
+.sidebar-logo {
+    width: 140px;
+    height: auto;
+    margin-bottom: 0;
+    margin-bottom: 0;
+}
+
+.sidebar-nav {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+    padding: 1rem;
+    gap: 0.5rem;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    color: #333;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    font-size: 0.95rem;
+    font-weight: 400;
+    cursor: pointer;
+    border: none;
+    margin-bottom: 0.25rem;
+}
+
+.nav-item:hover {
+    background: #f8f9fa;
+    transform: translateX(2px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.nav-item.active {
+    background: #4299e1;
+    color: white;
+    box-shadow: 0 2px 8px rgba(66, 153, 225, 0.3);
+}
+
+.nav-icon {
+    margin-right: 0.75rem;
+    font-size: 1.1rem;
+    width: 20px;
+    text-align: center;
+}
+
+.sidebar-footer {
+    margin-top: auto;
+    padding: 1rem;
+    padding: 1rem;
+}
+
+    margin-bottom: 1rem;
+    margin-bottom: 1rem;
+}
+
+.logout-btn {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    padding: 1rem 1.5rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    color: #333;
+    color: #333;
+    transition: all 0.2s ease;
+    transition: all 0.2s ease;
+    font-weight: 400;
+    font-weight: 400;
+}
+
+    background: #f8f9fa;
+    transform: translateX(2px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.logout-icon {
+    font-size: 1.1rem;
+    font-size: 1.1rem;
+    width: 20px;
+    text-align: center;
+}
+
+    background: #2d3748;
+    padding: 1.5rem 1rem;
+    border-radius: 8px;
+    border-radius: 8px;
+    margin: 0;
+    margin: 0;
+}
+
+.footer-logo img {
+    width: 140px;
+    height: auto;
+    filter: brightness(0) invert(1);
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    background: #f5f5f5;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.content-header {
+    padding: 2rem;
+    border-bottom: 1px solid #e0e0e0;
+    background: white;
+}
+
+.page-title {
+    font-size: 2rem;
+    color: #333;
+    margin: 0;
+    font-weight: 600;
+}
+
+.page-subtitle {
+    font-size: 1rem;
+    color: #666;
+    margin: 0.5rem 0 0 0;
+}
+
+.content-body {
+    flex: 1;
+    padding: 2rem;
+    overflow-y: auto;
+}
+
+/* Dashboard Sections */
+.dashboard-sections {
+    position: relative;
+    height: 100%;
+}
+
+.section-content {
+    display: none;
+    height: 100%;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.section-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Welcome Section */
+.welcome-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.welcome-content {
+    text-align: center;
+    max-width: 500px;
+}
+
+.welcome-logo {
+    width: 200px;
+    height: auto;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+.welcome-text {
+    font-size: 1.5rem;
+    color: #333;
+    font-weight: 500;
+    margin: 0;
+}
+
+/* Info Grid */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    height: fit-content;
+}
+
+.info-card {
+    transition: all 0.2s ease;
+    padding: 2rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border-left: 4px solid #ffa726;
+}
+
+.info-card h3 {
+    color: #333;
+    margin-bottom: 1.5rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.info-items {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+.info-label {
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+}
+
+    background: #f8f9fa;
+    transform: translateX(2px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    font-size: 1rem;
+    font-weight: 400;
+}
+    background: #4299e1;
+/* Stats Grid */
+    box-shadow: 0 2px 8px rgba(66, 153, 225, 0.3);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+}
+    font-size: 1.1rem;
+.stat-item {
+    text-align: center;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.stat-number {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #ffa726;
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .dashboard-container {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        overflow-x: auto;
+        padding: 1rem;
+    }
+    
+    .sidebar-nav {
+        display: flex;
+        flex-direction: row;
+        gap: 0.5rem;
+    }
+    
+    .nav-item {
+        white-space: nowrap;
+        min-width: 150px;
+    }
+    
+    .content-header {
+        padding: 1rem;
+    }
+    
+    .content-body {
+        padding: 1rem;
+    }
+    
+    .info-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+}
