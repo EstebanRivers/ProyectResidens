@@ -65,18 +65,18 @@
     @endif
 
     <div class="course-actions">
-        @if(isset($course->is_teacher))
+        @if(isset($course->is_teacher) || isset($course->is_admin))
+            <a href="{{ route('cursos.show', $course->id) }}" class="btn btn-primary btn-small">Ver Curso</a>
             <button class="btn btn-primary btn-small" onclick="showCourseContent()">Gestionar Contenido</button>
-            <button class="btn btn-outline btn-small">Editar</button>
+            <a href="{{ route('cursos.edit', $course->id) }}" class="btn btn-outline btn-small">Editar</a>
         @elseif(isset($course->available))
             <button class="btn btn-primary btn-small" onclick="enrollInCourse({{ $course->id ?? 1 }})">Inscribirse</button>
-            <button class="btn btn-outline btn-small" onclick="previewCourse({{ $course->id ?? 1 }})">Vista Previa</button>
+            <a href="{{ route('cursos.show', $course->id) }}" class="btn btn-outline btn-small">Vista Previa</a>
         @elseif(isset($course->enrolled))
-            <button class="btn btn-primary btn-small" onclick="continueCourse({{ $course->id ?? 1 }})">Continuar</button>
+            <a href="{{ route('cursos.show', $course->id) }}" class="btn btn-primary btn-small">Continuar</a>
             <button class="btn btn-outline btn-small" onclick="viewGrades({{ $course->id ?? 1 }})">Ver Calificaciones</button>
         @else
-            <button class="btn btn-primary btn-small" onclick="showCourseContent()">Ver Curso</button>
-            <button class="btn btn-outline btn-small">Editar</button>
+            <a href="{{ route('cursos.show', $course->id) }}" class="btn btn-primary btn-small">Ver Curso</a>
         @endif
     </div>
 </div>

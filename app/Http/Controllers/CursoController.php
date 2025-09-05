@@ -1,346 +1,212 @@
-/* Dashboard Main Styles */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+<?php
 
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f5f5f5;
-    height: 100vh;
-    overflow: hidden;
-}
+namespace App\Http\Controllers;
 
-.dashboard-container {
-    display: flex;
-    height: 100vh;
-    width: 100%;
-}
+use App\Models\Curso;
+use App\Models\User;
+use App\Models\Contenido;
+use App\Models\Actividad;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
-/* Sidebar Styles - Nuevo diseño según imagen */
-.sidebar {
-    width: 300px;
-    background: #f1f1f1;
-    display: flex;
-    flex-direction: column;
-    padding: 0;
-    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-    min-height: 100vh;
-    min-height: 100vh;
-}
+class CursoController extends Controller
+{
+    use AuthorizesRequests;
 
-.sidebar-header {
-    background: #f1f1f1;
-    padding: 2rem 1rem 1rem 1rem;
-    text-align: center;
-    border-bottom: none;
-    border-bottom: none;
-}
-
-.sidebar-logo {
-    width: 140px;
-    height: auto;
-    margin-bottom: 0;
-    margin-bottom: 0;
-}
-
-.sidebar-nav {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding: 1rem;
-    padding: 1rem;
-    gap: 0.5rem;
-}
-
-.nav-item {
-    display: flex;
-    align-items: center;
-    padding: 1rem 1.5rem;
-    color: #333;
-    text-decoration: none;
-    transition: all 0.2s ease;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    font-size: 0.95rem;
-    font-weight: 400;
-    cursor: pointer;
-    border: none;
-    margin-bottom: 0.25rem;
-}
-
-.nav-item:hover {
-    background: #f8f9fa;
-    transform: translateX(2px);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-}
-
-.nav-item.active {
-    background: #4299e1;
-    color: white;
-    box-shadow: 0 2px 8px rgba(66, 153, 225, 0.3);
-}
-
-.nav-icon {
-    margin-right: 0.75rem;
-    font-size: 1.1rem;
-    width: 20px;
-    text-align: center;
-}
-
-.sidebar-footer {
-    margin-top: auto;
-    padding: 1rem;
-    padding: 1rem;
-}
-
-    margin-bottom: 1rem;
-    margin-bottom: 1rem;
-}
-
-.logout-btn {
-    display: flex;
-    align-items: center;
-    padding: 1rem 1.5rem;
-    padding: 1rem 1.5rem;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    color: #333;
-    color: #333;
-    transition: all 0.2s ease;
-    transition: all 0.2s ease;
-    font-weight: 400;
-    font-weight: 400;
-}
-
-    background: #f8f9fa;
-    transform: translateX(2px);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-}
-
-.logout-icon {
-    font-size: 1.1rem;
-    font-size: 1.1rem;
-    width: 20px;
-    text-align: center;
-}
-
-    background: #2d3748;
-    padding: 1.5rem 1rem;
-    border-radius: 8px;
-    border-radius: 8px;
-    margin: 0;
-    margin: 0;
-}
-
-.footer-logo img {
-    width: 140px;
-    height: auto;
-    filter: brightness(0) invert(1);
-}
-
-/* Main Content */
-.main-content {
-    flex: 1;
-    background: #f5f5f5;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.content-header {
-    padding: 2rem;
-    border-bottom: 1px solid #e0e0e0;
-    background: white;
-}
-
-.page-title {
-    font-size: 2rem;
-    color: #333;
-    margin: 0;
-    font-weight: 600;
-}
-
-.page-subtitle {
-    font-size: 1rem;
-    color: #666;
-    margin: 0.5rem 0 0 0;
-}
-
-.content-body {
-    flex: 1;
-    padding: 2rem;
-    overflow-y: auto;
-}
-
-/* Dashboard Sections */
-.dashboard-sections {
-    position: relative;
-    height: 100%;
-}
-
-.section-content {
-    display: none;
-    height: 100%;
-    animation: fadeIn 0.3s ease-in-out;
-}
-
-.section-content.active {
-    display: block;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Welcome Section */
-.welcome-section {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-}
-
-.welcome-content {
-    text-align: center;
-    max-width: 500px;
-}
-
-.welcome-logo {
-    width: 200px;
-    height: auto;
-    margin-bottom: 2rem;
-    opacity: 0.9;
-}
-
-.welcome-text {
-    font-size: 1.5rem;
-    color: #333;
-    font-weight: 500;
-    margin: 0;
-}
-
-/* Info Grid */
-.info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-    height: fit-content;
-}
-
-.info-card {
-    transition: all 0.2s ease;
-    padding: 2rem;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    border-left: 4px solid #ffa726;
-}
-
-.info-card h3 {
-    color: #333;
-    margin-bottom: 1.5rem;
-    font-size: 1.2rem;
-    font-weight: 600;
-}
-
-.info-items {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.info-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid #e9ecef;
-}
-
-.info-item:last-child {
-    border-bottom: none;
-}
-
-.info-label {
-    font-weight: 600;
-    color: #666;
-    margin-bottom: 0.25rem;
-    font-size: 0.9rem;
-}
-
-    background: #f8f9fa;
-    transform: translateX(2px);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    font-size: 1rem;
-    font-weight: 400;
-}
-    background: #4299e1;
-/* Stats Grid */
-    box-shadow: 0 2px 8px rgba(66, 153, 225, 0.3);
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 1rem;
-}
-    font-size: 1.1rem;
-.stat-item {
-    text-align: center;
-    padding: 1rem;
-    background: #f8f9fa;
-    border-radius: 8px;
-    border: 1px solid #e9ecef;
-}
-
-.stat-number {
-    font-size: 1.8rem;
-    font-weight: bold;
-    color: #ffa726;
-    margin-bottom: 0.25rem;
-}
-
-.stat-label {
-    font-size: 0.8rem;
-    color: #666;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .dashboard-container {
-        flex-direction: column;
+    public function index()
+    {
+        $user = Auth::user();
+        
+        if ($user->isAdmin()) {
+            $cursos = Curso::with(['maestro', 'estudiantes'])->get();
+        } elseif ($user->isMaestro()) {
+            $cursos = Curso::where('maestro_id', $user->id)->with(['estudiantes'])->get();
+        } else {
+            // Para alumnos, mostrar cursos disponibles y sus cursos inscritos
+            $cursosDisponibles = Curso::activos()->with(['maestro'])->get();
+            $cursosInscritos = $user->cursosComoEstudiante()->with(['maestro'])->get();
+            
+            return view('cursos.index', compact('cursosDisponibles', 'cursosInscritos'));
+        }
+        
+        return view('cursos.index', compact('cursos'));
     }
-    
-    .sidebar {
-        width: 100%;
-        height: auto;
-        flex-direction: row;
-        overflow-x: auto;
-        padding: 1rem;
+
+    public function create()
+    {
+        $this->authorize('create', Curso::class);
+        
+        $maestros = User::maestros()->get();
+        return view('cursos.create', compact('maestros'));
     }
-    
-    .sidebar-nav {
-        display: flex;
-        flex-direction: row;
-        gap: 0.5rem;
+
+    public function createWizard()
+    {
+        $this->authorize('create', Curso::class);
+        
+        $maestros = User::maestros()->get();
+        return view('cursos.create-wizard', compact('maestros'));
     }
-    
-    .nav-item {
-        white-space: nowrap;
-        min-width: 150px;
+
+    public function store(Request $request)
+    {
+        $this->authorize('create', Curso::class);
+
+        $validated = $request->validate([
+            'nombre' => 'required|string|max:255',
+            'codigo' => 'required|string|max:20|unique:cursos',
+            'descripcion' => 'nullable|string',
+            'creditos' => 'required|integer|min:1|max:5',
+            'cupo_maximo' => 'required|integer|min:1|max:100',
+            'periodo_academico' => 'required|string|max:20',
+            'maestro_id' => 'required|exists:users,id'
+        ]);
+
+        $curso = Curso::create($validated);
+
+        return redirect()->route('cursos.show', $curso)
+                        ->with('success', 'Curso creado exitosamente');
     }
-    
-    .content-header {
-        padding: 1rem;
+
+    public function storeWizard(Request $request)
+    {
+        $this->authorize('create', Curso::class);
+
+        // Validar información básica del curso
+        $validated = $request->validate([
+            'nombre' => 'required|string|max:255',
+            'codigo' => 'required|string|max:20|unique:cursos',
+            'descripcion' => 'nullable|string',
+            'creditos' => 'required|integer|min:1|max:5',
+            'cupo_maximo' => 'required|integer|min:1|max:100',
+            'periodo_academico' => 'required|string|max:20',
+            'maestro_id' => 'required|exists:users,id'
+        ]);
+
+        // Crear el curso
+        $curso = Curso::create($validated);
+
+        // Procesar lecciones si existen
+        if ($request->has('lecciones')) {
+            foreach ($request->lecciones as $orden => $leccionData) {
+                if (!empty($leccionData['titulo'])) {
+                    // Crear contenido
+                    $contenido = Contenido::create([
+                        'curso_id' => $curso->id,
+                        'titulo' => $leccionData['titulo'],
+                        'descripcion' => $leccionData['descripcion'] ?? '',
+                        'tipo' => $leccionData['contenido']['tipo'] ?? 'texto',
+                        'contenido_texto' => $leccionData['contenido']['texto'] ?? null,
+                        'orden' => $orden,
+                        'activo' => true
+                    ]);
+
+                    // Crear actividad si existe
+                    if (!empty($leccionData['actividad']['pregunta'])) {
+                        Actividad::create([
+                            'curso_id' => $curso->id,
+                            'contenido_id' => $contenido->id,
+                            'titulo' => 'Actividad: ' . $leccionData['titulo'],
+                            'descripcion' => 'Evaluación de la lección',
+                            'tipo' => $leccionData['actividad']['tipo'] ?? 'opcion_multiple',
+                            'pregunta' => ['texto' => $leccionData['actividad']['pregunta']],
+                            'opciones' => $leccionData['actividad']['opciones'] ?? null,
+                            'respuesta_correcta' => [$leccionData['actividad']['respuesta_correcta']] ?? [],
+                            'explicacion' => $leccionData['actividad']['explicacion'] ?? null,
+                            'puntos' => $leccionData['actividad']['puntos'] ?? 10,
+                            'orden' => $orden,
+                            'activo' => true
+                        ]);
+                    }
+                }
+            }
+        }
+
+        return redirect()->route('cursos.show', $curso)
+                        ->with('success', 'Curso creado exitosamente con ' . count($request->lecciones ?? []) . ' lecciones');
     }
-    
-    .content-body {
-        padding: 1rem;
+
+    public function show(Curso $curso)
+    {
+        $this->authorize('view', $curso);
+        
+        $curso->load(['maestro', 'estudiantes', 'contenidos', 'actividades']);
+        
+        // Obtener progreso si es alumno
+        $progreso = null;
+        if (Auth::user()->isAlumno()) {
+            $progreso = $curso->progreso()
+                             ->where('estudiante_id', Auth::id())
+                             ->get()
+                             ->keyBy(function($item) {
+                                 return $item->tipo . '_' . ($item->contenido_id ?? $item->actividad_id);
+                             });
+        }
+        
+        return view('cursos.show', compact('curso', 'progreso'));
     }
-    
-    .info-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
+
+    public function edit(Curso $curso)
+    {
+        $this->authorize('update', $curso);
+        
+        $maestros = User::maestros()->get();
+        return view('cursos.edit', compact('curso', 'maestros'));
+    }
+
+    public function update(Request $request, Curso $curso)
+    {
+        $this->authorize('update', $curso);
+
+        $validated = $request->validate([
+            'nombre' => 'required|string|max:255',
+            'codigo' => 'required|string|max:20|unique:cursos,codigo,' . $curso->id,
+            'descripcion' => 'nullable|string',
+            'creditos' => 'required|integer|min:1|max:5',
+            'cupo_maximo' => 'required|integer|min:1|max:100',
+            'periodo_academico' => 'required|string|max:20',
+            'maestro_id' => 'required|exists:users,id',
+            'activo' => 'boolean'
+        ]);
+
+        $curso->update($validated);
+
+        return redirect()->route('cursos.show', $curso)
+                        ->with('success', 'Curso actualizado exitosamente');
+    }
+
+    public function destroy(Curso $curso)
+    {
+        $this->authorize('delete', $curso);
+        
+        $curso->delete();
+        
+        return redirect()->route('cursos.index')
+                        ->with('success', 'Curso eliminado exitosamente');
+    }
+
+    public function inscribir(Request $request, Curso $curso)
+    {
+        $user = Auth::user();
+        
+        if (!$user->isAlumno()) {
+            return back()->with('error', 'Solo los alumnos pueden inscribirse en cursos');
+        }
+        
+        if (!$curso->tieneCupoDisponible()) {
+            return back()->with('error', 'El curso no tiene cupo disponible');
+        }
+        
+        if ($user->cursosComoEstudiante()->where('curso_id', $curso->id)->exists()) {
+            return back()->with('error', 'Ya estás inscrito en este curso');
+        }
+        
+        $user->cursosComoEstudiante()->attach($curso->id, [
+            'fecha_inscripcion' => now(),
+            'estado' => 'inscrito'
+        ]);
+        
+        return back()->with('success', 'Te has inscrito exitosamente en el curso');
     }
 }

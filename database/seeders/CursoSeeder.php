@@ -1,354 +1,165 @@
-/* Dashboard Main Styles */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+<?php
 
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f5f5f5;
-    height: 100vh;
-    overflow: hidden;
-}
+namespace Database\Seeders;
 
-.dashboard-container {
-    display: flex;
-    height: 100vh;
-    width: 100%;
-}
+use Illuminate\Database\Seeder;
+use App\Models\Curso;
+use App\Models\User;
+use App\Models\Contenido;
+use App\Models\Actividad;
 
-/* Sidebar Styles - Nuevo diseño según imagen */
-.sidebar {
-    width: 300px;
-    background: #f1f1f1;
-    display: flex;
-    flex-direction: column;
-    padding: 0;
-    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-    min-height: 100vh;
-    min-height: 100vh;
-}
+class CursoSeeder extends Seeder
+{
+    public function run(): void
+    {
+        // Obtener usuarios
+        $admin = User::where('role', 'administrador')->first();
+        $maestro = User::where('role', 'maestro')->first();
+        $alumno = User::where('role', 'alumno')->first();
 
-.sidebar-header {
-    background: #f1f1f1;
-    padding: 2rem 1rem 1rem 1rem;
-    text-align: center;
-    border-bottom: none;
-    border-bottom: none;
-}
-
-.sidebar-logo {
-    width: 140px;
-    height: auto;
-    margin-bottom: 0;
-    margin-bottom: 0;
-}
-
-.sidebar-nav {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding: 1rem;
-    padding: 1rem;
-    gap: 0.5rem;
-}
-
-.nav-item {
-    display: flex;
-    align-items: center;
-    padding: 1rem 1.5rem;
-    color: #333;
-    text-decoration: none;
-    transition: all 0.2s ease;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    font-size: 0.95rem;
-    font-weight: 400;
-    cursor: pointer;
-    border: none;
-    margin-bottom: 0.25rem;
-}
-
-.nav-item:hover {
-    background: #f8f9fa;
-    transform: translateX(2px);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-}
-
-.nav-item.active {
-    background: #4299e1;
-    color: white;
-    box-shadow: 0 2px 8px rgba(66, 153, 225, 0.3);
-}
-
-.nav-icon {
-    margin-right: 0.75rem;
-    font-size: 1.1rem;
-    width: 20px;
-    text-align: center;
-}
-
-.sidebar-footer {
-    margin-top: auto;
-    padding: 1rem;
-    padding: 1rem;
-}
-
-    margin-bottom: 1rem;
-    margin-bottom: 1rem;
-}
-
-.logout-btn {
-    display: flex;
-    align-items: center;
-    padding: 1rem 1.5rem;
-    padding: 1rem 1.5rem;
-    background: white;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    color: #333;
-    color: #333;
-    transition: all 0.2s ease;
-    transition: all 0.2s ease;
-    font-weight: 400;
-    font-weight: 400;
-}
-
-    background: #f8f9fa;
-    transform: translateX(2px);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-}
-
-.logout-icon {
-    font-size: 1.1rem;
-    font-size: 1.1rem;
-    width: 20px;
-    text-align: center;
-}
-
-    background: #2d3748;
-    padding: 1.5rem 1rem;
-    border-radius: 8px;
-    border-radius: 8px;
-    margin: 0;
-    margin: 0;
-}
-
-                'respuesta_correcta' => [0], // Primera opción es correcta
-                'explicacion' => "La respuesta correcta es la opción A porque...",
-                'puntos' => 10,
-                'orden' => $i,
-                'activo' => true
+        if (!$maestro) {
+            $maestro = User::create([
+                'name' => 'Dr. Juan Pérez',
+                'email' => 'juan.perez@uhta.edu.mx',
+                'password' => bcrypt('password'),
+                'role' => 'maestro'
             ]);
         }
-    }
-.footer-logo img {
-    width: 140px;
-    height: auto;
-    filter: brightness(0) invert(1);
-}
 
-/* Main Content */
-.main-content {
-    flex: 1;
-    background: #f5f5f5;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
+        // Crear cursos con contenido completo
+        $cursos = [
+            [
+                'nombre' => 'Matemáticas I',
+                'codigo' => 'MAT101',
+                'descripcion' => 'Curso fundamental de matemáticas que cubre álgebra, geometría y trigonometría básica. Incluye ejercicios prácticos y evaluaciones continuas.',
+                'creditos' => 4,
+                'cupo_maximo' => 30,
+                'periodo_academico' => '2025-1',
+                'maestro_id' => $maestro->id,
+                'lecciones' => [
+                    [
+                        'titulo' => 'Introducción al Álgebra',
+                        'descripcion' => 'Conceptos básicos de álgebra y operaciones fundamentales',
+                        'contenido_texto' => 'El álgebra es una rama de las matemáticas que utiliza símbolos y letras para representar números y cantidades en fórmulas y ecuaciones. En esta lección aprenderemos los conceptos fundamentales que nos permitirán resolver problemas matemáticos de manera sistemática.',
+                        'pregunta' => '¿Cuál es el resultado de 2x + 3 = 11?',
+                        'opciones' => ['x = 4', 'x = 5', 'x = 6', 'x = 7'],
+                        'respuesta_correcta' => 0
+                    ],
+                    [
+                        'titulo' => 'Ecuaciones Lineales',
+                        'descripcion' => 'Resolución de ecuaciones de primer grado',
+                        'contenido_texto' => 'Las ecuaciones lineales son ecuaciones algebraicas en las que cada término es una constante o el producto de una constante por una variable elevada a la primera potencia. Son fundamentales para resolver problemas de la vida real.',
+                        'pregunta' => '¿Cuál es la pendiente de la recta y = 3x + 2?',
+                        'opciones' => ['2', '3', '5', '1'],
+                        'respuesta_correcta' => 1
+                    ],
+                    [
+                        'titulo' => 'Sistemas de Ecuaciones',
+                        'descripcion' => 'Métodos para resolver sistemas de ecuaciones lineales',
+                        'contenido_texto' => 'Un sistema de ecuaciones lineales es un conjunto de dos o más ecuaciones lineales que comparten las mismas variables. Existen varios métodos para resolverlos: sustitución, eliminación y método gráfico.',
+                        'pregunta' => '¿Cuál es el valor de x en el sistema: x + y = 5, x - y = 1?',
+                        'opciones' => ['x = 2', 'x = 3', 'x = 4', 'x = 5'],
+                        'respuesta_correcta' => 1
+                    ]
+                ]
+            ],
+            [
+                'nombre' => 'Física General',
+                'codigo' => 'FIS101',
+                'descripcion' => 'Introducción a los principios fundamentales de la física: mecánica, termodinámica, ondas y electricidad.',
+                'creditos' => 4,
+                'cupo_maximo' => 25,
+                'periodo_academico' => '2025-1',
+                'maestro_id' => $maestro->id,
+                'lecciones' => [
+                    [
+                        'titulo' => 'Cinemática y Movimiento',
+                        'descripcion' => 'Estudio del movimiento de los objetos',
+                        'contenido_texto' => 'La cinemática es la rama de la física que describe el movimiento de los objetos sin considerar las causas que lo producen. Estudiaremos conceptos como velocidad, aceleración y desplazamiento.',
+                        'pregunta' => '¿Cuál es la unidad de velocidad en el Sistema Internacional?',
+                        'opciones' => ['km/h', 'm/s', 'cm/s', 'mph'],
+                        'respuesta_correcta' => 1
+                    ],
+                    [
+                        'titulo' => 'Leyes de Newton',
+                        'descripcion' => 'Los tres principios fundamentales de la mecánica',
+                        'contenido_texto' => 'Las tres leyes de Newton son los principios fundamentales que describen la relación entre las fuerzas que actúan sobre un cuerpo y su movimiento. Estas leyes son la base de la mecánica clásica.',
+                        'pregunta' => '¿Cuál es la segunda ley de Newton?',
+                        'opciones' => ['F = ma', 'v = d/t', 'E = mc²', 'P = mv'],
+                        'respuesta_correcta' => 0
+                    ]
+                ]
+            ],
+            [
+                'nombre' => 'Programación I',
+                'codigo' => 'PRG101',
+                'descripcion' => 'Introducción a la programación con conceptos fundamentales, algoritmos y práctica con lenguajes modernos.',
+                'creditos' => 4,
+                'cupo_maximo' => 20,
+                'periodo_academico' => '2025-1',
+                'maestro_id' => $maestro->id,
+                'lecciones' => [
+                    [
+                        'titulo' => 'Fundamentos de Programación',
+                        'descripcion' => 'Conceptos básicos y lógica de programación',
+                        'contenido_texto' => 'La programación es el proceso de crear un conjunto de instrucciones que le dicen a una computadora cómo realizar una tarea. Aprenderemos sobre algoritmos, variables, estructuras de control y funciones.',
+                        'pregunta' => '¿Qué es una variable en programación?',
+                        'opciones' => ['Un número fijo', 'Un espacio de memoria para almacenar datos', 'Una función', 'Un algoritmo'],
+                        'respuesta_correcta' => 1
+                    ],
+                    [
+                        'titulo' => 'Estructuras de Control',
+                        'descripcion' => 'Condicionales y bucles en programación',
+                        'contenido_texto' => 'Las estructuras de control permiten alterar el flujo de ejecución de un programa. Incluyen condicionales (if, else) y bucles (for, while) que nos permiten crear programas más complejos y útiles.',
+                        'pregunta' => '¿Cuál es la diferencia entre un bucle for y while?',
+                        'opciones' => ['No hay diferencia', 'For tiene contador definido, while tiene condición', 'While es más rápido', 'For solo funciona con números'],
+                        'respuesta_correcta' => 1
+                    ]
+                ]
+            ]
+        ];
 
-.content-header {
-    padding: 2rem;
-    border-bottom: 1px solid #e0e0e0;
-    background: white;
-}
+        foreach ($cursos as $cursoData) {
+            $lecciones = $cursoData['lecciones'];
+            unset($cursoData['lecciones']);
+            
+            $curso = Curso::create($cursoData);
 
-.page-title {
-    font-size: 2rem;
-    color: #333;
-    margin: 0;
-    font-weight: 600;
-}
+            // Inscribir al alumno en algunos cursos
+            if ($alumno && in_array($curso->codigo, ['MAT101', 'PRG101'])) {
+                $curso->estudiantes()->attach($alumno->id, [
+                    'fecha_inscripcion' => now(),
+                    'estado' => 'inscrito'
+                ]);
+            }
 
-.page-subtitle {
-    font-size: 1rem;
-    color: #666;
-    margin: 0.5rem 0 0 0;
-}
+            // Crear contenido y actividades para cada lección
+            foreach ($lecciones as $index => $leccion) {
+                $contenido = Contenido::create([
+                    'curso_id' => $curso->id,
+                    'titulo' => $leccion['titulo'],
+                    'descripcion' => $leccion['descripcion'],
+                    'tipo' => 'texto',
+                    'contenido_texto' => $leccion['contenido_texto'],
+                    'orden' => $index,
+                    'activo' => true
+                ]);
 
-.content-body {
-    flex: 1;
-    padding: 2rem;
-    overflow-y: auto;
-}
-
-/* Dashboard Sections */
-.dashboard-sections {
-    position: relative;
-    height: 100%;
-}
-
-.section-content {
-    display: none;
-    height: 100%;
-    animation: fadeIn 0.3s ease-in-out;
-}
-
-.section-content.active {
-    display: block;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Welcome Section */
-.welcome-section {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-}
-
-.welcome-content {
-    text-align: center;
-    max-width: 500px;
-}
-
-.welcome-logo {
-    width: 200px;
-    height: auto;
-    margin-bottom: 2rem;
-    opacity: 0.9;
-}
-
-.welcome-text {
-    font-size: 1.5rem;
-    color: #333;
-    font-weight: 500;
-    margin: 0;
-}
-
-/* Info Grid */
-.info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-    height: fit-content;
-}
-
-.info-card {
-    transition: all 0.2s ease;
-    padding: 2rem;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    border-left: 4px solid #ffa726;
-}
-
-.info-card h3 {
-    color: #333;
-    margin-bottom: 1.5rem;
-    font-size: 1.2rem;
-    font-weight: 600;
-}
-
-.info-items {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.info-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid #e9ecef;
-}
-
-.info-item:last-child {
-    border-bottom: none;
-}
-
-.info-label {
-    font-weight: 600;
-    color: #666;
-    margin-bottom: 0.25rem;
-    font-size: 0.9rem;
-}
-
-    background: #f8f9fa;
-    transform: translateX(2px);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    font-size: 1rem;
-    font-weight: 400;
-}
-    background: #4299e1;
-/* Stats Grid */
-    box-shadow: 0 2px 8px rgba(66, 153, 225, 0.3);
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 1rem;
-}
-    font-size: 1.1rem;
-.stat-item {
-    text-align: center;
-    padding: 1rem;
-    background: #f8f9fa;
-    border-radius: 8px;
-    border: 1px solid #e9ecef;
-}
-
-.stat-number {
-    font-size: 1.8rem;
-    font-weight: bold;
-    color: #ffa726;
-    margin-bottom: 0.25rem;
-}
-
-.stat-label {
-    font-size: 0.8rem;
-    color: #666;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .dashboard-container {
-        flex-direction: column;
-    }
-    
-    .sidebar {
-        width: 100%;
-        height: auto;
-        flex-direction: row;
-        overflow-x: auto;
-        padding: 1rem;
-    }
-    
-    .sidebar-nav {
-        display: flex;
-        flex-direction: row;
-        gap: 0.5rem;
-    }
-    
-    .nav-item {
-        white-space: nowrap;
-        min-width: 150px;
-    }
-    
-    .content-header {
-        padding: 1rem;
-    }
-    
-    .content-body {
-        padding: 1rem;
-    }
-    
-    .info-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
+                Actividad::create([
+                    'curso_id' => $curso->id,
+                    'contenido_id' => $contenido->id,
+                    'titulo' => 'Quiz: ' . $leccion['titulo'],
+                    'descripcion' => 'Evaluación de comprensión de la lección',
+                    'tipo' => 'opcion_multiple',
+                    'pregunta' => ['texto' => $leccion['pregunta']],
+                    'opciones' => $leccion['opciones'],
+                    'respuesta_correcta' => [$leccion['respuesta_correcta']],
+                    'explicacion' => 'Revisa el contenido de la lección para entender mejor el concepto.',
+                    'puntos' => 10,
+                    'orden' => $index,
+                    'activo' => true
+                ]);
+            }
+        }
     }
 }
