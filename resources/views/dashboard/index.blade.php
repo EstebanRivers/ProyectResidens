@@ -1,10 +1,18 @@
-@extends('layouts.dashboard')
-
-@section('title', 'Dashboard - ' . ucfirst(Auth::user()->role))
-@section('page-title', 'Dashboard')
-@section('page-subtitle', 'Panel de control principal')
-
-@section('content')
+<x-app-layout>
+    <x-slot name="title">Dashboard - {{ ucfirst(Auth::user()->role) }}</x-slot>
+    
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <x-dashboard.sidebar />
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="content-header">
+                <h1 class="page-title">Dashboard</h1>
+                <p class="page-subtitle">Panel de control principal</p>
+            </div>
+            
+            <div class="content-body">
 <div class="dashboard-sections">
     <!-- Welcome Section (Default) -->
     <div class="welcome-section active">
@@ -21,8 +29,11 @@
     @include('dashboard.sections.control-administrativo')
     @include('dashboard.sections.ajustes')
 </div>
-@endsection
-
-@push('scripts')
-<script src="{{ asset('js/dashboard/navigation.js') }}"></script>
-@endpush
+            </div>
+        </div>
+    </div>
+    
+    @push('scripts')
+    <script src="{{ asset('js/dashboard/main.js') }}"></script>
+    @endpush
+</x-app-layout>
