@@ -34,12 +34,21 @@ class DashboardManager {
         // Hide all sections
         document.querySelectorAll('.section-content, .welcome-section').forEach(section => {
             section.classList.remove('active');
+            section.style.display = 'none';
         });
 
         // Show target section
         const targetSection = document.getElementById(sectionId);
         if (targetSection) {
             targetSection.classList.add('active');
+            targetSection.style.display = 'block';
+        } else {
+            // If section doesn't exist, show welcome
+            const welcomeSection = document.querySelector('.welcome-section');
+            if (welcomeSection) {
+                welcomeSection.classList.add('active');
+                welcomeSection.style.display = 'flex';
+            }
         }
 
         // Update navigation
@@ -55,19 +64,18 @@ class DashboardManager {
         // Save current section
         this.currentSection = sectionId;
         localStorage.setItem('currentSection', sectionId);
-
-        // Update page title
-        this.updatePageTitle(sectionId);
     }
 
     showWelcome() {
         document.querySelectorAll('.section-content').forEach(section => {
             section.classList.remove('active');
+            section.style.display = 'none';
         });
 
         const welcomeSection = document.querySelector('.welcome-section');
         if (welcomeSection) {
             welcomeSection.classList.add('active');
+            welcomeSection.style.display = 'flex';
         }
 
         document.querySelectorAll('.nav-item').forEach(item => {
@@ -101,34 +109,6 @@ class DashboardManager {
             this.showSection(savedSection);
         } else {
             this.showWelcome();
-        }
-    }
-
-    updatePageTitle(sectionId) {
-        const titles = {
-            'mi-informacion': 'Mi Información',
-            'cursos': 'Cursos',
-            'facturacion': 'Facturación',
-            'control-administrativo': 'Control Administrativo',
-            'ajustes': 'Ajustes'
-        };
-
-        const titleElement = document.querySelector('.page-title');
-        const subtitleElement = document.querySelector('.page-subtitle');
-
-        if (titleElement && titles[sectionId]) {
-            titleElement.textContent = titles[sectionId];
-        }
-
-        if (subtitleElement) {
-            const subtitles = {
-                'mi-informacion': 'Información personal y datos del usuario',
-                'cursos': 'Gestión de cursos y materias',
-                'facturacion': 'Gestión de pagos y facturación',
-                'control-administrativo': 'Herramientas administrativas y reportes',
-                'ajustes': 'Configuración del sistema y preferencias'
-            };
-            subtitleElement.textContent = subtitles[sectionId] || '';
         }
     }
 }
@@ -171,29 +151,6 @@ window.courseUtils = {
 
     viewGrades(courseId) {
         alert('Mostrando calificaciones del curso');
-    },
-
-    showCourseContent() {
-        const modal = document.getElementById('course-content-modal');
-        if (modal) {
-            modal.style.display = 'block';
-        }
-    },
-
-    hideCourseContent() {
-        const modal = document.getElementById('course-content-modal');
-        if (modal) {
-            modal.style.display = 'none';
-        }
-    },
-
-    showMyCourses() {
-        document.getElementById('available-courses').style.display = 'none';
-        document.getElementById('my-courses').style.display = 'block';
-    },
-
-    loadAllCourses() {
-        alert('Cargando todos los cursos...');
     }
 };
 

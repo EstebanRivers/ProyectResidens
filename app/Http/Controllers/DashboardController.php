@@ -6,13 +6,15 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Curso;
 use App\Models\Calificacion;
-
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        $stats = $this->getStatsForUser(auth()->user());
+        $user = Auth::user();
+        $stats = $this->getStatsForUser($user);
+        
         return view('dashboard.index', compact('stats'));
     }
     
@@ -38,7 +40,7 @@ class DashboardController extends Controller
             case 'alumno':
                 return [
                     'cursos_inscritos' => $user->cursosComoEstudiante->count(),
-                    'promedio_general' => round($user->calificaciones()->avg('calificacion'), 2),
+                    'promedio_general' => round($user->calificaciones()->avg('calificacion') ?? 0, 2),
                     'calificaciones_recientes' => $user->calificaciones()->count()
                 ];
                 
