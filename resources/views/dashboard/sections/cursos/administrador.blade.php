@@ -3,18 +3,11 @@
         <div class="course-header">
             <div class="header-actions">
                 <a href="{{ route('cursos.create') }}" class="btn btn-primary">
-                    <span class="btn-icon">➕</span>
+                    <span class="btn-icon"></span>
                     Crear Nuevo Curso
                 </a>
-                <button class="btn btn-secondary" onclick="showCreateCourseForm()">
-                    <span class="btn-icon">📝</span>
-                    Crear Rápido
-                </button>
             </div>
         </div>
-
-        <!-- Create Course Form -->
-        @include('dashboard.partials.forms.create-course')
 
         <!-- Courses Grid -->
         <div class="courses-grid">
