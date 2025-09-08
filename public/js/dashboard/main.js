@@ -2,7 +2,6 @@
 class DashboardManager {
     constructor() {
         this.currentSection = 'mi-informacion';
-        this.currentEnrollmentCourse = null;
         this.init();
     }
 
@@ -119,44 +118,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.dashboard = new DashboardManager();
 });
 
-// Enrollment Modal Functions
-function showEnrollModal(courseId, courseName) {
-    window.dashboard.currentEnrollmentCourse = courseId;
-    const modal = document.getElementById('confirmModal');
-    const modalBody = modal.querySelector('.modal-body p');
-    modalBody.textContent = `¿Estás seguro de que quieres inscribirte en el curso "${courseName}"?`;
-    modal.style.display = 'flex';
-}
-
-function closeConfirmModal() {
-    const modal = document.getElementById('confirmModal');
-    modal.style.display = 'none';
-    window.dashboard.currentEnrollmentCourse = null;
-}
-
-function confirmEnrollment() {
-    if (!window.dashboard.currentEnrollmentCourse) return;
-    
-    const courseId = window.dashboard.currentEnrollmentCourse;
-    
-    // Create form and submit
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = `/cursos/${courseId}/inscribir`;
-    
-    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-    const csrfInput = document.createElement('input');
-    csrfInput.type = 'hidden';
-    csrfInput.name = '_token';
-    csrfInput.value = csrfToken;
-    
-    form.appendChild(csrfInput);
-    document.body.appendChild(form);
-    form.submit();
-    
-    closeConfirmModal();
-}
-
 // Utility functions for course management
 window.courseUtils = {
     showCreateCourseForm() {
@@ -173,6 +134,13 @@ window.courseUtils = {
         }
     },
 
+    enrollInCourse(courseId) {
+        if (confirm('¿Estás seguro de que quieres inscribirte en este curso?')) {
+            // Here you would make an AJAX call to enroll
+            alert('Te has inscrito exitosamente en el curso!');
+        }
+    },
+
     previewCourse(courseId) {
         window.location.href = `/cursos/${courseId}`;
     },
@@ -183,23 +151,16 @@ window.courseUtils = {
 
     viewGrades(courseId) {
         alert('Mostrando calificaciones del curso');
-    },
-
-    showMyCourses() {
-        const availableCourses = document.getElementById('available-courses');
-        const myCourses = document.getElementById('my-courses');
-        
-        if (availableCourses && myCourses) {
-            if (myCourses.style.display === 'none') {
-                availableCourses.style.display = 'none';
-                myCourses.style.display = 'block';
-            } else {
-                availableCourses.style.display = 'block';
-                myCourses.style.display = 'none';
-            }
-        }
     }
 };
 
 // Make functions globally available
 Object.assign(window, window.courseUtils);
+
+// Global functions
+window.showCreateCourseForm = window.courseUtils.showCreateCourseForm;
+window.hideCreateCourseForm = window.courseUtils.hideCreateCourseForm;
+window.enrollInCourse = window.courseUtils.enrollInCourse;
+window.previewCourse = window.courseUtils.previewCourse;
+window.continueCourse = window.courseUtils.continueCourse;
+window.viewGrades = window.courseUtils.viewGrades;

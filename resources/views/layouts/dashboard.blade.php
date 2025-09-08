@@ -11,6 +11,9 @@
     
     <!-- CSS del Dashboard -->
     <link rel="stylesheet" href="{{ asset('css/dashboard/main.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/dashboard/courses.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/dashboard/forms.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/dashboard/wizard.css') }}">
     
     @stack('styles')
 </head>
@@ -40,22 +43,6 @@
                 @endif
                 
                 @yield('content')
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal de Confirmación -->
-    <div id="confirmModal" class="modal-overlay" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Confirmar Inscripción</h3>
-            </div>
-            <div class="modal-body">
-                <p>¿Estás seguro de que quieres inscribirte en este curso?</p>
-            </div>
-            <div class="modal-actions">
-                <button type="button" class="btn-secondary" onclick="closeConfirmModal()">Cancelar</button>
-                <button type="button" class="btn-primary" onclick="confirmEnrollment()">Confirmar</button>
             </div>
         </div>
     </div>

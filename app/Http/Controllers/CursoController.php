@@ -141,6 +141,6 @@ class CursoController extends Controller
             'estado' => 'inscrito'
         ]);
         
-        return redirect()->route('cursos.show', $curso)->with('success', 'Te has inscrito exitosamente en el curso');
+        return back()->with('success', 'Te has inscrito exitosamente en el curso');
     }
 }
