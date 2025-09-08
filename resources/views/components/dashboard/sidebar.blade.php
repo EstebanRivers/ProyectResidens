@@ -45,7 +45,7 @@
 
         <!-- Logo del Footer -->
         <div class="footer-logo">
-            <img src="{{ asset('images/uhta-logo.png') }}" alt="UHTA">
+            <img src="{{ asset('images/LOGO3.png') }}" alt="UHTA">
         </div>
     </div>
 </div>
