@@ -20,8 +20,10 @@ class CursoController extends Controller
         
         if ($user->isAdmin()) {
             $cursos = Curso::with(['maestro', 'estudiantes'])->get();
+            return view('cursos.index', compact('cursos'));
         } elseif ($user->isMaestro()) {
             $cursos = Curso::where('maestro_id', $user->id)->with(['estudiantes'])->get();
+            return view('cursos.index', compact('cursos'));
         } else {
             // Para alumnos, mostrar cursos disponibles y sus cursos inscritos
             $cursosDisponibles = Curso::activos()->with(['maestro'])->get();
@@ -29,8 +31,6 @@ class CursoController extends Controller
             
             return view('cursos.index', compact('cursosDisponibles', 'cursosInscritos'));
         }
-        
-        return view('cursos.index', compact('cursos'));
     }
 
     public function create()

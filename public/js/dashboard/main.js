@@ -28,6 +28,13 @@ class DashboardManager {
                 this.showSettingsTab(tab.getAttribute('data-tab'));
             });
         });
+        
+        // Course content tabs
+        document.querySelectorAll('.content-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                this.showContentTab(tab.getAttribute('data-tab'));
+            });
+        });
     }
 
     showSection(sectionId) {
@@ -90,17 +97,50 @@ class DashboardManager {
         // Remove active class from all tabs and sections
         document.querySelectorAll('.ajustes-tab').forEach(tab => {
             tab.classList.remove('active');
+            tab.style.color = '#666';
+            tab.style.borderBottomColor = 'transparent';
         });
         document.querySelectorAll('.ajustes-section').forEach(section => {
             section.classList.remove('active');
+            section.style.display = 'none';
         });
 
         // Activate selected tab
         const activeTab = document.querySelector(`[data-tab="${tabId}"]`);
         const activeSection = document.getElementById(tabId);
 
-        if (activeTab) activeTab.classList.add('active');
-        if (activeSection) activeSection.classList.add('active');
+        if (activeTab) {
+            activeTab.classList.add('active');
+            activeTab.style.color = '#ffa726';
+            activeTab.style.borderBottomColor = '#ffa726';
+        }
+        if (activeSection) {
+            activeSection.classList.add('active');
+            activeSection.style.display = 'block';
+        }
+    }
+    
+    showContentTab(tabId) {
+        // Remove active class from all tabs and sections
+        document.querySelectorAll('.content-tab').forEach(tab => {
+            tab.style.color = '#6c757d';
+            tab.style.borderBottomColor = 'transparent';
+        });
+        document.querySelectorAll('.content-section').forEach(section => {
+            section.style.display = 'none';
+        });
+
+        // Activate selected tab
+        const activeTab = document.querySelector(`[data-tab="${tabId}"]`);
+        const activeSection = document.getElementById(tabId);
+
+        if (activeTab) {
+            activeTab.style.color = '#ffa726';
+            activeTab.style.borderBottomColor = '#ffa726';
+        }
+        if (activeSection) {
+            activeSection.style.display = 'block';
+        }
     }
 
     loadSavedSection() {
@@ -120,24 +160,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Utility functions for course management
 window.courseUtils = {
-    showCreateCourseForm() {
-        const form = document.getElementById('create-course-form');
-        if (form) {
-            form.style.display = form.style.display === 'none' ? 'block' : 'none';
-        }
-    },
-
-    hideCreateCourseForm() {
-        const form = document.getElementById('create-course-form');
-        if (form) {
-            form.style.display = 'none';
-        }
-    },
-
     enrollInCourse(courseId) {
         if (confirm('¿Estás seguro de que quieres inscribirte en este curso?')) {
-            // Here you would make an AJAX call to enroll
-            alert('Te has inscrito exitosamente en el curso!');
+            // Redirect to enrollment
+            window.location.href = `/cursos/${courseId}/inscribir`;
         }
     },
 
@@ -150,17 +176,9 @@ window.courseUtils = {
     },
 
     viewGrades(courseId) {
-        alert('Mostrando calificaciones del curso');
+        window.location.href = `/alumno/calificaciones`;
     }
 };
 
 // Make functions globally available
 Object.assign(window, window.courseUtils);
-
-// Global functions
-window.showCreateCourseForm = window.courseUtils.showCreateCourseForm;
-window.hideCreateCourseForm = window.courseUtils.hideCreateCourseForm;
-window.enrollInCourse = window.courseUtils.enrollInCourse;
-window.previewCourse = window.courseUtils.previewCourse;
-window.continueCourse = window.courseUtils.continueCourse;
-window.viewGrades = window.courseUtils.viewGrades;

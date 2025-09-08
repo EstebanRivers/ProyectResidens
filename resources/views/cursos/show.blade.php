@@ -51,7 +51,7 @@
         <div id="contenidos" class="content-section active">
             <div class="content-list" style="display: grid; gap: 1rem;">
                 @forelse($curso->contenidos as $contenido)
-                    <div class="content-item" style="display: flex; align-items: center; padding: 1rem; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef; transition: all 0.3s ease; text-decoration: none; color: inherit;">
+                    <a href="{{ route('contenidos.show', [$curso, $contenido]) }}" class="content-item" style="display: flex; align-items: center; padding: 1rem; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef; transition: all 0.3s ease; text-decoration: none; color: inherit;">
                         <div class="content-icon" style="font-size: 1.5rem; margin-right: 1rem; width: 40px; text-align: center;">{{ $contenido->icono_tipo }}</div>
                         <div class="content-info" style="flex: 1;">
                             <div class="content-title" style="font-weight: 600; color: #2c3e50; margin-bottom: 0.25rem;">{{ $contenido->titulo }}</div>
@@ -64,7 +64,7 @@
                                 <span class="status-badge status-completed" style="padding: 0.25rem 0.75rem; background: #d4edda; color: #155724; border-radius: 20px; font-size: 0.8rem; font-weight: 500;">📖 Disponible</span>
                             @endif
                         </div>
-                    </div>
+                    </a>
                 @empty
                     <div class="empty-content" style="text-align: center; padding: 2rem; color: #6c757d;">
                         <p>No hay contenido disponible aún.</p>
@@ -79,8 +79,8 @@
         <!-- Actividades Tab -->
         <div id="actividades" class="content-section" style="display: none;">
             <div class="content-list" style="display: grid; gap: 1rem;">
-                @forelse($curso->actividades as $actividad)
-                    <div class="content-item" style="display: flex; align-items: center; padding: 1rem; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef; transition: all 0.3s ease;">
+                @forelse($curso->actividades()->activas()->ordenadas()->get() as $actividad)
+                    <a href="{{ route('actividades.show', [$curso, $actividad]) }}" class="content-item" style="display: flex; align-items: center; padding: 1rem; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef; transition: all 0.3s ease; text-decoration: none; color: inherit;">
                         <div class="content-icon" style="font-size: 1.5rem; margin-right: 1rem; width: 40px; text-align: center;">{{ $actividad->icono_tipo }}</div>
                         <div class="content-info" style="flex: 1;">
                             <div class="content-title" style="font-weight: 600; color: #2c3e50; margin-bottom: 0.25rem;">{{ $actividad->titulo }}</div>
@@ -102,7 +102,7 @@
                                 <span class="status-badge status-completed" style="padding: 0.25rem 0.75rem; background: #d4edda; color: #155724; border-radius: 20px; font-size: 0.8rem; font-weight: 500;">{{ $actividad->puntos }} pts</span>
                             @endif
                         </div>
-                    </div>
+                    </a>
                 @empty
                     <div class="empty-content" style="text-align: center; padding: 2rem; color: #6c757d;">
                         <p>No hay actividades disponibles aún.</p>

@@ -50,26 +50,12 @@ class Curso extends Model
 
     public function actividades(): HasManyThrough
     {
-        return $this->hasManyThrough(
-            Actividad::class,   // Modelo destino
-            Contenido::class,   // Modelo intermedio
-            'curso_id',         // FK en contenidos que apunta a cursos
-            'contenido_id',     // FK en actividades que apunta a contenidos
-            'id',               // PK en cursos
-            'id'                // PK en contenidos
-        );
+        return $this->hasMany(Actividad::class);
     }
 
     public function progreso(): HasManyThrough
     {
-        return $this->hasManyThrough(
-            ProgresoCurso::class, // Modelo destino
-            Contenido::class,     // Modelo intermedio
-            'curso_id',           // FK en contenidos que apunta a cursos
-            'contenido_id',       // FK en progreso que apunta a contenidos
-            'id',                 // PK en cursos
-            'id'                  // PK en contenidos
-        );
+        return $this->hasMany(ProgresoCurso::class);
     }
 
 

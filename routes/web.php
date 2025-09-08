@@ -30,6 +30,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/cursos/{curso}/contenidos/create', [ContenidoController::class, 'create'])->name('contenidos.create');
     Route::post('/cursos/{curso}/contenidos', [ContenidoController::class, 'store'])->name('contenidos.store');
     Route::get('/cursos/{curso}/contenidos/{contenido}', [ContenidoController::class, 'show'])->name('contenidos.show');
+    Route::get('/cursos/{curso}/contenidos/{contenido}/edit', [ContenidoController::class, 'edit'])->name('contenidos.edit');
     Route::put('/cursos/{curso}/contenidos/{contenido}', [ContenidoController::class, 'update'])->name('contenidos.update');
     Route::delete('/cursos/{curso}/contenidos/{contenido}', [ContenidoController::class, 'destroy'])->name('contenidos.destroy');
     
@@ -41,18 +42,16 @@ Route::middleware('auth')->group(function () {
     
     // Rutas específicas por rol
     Route::middleware('role:administrador')->group(function () {
-        Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('dashboard.admin');
+        // Rutas administrativas adicionales pueden ir aquí
     });
     
     Route::middleware('role:maestro')->group(function () {
-        Route::get('/maestro/dashboard', [DashboardController::class, 'index'])->name('dashboard.maestro');
         Route::get('/maestro/cursos', [MaestroController::class, 'cursos'])->name('maestro.cursos');
         Route::get('/maestro/calificaciones', [MaestroController::class, 'calificaciones'])->name('maestro.calificaciones');
         Route::post('/maestro/calificaciones', [MaestroController::class, 'registrarCalificacion'])->name('maestro.calificaciones.store');
     });
     
     Route::middleware('role:alumno')->group(function () {
-        Route::get('/alumno/dashboard', [DashboardController::class, 'index'])->name('dashboard.alumno');
         Route::get('/alumno/cursos', [AlumnoController::class, 'cursos'])->name('alumno.cursos');
         Route::get('/alumno/calificaciones', [AlumnoController::class, 'calificaciones'])->name('alumno.calificaciones');
         Route::get('/alumno/perfil', [AlumnoController::class, 'perfil'])->name('alumno.perfil');
