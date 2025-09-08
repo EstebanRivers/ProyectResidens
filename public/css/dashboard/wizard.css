@@ -6,10 +6,17 @@
     border-radius: 16px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.1);
     overflow: hidden;
+    height: calc(100vh - 4rem);
+    display: flex;
+    flex-direction: column;
 }
 
 .wizard-container {
     padding: 2rem;
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Progress Steps */
@@ -18,6 +25,7 @@
     justify-content: space-between;
     margin-bottom: 3rem;
     position: relative;
+    flex-shrink: 0;
 }
 
 .wizard-steps::before {
@@ -80,11 +88,13 @@
 /* Wizard Steps Content */
 .wizard-step {
     display: none;
-    min-height: 400px;
+    flex: 1;
+    overflow-y: auto;
 }
 
 .wizard-step.active {
     display: block;
+    flex-direction: column;
     animation: slideIn 0.3s ease-in-out;
 }
 
@@ -153,6 +163,9 @@
 /* Lecciones Container */
 .lecciones-container {
     margin-top: 2rem;
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
 }
 
 .leccion-item {
@@ -186,6 +199,7 @@
     justify-content: center;
     font-weight: bold;
     margin-right: 1rem;
+    flex-shrink: 0;
 }
 
 .leccion-title-input {
@@ -226,6 +240,7 @@
     justify-content: center;
     font-size: 1.5rem;
     margin-right: 1rem;
+    flex-shrink: 0;
 }
 
 .section-title {
@@ -305,6 +320,8 @@
     background: #f8f9fa;
     border-radius: 12px;
     padding: 2rem;
+    max-height: 500px;
+    overflow-y: auto;
 }
 
 .review-section {
@@ -350,6 +367,7 @@
     margin-top: 3rem;
     padding-top: 2rem;
     border-top: 2px solid #e9ecef;
+    flex-shrink: 0;
 }
 
 .btn-primary {
@@ -407,6 +425,12 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+    .course-wizard {
+        height: 100vh;
+        margin: 0;
+        border-radius: 0;
+    }
+    
     .wizard-steps {
         flex-direction: column;
         gap: 1rem;
@@ -428,5 +452,13 @@
     .wizard-navigation {
         flex-direction: column;
         gap: 1rem;
+    }
+    
+    .lecciones-container {
+        max-height: 300px;
+    }
+    
+    .review-container {
+        max-height: 400px;
     }
 }

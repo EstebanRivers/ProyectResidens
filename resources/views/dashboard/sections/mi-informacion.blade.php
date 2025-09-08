@@ -1,3 +1,4 @@
+<!-- Mi Información Section -->
 <div id="mi-informacion" class="section-content">
     <div class="info-grid">
         <div class="info-card">
@@ -21,6 +22,18 @@
                     <span class="info-value">{{ Auth::user()->matricula }}</span>
                 </div>
                 @endif
+                @if(Auth::user()->telefono)
+                <div class="info-item">
+                    <span class="info-label">Teléfono:</span>
+                    <span class="info-value">{{ Auth::user()->telefono }}</span>
+                </div>
+                @endif
+                @if(Auth::user()->direccion)
+                <div class="info-item">
+                    <span class="info-label">Dirección:</span>
+                    <span class="info-value">{{ Auth::user()->direccion }}</span>
+                </div>
+                @endif
             </div>
         </div>
 
@@ -28,11 +41,51 @@
             <h3>Estadísticas</h3>
             <div class="stats-grid">
                 @if(Auth::user()->isAdmin())
-                    @include('dashboard.partials.stats.admin')
+                    <div class="stat-item">
+                        <div class="stat-number">{{ \App\Models\User::alumnos()->count() }}</div>
+                        <div class="stat-label">Estudiantes</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">{{ \App\Models\User::maestros()->count() }}</div>
+                        <div class="stat-label">Maestros</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">{{ \App\Models\Curso::activos()->count() }}</div>
+                        <div class="stat-label">Cursos Activos</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">{{ \App\Models\Calificacion::count() }}</div>
+                        <div class="stat-label">Calificaciones</div>
+                    </div>
                 @elseif(Auth::user()->isMaestro())
-                    @include('dashboard.partials.stats.maestro')
+                    @php
+                        $cursos = Auth::user()->cursosComoMaestro()->with('estudiantes')->get();
+                    @endphp
+                    <div class="stat-item">
+                        <div class="stat-number">{{ $cursos->count() }}</div>
+                        <div class="stat-label">Mis Cursos</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">{{ $cursos->sum(fn($curso) => $curso->estudiantes->count()) }}</div>
+                        <div class="stat-label">Estudiantes</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">{{ $cursos->where('activo', true)->count() }}</div>
+                        <div class="stat-label">Cursos Activos</div>
+                    </div>
                 @else
-                    @include('dashboard.partials.stats.alumno')
+                    <div class="stat-item">
+                        <div class="stat-number">{{ Auth::user()->cursosComoEstudiante->count() }}</div>
+                        <div class="stat-label">Cursos Inscritos</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">{{ Auth::user()->calificaciones()->avg('calificacion') ? round(Auth::user()->calificaciones()->avg('calificacion'), 1) : 'N/A' }}</div>
+                        <div class="stat-label">Promedio</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">{{ Auth::user()->calificaciones()->count() }}</div>
+                        <div class="stat-label">Calificaciones</div>
+                    </div>
                 @endif
             </div>
         </div>
