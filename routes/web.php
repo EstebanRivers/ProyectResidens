@@ -24,8 +24,6 @@ Route::middleware('auth')->group(function () {
     
     // Rutas de cursos
     Route::resource('cursos', CursoController::class);
-    Route::get('/cursos/create/wizard', [CursoController::class, 'createWizard'])->name('cursos.create-wizard');
-    Route::post('/cursos/wizard', [CursoController::class, 'storeWizard'])->name('cursos.store-wizard');
     Route::post('/cursos/{curso}/inscribir', [CursoController::class, 'inscribir'])->name('cursos.inscribir');
     
     // Rutas de contenidos

@@ -1,7 +1,7 @@
 // Dashboard Main JavaScript
 class DashboardManager {
     constructor() {
-        this.currentSection = 'welcome';
+        this.currentSection = 'mi-informacion';
         this.init();
     }
 
@@ -108,7 +108,7 @@ class DashboardManager {
         if (savedSection && document.getElementById(savedSection)) {
             this.showSection(savedSection);
         } else {
-            this.showWelcome();
+            this.showSection('mi-informacion');
         }
     }
 }
@@ -142,11 +142,11 @@ window.courseUtils = {
     },
 
     previewCourse(courseId) {
-        alert('Vista previa del curso - Mostrando contenido disponible');
+        window.location.href = `/cursos/${courseId}`;
     },
 
     continueCourse(courseId) {
-        alert('Continuando con el curso...');
+        window.location.href = `/cursos/${courseId}`;
     },
 
     viewGrades(courseId) {
@@ -156,3 +156,11 @@ window.courseUtils = {
 
 // Make functions globally available
 Object.assign(window, window.courseUtils);
+
+// Global functions
+window.showCreateCourseForm = window.courseUtils.showCreateCourseForm;
+window.hideCreateCourseForm = window.courseUtils.hideCreateCourseForm;
+window.enrollInCourse = window.courseUtils.enrollInCourse;
+window.previewCourse = window.courseUtils.previewCourse;
+window.continueCourse = window.courseUtils.continueCourse;
+window.viewGrades = window.courseUtils.viewGrades;

@@ -1,18 +1,14 @@
 <div id="cursos" class="section-content">
-    <div class="courses-management">
-        <div class="courses-header">
+    <div class="course-management">
+        <div class="course-header">
             <div class="header-actions">
-                <a href="{{ route('cursos.create-wizard') }}" class="btn btn-primary">
-                    <span class="btn-icon">🧙‍♂️</span>
-                    Crear con Asistente
-                </a>
-                <a href="{{ route('cursos.create') }}" class="btn btn-secondary">
+                <a href="{{ route('cursos.create') }}" class="btn btn-primary">
                     <span class="btn-icon">➕</span>
-                    Crear Rápido
+                    Crear Nuevo Curso
                 </a>
-                <button class="btn btn-secondary" onclick="loadAllCourses()">
-                    <span class="btn-icon">📚</span>
-                    Ver Todos los Cursos
+                <button class="btn btn-secondary" onclick="showCreateCourseForm()">
+                    <span class="btn-icon">📝</span>
+                    Crear Rápido
                 </button>
             </div>
         </div>

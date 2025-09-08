@@ -1,7 +1,7 @@
-<div class="create-course-card" onclick="window.location.href='{{ route('cursos.create-wizard') }}'">
+<div class="create-course-card" onclick="showCreateCourseForm()">
     <div class="create-course-content">
-        <div class="create-course-icon">🧙‍♂️</div>
-        <h3>Crear con Asistente</h3>
-        <p>Proceso guiado paso a paso para crear cursos completos</p>
+        <div class="create-course-icon">➕</div>
+        <h3>Crear Nuevo Curso</h3>
+        <p>Haz clic para crear un curso rápidamente</p>
     </div>
 </div>

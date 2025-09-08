@@ -45,7 +45,7 @@
 
         <!-- Logo del Footer -->
         <div class="footer-logo">
-            <img src="{{ asset('images/uhta-logo.png') }}" alt="Mundo Imperial">
+            <img src="{{ asset('images/uhta-logo.png') }}" alt="UHTA">
         </div>
     </div>
 </div>
