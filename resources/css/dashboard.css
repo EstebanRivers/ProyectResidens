@@ -1,17 +1,19 @@
 /* Dashboard Main Styles */
 html, body {
-    height: 100%;
+    min-height: 100%;         /* en lugar de height fijo */
     margin: 0;
     padding: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow-y: auto;         /* permite scroll vertical */
+    overflow-x: hidden;       /* evita scroll horizontal */
 }
 
 /* Dashboard Container */
 .dashboard-container {
     display: flex;
-    height: 100vh;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh; /* en lugar de height fijo */
 }
+
 
 /* Sidebar Styles */
 .sidebar {
@@ -137,6 +139,8 @@ html, body {
     display: flex;
     flex-direction: column;
     position: relative;
+    overflow-y: auto;   /* ✅ permite scroll vertical */
+    overflow-x: hidden; /* ✅ evita scroll horizontal */
 }
 
 .settings-icon {
@@ -196,9 +200,9 @@ html, body {
 .section-content {
     display: none;
     width: 100%;
-    height: 100%;
+    min-height: 100%;   /* ✅ antes height: 100%, para que pueda crecer */
     padding: 2rem;
-    overflow-y: auto;
+    overflow-y: auto;   /* mantiene scroll si el contenido lo requiere */
 }
 
 .section-content.active {
