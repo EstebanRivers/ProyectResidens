@@ -182,3 +182,24 @@ window.courseUtils = {
 
 // Make functions globally available
 Object.assign(window, window.courseUtils);
+
+// Functions for course form management
+function showCreateCourseForm() {
+    const form = document.getElementById('create-course-form');
+    if (form) {
+        form.style.display = 'block';
+        form.scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
+function hideCreateCourseForm() {
+    const form = document.getElementById('create-course-form');
+    if (form) {
+        form.style.display = 'none';
+        // Clear form data
+        const formElement = form.querySelector('form');
+        if (formElement) {
+            formElement.reset();
+        }
+    }
+}
