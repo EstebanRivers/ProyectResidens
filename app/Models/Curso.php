@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 
 class Curso extends Model
@@ -53,16 +52,9 @@ class Curso extends Model
         return $this->hasMany(Actividad::class);
     }
 
-    public function progreso(): HasManyThrough
+    public function progreso(): HasMany
     {
-        return $this->hasManyThrough(
-            Progreso::class,
-            Contenido::class,
-            'curso_id', // Foreign key on contenidos table
-            'contenido_id', // Foreign key on progresos table
-            'id', // Local key on cursos table
-            'id' // Local key on contenidos table
-        );
+        return $this->hasMany(ProgresoCurso::class);
     }
 
 
