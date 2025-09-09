@@ -1,195 +1,241 @@
-@extends('layouts.dashboard')
+@extends('layouts.app')
 
 @section('title', $actividad->titulo)
-@section('page-title', $actividad->titulo)
-@section('page-subtitle', 'Curso: ' . $curso->nombre)
 
 @section('content')
-<div class="activity-detail">
-    <!-- Activity Header -->
-    <div class="activity-header" style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 2rem;">
-        <div class="activity-info">
-            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
-                <span style="font-size: 2rem;">{{ $actividad->icono_tipo }}</span>
-                <div>
-                    <h1 style="color: #2c3e50; margin: 0;">{{ $actividad->titulo }}</h1>
-                    <p style="color: #6c757d; margin: 0;">{{ $actividad->descripcion }}</p>
-                </div>
-            </div>
-            
-            <div class="activity-meta" style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                <span style="padding: 0.5rem 1rem; background: #e3f2fd; color: #1976d2; border-radius: 20px; font-size: 0.9rem;">⭐ {{ $actividad->puntos }} puntos</span>
-                <span style="padding: 0.5rem 1rem; background: #f3e5f5; color: #7b1fa2; border-radius: 20px; font-size: 0.9rem;">📝 {{ ucfirst(str_replace('_', ' ', $actividad->tipo)) }}</span>
-                @if($actividad->contenido)
-                    <span style="padding: 0.5rem 1rem; background: #fff3e0; color: #f57c00; border-radius: 20px; font-size: 0.9rem;">📚 {{ $actividad->contenido->titulo }}</span>
-                @endif
-            </div>
-        </div>
-    </div>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('cursos.index') }}">Cursos</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('cursos.show', $actividad->contenido->curso->id) }}">{{ $actividad->contenido->curso->nombre }}</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('contenidos.show', $actividad->contenido->id) }}">{{ $actividad->contenido->titulo }}</a></li>
+                    <li class="breadcrumb-item active">{{ $actividad->titulo }}</li>
+                </ol>
+            </nav>
 
-    <!-- Activity Content -->
-    <div class="activity-content" style="background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 2rem;">
-        <div class="question-section" style="margin-bottom: 2rem;">
-            <h3 style="color: #2c3e50; margin-bottom: 1rem;">Pregunta:</h3>
-            <div style="padding: 1.5rem; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #1976d2;">
-                <p style="color: #2c3e50; font-size: 1.1rem; line-height: 1.6; margin: 0;">{{ $actividad->pregunta['texto'] }}</p>
-            </div>
-        </div>
-
-        @if(Auth::user()->isAlumno())
-            @if($respuestaUsuario)
-                <!-- Mostrar respuesta ya enviada -->
-                <div class="response-section" style="margin-bottom: 2rem;">
-                    <h3 style="color: #2c3e50; margin-bottom: 1rem;">Tu Respuesta:</h3>
-                    <div style="padding: 1.5rem; background: {{ $respuestaUsuario->es_correcta ? '#d4edda' : '#f8d7da' }}; border-radius: 8px; border-left: 4px solid {{ $respuestaUsuario->es_correcta ? '#28a745' : '#dc3545' }};">
-                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
-                            <span style="font-size: 1.5rem;">{{ $respuestaUsuario->es_correcta ? '✅' : '❌' }}</span>
-                            <div>
-                                <strong style="color: {{ $respuestaUsuario->es_correcta ? '#155724' : '#721c24' }};">
-                                    {{ $respuestaUsuario->es_correcta ? 'Respuesta Correcta' : 'Respuesta Incorrecta' }}
-                                </strong>
-                                <p style="margin: 0; color: {{ $respuestaUsuario->es_correcta ? '#155724' : '#721c24' }};">
-                                    Puntos obtenidos: {{ $respuestaUsuario->puntos_obtenidos }}/{{ $actividad->puntos }}
-                                </p>
-                            </div>
-                        </div>
-                        
-                        <div style="margin-bottom: 1rem;">
-                            <strong>Tu respuesta:</strong>
-                            @if($actividad->tipo === 'opcion_multiple')
-                                {{ $actividad->opciones[$respuestaUsuario->respuesta[0]] ?? 'Respuesta no válida' }}
-                            @elseif($actividad->tipo === 'verdadero_falso')
-                                {{ ucfirst($respuestaUsuario->respuesta[0]) }}
-                            @else
-                                {{ implode(', ', $respuestaUsuario->respuesta) }}
-                            @endif
-                        </div>
-                        
-                        @if(!$respuestaUsuario->es_correcta && $actividad->respuesta_correcta)
-                            <div style="margin-bottom: 1rem;">
-                                <strong>Respuesta correcta:</strong>
-                                @if($actividad->tipo === 'opcion_multiple')
-                                    @foreach($actividad->respuesta_correcta as $correcta)
-                                        {{ $actividad->opciones[$correcta] ?? '' }}{{ !$loop->last ? ', ' : '' }}
-                                    @endforeach
-                                @else
-                                    {{ implode(', ', $actividad->respuesta_correcta) }}
-                                @endif
-                            </div>
-                        @endif
-                        
-                        @if($actividad->explicacion)
-                            <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(0,0,0,0.1);">
-                                <strong>Explicación:</strong>
-                                <p style="margin: 0.5rem 0 0 0;">{{ $actividad->explicacion }}</p>
-                            </div>
-                        @endif
-                    </div>
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">{{ $actividad->titulo }}</h4>
+                    <p class="text-muted mb-0">{{ $actividad->contenido->titulo }} - {{ $actividad->contenido->curso->nombre }}</p>
                 </div>
-            @else
-                <!-- Formulario para responder -->
-                <form method="POST" action="{{ route('actividades.responder', [$curso, $actividad]) }}" style="margin-bottom: 2rem;">
-                    @csrf
-                    
-                    @if(!Auth::user()->cursosComoEstudiante()->where('curso_id', $curso->id)->exists())
-                        <div style="background: #f8d7da; color: #721c24; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; text-align: center;">
-                            <strong>⚠️ Debes inscribirte en el curso para responder esta actividad</strong>
+
+                <div class="card-body">
+                    @if($actividad->descripcion)
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            {{ $actividad->descripcion }}
                         </div>
-                    @else
-                    <div class="answer-section" style="margin-bottom: 2rem;">
-                        <h3 style="color: #2c3e50; margin-bottom: 1rem;">Tu Respuesta:</h3>
-                        
-                        @if($actividad->tipo === 'opcion_multiple')
-                            <div style="display: grid; gap: 1rem;">
-                                @foreach($actividad->opciones as $index => $opcion)
-                                    <label style="display: flex; align-items: center; padding: 1rem; background: #f8f9fa; border-radius: 8px; cursor: pointer; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#e3f2fd'" onmouseout="this.style.backgroundColor='#f8f9fa'">
-                                        <input type="radio" name="respuesta" value="{{ $index }}" required style="margin-right: 1rem;">
-                                        <span>{{ $opcion }}</span>
-                                    </label>
-                                @endforeach
-                            </div>
-                        @elseif($actividad->tipo === 'verdadero_falso')
-                            <div style="display: grid; gap: 1rem;">
-                                <label style="display: flex; align-items: center; padding: 1rem; background: #f8f9fa; border-radius: 8px; cursor: pointer; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#e3f2fd'" onmouseout="this.style.backgroundColor='#f8f9fa'">
-                                    <input type="radio" name="respuesta" value="verdadero" required style="margin-right: 1rem;">
-                                    <span>Verdadero</span>
-                                </label>
-                                <label style="display: flex; align-items: center; padding: 1rem; background: #f8f9fa; border-radius: 8px; cursor: pointer; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#e3f2fd'" onmouseout="this.style.backgroundColor='#f8f9fa'">
-                                    <input type="radio" name="respuesta" value="falso" required style="margin-right: 1rem;">
-                                    <span>Falso</span>
-                                </label>
-                            </div>
-                        @elseif($actividad->tipo === 'respuesta_corta')
-                            <input type="text" name="respuesta" required style="width: 100%; padding: 1rem; border: 2px solid #e9ecef; border-radius: 8px; font-size: 1rem;" placeholder="Escribe tu respuesta aquí...">
-                        @elseif($actividad->tipo === 'ensayo')
-                            <textarea name="respuesta" required rows="8" style="width: 100%; padding: 1rem; border: 2px solid #e9ecef; border-radius: 8px; font-size: 1rem; resize: vertical;" placeholder="Desarrolla tu respuesta aquí..."></textarea>
-                        @endif
-                    </div>
-                    
-                    <div style="text-align: center;">
-                        <button type="submit" style="padding: 1rem 2rem; background: #1976d2; color: white; border: none; border-radius: 8px; font-size: 1rem; cursor: pointer; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#1565c0'" onmouseout="this.style.backgroundColor='#1976d2'">
-                            📤 Enviar Respuesta
-                        </button>
-                    </div>
                     @endif
-                </form>
-            @endif
-        @else
-            <!-- Vista para maestros/admin -->
-            <div class="teacher-view" style="margin-bottom: 2rem;">
-                <h3 style="color: #2c3e50; margin-bottom: 1rem;">Información de la Actividad:</h3>
-                
-                @if($actividad->tipo === 'opcion_multiple')
-                    <div style="margin-bottom: 1rem;">
-                        <strong>Opciones:</strong>
-                        <ul style="margin: 0.5rem 0; padding-left: 2rem;">
-                            @foreach($actividad->opciones as $index => $opcion)
-                                <li style="margin: 0.5rem 0; {{ in_array($index, $actividad->respuesta_correcta) ? 'color: #28a745; font-weight: bold;' : '' }}">
-                                    {{ $opcion }} {{ in_array($index, $actividad->respuesta_correcta) ? '✓' : '' }}
-                                </li>
+
+                    @if(auth()->user()->rol === 'estudiante')
+                        <!-- Formulario para estudiantes -->
+                        <form action="{{ route('actividades.responder', $actividad->id) }}" method="POST" id="actividadForm">
+                            @csrf
+                            
+                            @foreach($actividad->preguntas as $index => $pregunta)
+                                <div class="question-card mb-4">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h6 class="mb-0">
+                                                Pregunta {{ $index + 1 }}
+                                                @if(isset($respuestasEstudiante[$pregunta->id]))
+                                                    @if($respuestasEstudiante[$pregunta->id]->es_correcta)
+                                                        <span class="badge badge-success float-right">
+                                                            <i class="fas fa-check"></i> Correcta
+                                                        </span>
+                                                    @else
+                                                        <span class="badge badge-danger float-right">
+                                                            <i class="fas fa-times"></i> Incorrecta
+                                                        </span>
+                                                    @endif
+                                                @else
+                                                    <span class="badge badge-secondary float-right">
+                                                        <i class="fas fa-clock"></i> Sin responder
+                                                    </span>
+                                                @endif
+                                            </h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <p class="question-text mb-3">{{ $pregunta->pregunta }}</p>
+                                            
+                                            <div class="options">
+                                                @foreach($pregunta->opciones as $opcion)
+                                                    <div class="form-check mb-2">
+                                                        <input class="form-check-input" 
+                                                               type="radio" 
+                                                               name="respuestas[{{ $pregunta->id }}]" 
+                                                               id="opcion_{{ $opcion->id }}" 
+                                                               value="{{ $opcion->id }}"
+                                                               @if(isset($respuestasEstudiante[$pregunta->id]) && $respuestasEstudiante[$pregunta->id]->opcion_id == $opcion->id) checked @endif>
+                                                        <label class="form-check-label" for="opcion_{{ $opcion->id }}">
+                                                            {{ $opcion->opcion }}
+                                                            @if(isset($respuestasEstudiante[$pregunta->id]))
+                                                                @if($opcion->es_correcta)
+                                                                    <i class="fas fa-check text-success ml-2"></i>
+                                                                @elseif($respuestasEstudiante[$pregunta->id]->opcion_id == $opcion->id && !$opcion->es_correcta)
+                                                                    <i class="fas fa-times text-danger ml-2"></i>
+                                                                @endif
+                                                            @endif
+                                                        </label>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+
+                                            @if(isset($respuestasEstudiante[$pregunta->id]))
+                                                <div class="mt-3">
+                                                    <small class="text-muted">
+                                                        <i class="fas fa-clock"></i>
+                                                        Respondida el {{ $respuestasEstudiante[$pregunta->id]->fecha_respuesta->format('d/m/Y H:i') }}
+                                                    </small>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
                             @endforeach
-                        </ul>
-                    </div>
-                @elseif($actividad->tipo === 'verdadero_falso')
-                    <div style="margin-bottom: 1rem;">
-                        <strong>Respuesta correcta:</strong> {{ ucfirst(implode(', ', $actividad->respuesta_correcta)) }}
-                    </div>
-                @elseif($actividad->tipo === 'respuesta_corta')
-                    <div style="margin-bottom: 1rem;">
-                        <strong>Respuestas correctas:</strong> {{ implode(', ', $actividad->respuesta_correcta) }}
-                    </div>
-                @endif
-                
-                @if($actividad->explicacion)
-                    <div style="margin-bottom: 1rem;">
-                        <strong>Explicación:</strong>
-                        <p style="margin: 0.5rem 0;">{{ $actividad->explicacion }}</p>
-                    </div>
-                @endif
-                
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-top: 1rem;">
-                    <div style="text-align: center; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
-                        <div style="font-size: 1.5rem; font-weight: bold; color: #1976d2;">{{ $actividad->respuestas()->count() }}</div>
-                        <div style="font-size: 0.9rem; color: #6c757d;">Respuestas</div>
-                    </div>
-                    <div style="text-align: center; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
-                        <div style="font-size: 1.5rem; font-weight: bold; color: #28a745;">{{ $actividad->respuestas()->where('es_correcta', true)->count() }}</div>
-                        <div style="font-size: 0.9rem; color: #6c757d;">Correctas</div>
-                    </div>
-                    <div style="text-align: center; padding: 1rem; background: #f8f9fa; border-radius: 8px;">
-                        <div style="font-size: 1.5rem; font-weight: bold; color: #dc3545;">{{ $actividad->respuestas()->where('es_correcta', false)->count() }}</div>
-                        <div style="font-size: 0.9rem; color: #6c757d;">Incorrectas</div>
+
+                            @if($actividad->preguntas->count() > 0)
+                                <div class="text-center mt-4">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-paper-plane"></i>
+                                        @if($respuestasEstudiante->count() > 0)
+                                            Actualizar Respuestas
+                                        @else
+                                            Enviar Respuestas
+                                        @endif
+                                    </button>
+                                </div>
+                            @endif
+                        </form>
+
+                        @if($respuestasEstudiante->count() > 0)
+                            <!-- Mostrar estadísticas -->
+                            <div class="mt-4">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6 class="card-title">
+                                            <i class="fas fa-chart-bar"></i> Tus Resultados
+                                        </h6>
+                                        @php
+                                            $correctas = $respuestasEstudiante->where('es_correcta', true)->count();
+                                            $total = $actividad->preguntas->count();
+                                            $porcentaje = $total > 0 ? ($correctas / $total) * 100 : 0;
+                                        @endphp
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="text-center">
+                                                    <h4 class="text-success">{{ $correctas }}</h4>
+                                                    <small class="text-muted">Correctas</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="text-center">
+                                                    <h4 class="text-danger">{{ $total - $correctas }}</h4>
+                                                    <small class="text-muted">Incorrectas</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="text-center">
+                                                    <h4 class="text-primary">{{ $total }}</h4>
+                                                    <small class="text-muted">Total</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <div class="text-center">
+                                                    <h4 class="@if($porcentaje >= 70) text-success @elseif($porcentaje >= 50) text-warning @else text-danger @endif">
+                                                        {{ number_format($porcentaje, 1) }}%
+                                                    </h4>
+                                                    <small class="text-muted">Puntuación</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                    @else
+                        <!-- Vista para maestros y administradores -->
+                        <div class="questions-preview">
+                            @foreach($actividad->preguntas as $index => $pregunta)
+                                <div class="question-card mb-4">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h6 class="mb-0">Pregunta {{ $index + 1 }}</h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <p class="question-text mb-3">{{ $pregunta->pregunta }}</p>
+                                            
+                                            <div class="options">
+                                                @foreach($pregunta->opciones as $opcion)
+                                                    <div class="form-check mb-2">
+                                                        <input class="form-check-input" type="radio" disabled>
+                                                        <label class="form-check-label">
+                                                            {{ $opcion->opcion }}
+                                                            @if($opcion->es_correcta)
+                                                                <i class="fas fa-check text-success ml-2"></i>
+                                                                <small class="text-success">(Respuesta correcta)</small>
+                                                            @endif
+                                                        </label>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+
+                    @if($actividad->preguntas->count() === 0)
+                        <div class="alert alert-warning text-center">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Esta actividad aún no tiene preguntas configuradas.
+                        </div>
+                    @endif
+
+                    <!-- Botones de navegación -->
+                    <div class="mt-4 d-flex justify-content-between">
+                        <a href="{{ route('contenidos.show', $actividad->contenido->id) }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Volver al Contenido
+                        </a>
+                        
+                        @if(auth()->user()->rol === 'admin' || (auth()->user()->rol === 'maestro' && $actividad->contenido->curso->maestro_id === auth()->id()))
+                            <div>
+                                <a href="{{ route('actividades.edit', $actividad->id) }}" class="btn btn-warning">
+                                    <i class="fas fa-edit"></i> Editar Actividad
+                                </a>
+                                <form action="{{ route('actividades.destroy', $actividad->id) }}" method="POST" class="d-inline"
+                                      onsubmit="return confirm('¿Estás seguro de eliminar esta actividad?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger">
+                                        <i class="fas fa-trash"></i> Eliminar
+                                    </button>
+                                </form>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
-        @endif
-    </div>
-    
-    <!-- Navigation -->
-    <div style="margin-top: 2rem; text-align: center;">
-        <a href="{{ route('cursos.show', $curso) }}" style="padding: 0.75rem 1.5rem; background: #6c757d; color: white; text-decoration: none; border-radius: 8px; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#5a6268'" onmouseout="this.style.backgroundColor='#6c757d'">
-            ← Volver al Curso
-        </a>
+        </div>
     </div>
 </div>
+
+<script>
+// Confirmar antes de enviar respuestas
+document.getElementById('actividadForm')?.addEventListener('submit', function(e) {
+    const respuestasCompletas = document.querySelectorAll('input[type="radio"]:checked').length;
+    const totalPreguntas = {{ $actividad->preguntas->count() }};
+    
+    if (respuestasCompletas < totalPreguntas) {
+        if (!confirm(`Has respondido ${respuestasCompletas} de ${totalPreguntas} preguntas. ¿Deseas continuar?`)) {
+            e.preventDefault();
+        }
+    }
+});
+</script>
 @endsection

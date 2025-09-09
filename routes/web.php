@@ -26,9 +26,11 @@ Route::middleware('auth')->group(function () {
     Route::resource('cursos', CursoController::class);
     Route::post('/cursos/{curso}/inscribir', [CursoController::class, 'inscribir'])->name('cursos.inscribir');
     Route::delete('cursos/{curso}/desinscribir', [CursoController::class, 'desinscribir'])->name('cursos.desinscribir');
+    Route::delete('cursos/{curso}/desinscribir', [CursoController::class, 'desinscribir'])->name('cursos.desinscribir');
     
     // Rutas de contenidos
     Route::get('/cursos/{curso}/contenidos/create', [ContenidoController::class, 'create'])->name('contenidos.create');
+    Route::post('contenidos/{contenido}/completar', [ContenidoController::class, 'marcarCompletado'])->name('contenidos.completar');
     Route::post('contenidos/{contenido}/completar', [ContenidoController::class, 'marcarCompletado'])->name('contenidos.completar');
     Route::post('/cursos/{curso}/contenidos', [ContenidoController::class, 'store'])->name('contenidos.store');
     Route::get('/cursos/{curso}/contenidos/{contenido}', [ContenidoController::class, 'show'])->name('contenidos.show');
@@ -40,6 +42,7 @@ Route::middleware('auth')->group(function () {
     
     // Rutas de actividades
     Route::get('/cursos/{curso}/actividades/create', [ActividadController::class, 'create'])->name('actividades.create');
+    Route::post('actividades/{actividad}/responder', [ActividadController::class, 'responder'])->name('actividades.responder');
     Route::post('actividades/{actividad}/responder', [ActividadController::class, 'responder'])->name('actividades.responder');
     Route::post('/cursos/{curso}/actividades', [ActividadController::class, 'store'])->name('actividades.store');
     Route::get('/cursos/{curso}/actividades/{actividad}', [ActividadController::class, 'show'])->name('actividades.show');

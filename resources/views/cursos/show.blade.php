@@ -106,6 +106,16 @@
                                     @endphp
                                     @if($progreso && $progreso->completado)
                                         <span class="status-badge status-completed" style="padding: 0.25rem 0.75rem; background: #d4edda; color: #155724; border-radius: 20px; font-size: 0.8rem; font-weight: 500;">✅ Completado</span>
+                            
+                            <!-- Botón para desinscribirse -->
+                            <form action="{{ route('cursos.desinscribir', $curso->id) }}" method="POST" class="d-inline" 
+                                  onsubmit="return confirm('¿Estás seguro de que quieres desinscribirte de este curso?')">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                    <i class="fas fa-sign-out-alt"></i> Desinscribirse
+                                </button>
+                            </form>
                                     @else
                                         <span class="status-badge status-pending" style="padding: 0.25rem 0.75rem; background: #fff3cd; color: #856404; border-radius: 20px; font-size: 0.8rem; font-weight: 500;">⏳ Pendiente</span>
                                     @endif
