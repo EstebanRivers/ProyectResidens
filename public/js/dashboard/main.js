@@ -21,6 +21,15 @@ class DashboardManager {
                 }
             });
         });
+
+        // Ajustes tabs
+        document.querySelectorAll('.ajustes-tab').forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetTab = tab.getAttribute('data-tab');
+                this.showAjustesTab(targetTab);
+            });
+        });
     }
 
     showSection(sectionId) {
@@ -59,6 +68,29 @@ class DashboardManager {
         localStorage.setItem('currentSection', sectionId);
     }
 
+    showAjustesTab(tabId) {
+        // Hide all ajustes sections
+        document.querySelectorAll('.ajustes-section').forEach(section => {
+            section.classList.remove('active');
+        });
+
+        // Show target tab
+        const targetTab = document.getElementById(tabId);
+        if (targetTab) {
+            targetTab.classList.add('active');
+        }
+
+        // Update tab navigation
+        document.querySelectorAll('.ajustes-tab').forEach(tab => {
+            tab.classList.remove('active');
+        });
+
+        const activeTab = document.querySelector(`[data-tab="${tabId}"]`);
+        if (activeTab) {
+            activeTab.classList.add('active');
+        }
+    }
+
     loadSavedSection() {
         const savedSection = localStorage.getItem('currentSection');
         if (savedSection && document.getElementById(savedSection)) {
@@ -77,4 +109,20 @@ class DashboardManager {
 // Initialize dashboard when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     window.dashboard = new DashboardManager();
+});
+
+// Form handlers
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle form submissions
+    const forms = ['perfil-form', 'seguridad-form', 'notificaciones-form'];
+    
+    forms.forEach(formId => {
+        const form = document.getElementById(formId);
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                alert('Configuración guardada exitosamente');
+            });
+        }
+    });
 });
