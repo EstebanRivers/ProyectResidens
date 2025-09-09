@@ -20,7 +20,9 @@ require __DIR__.'/auth.php';
 // Rutas protegidas por autenticación
 Route::middleware('auth')->group(function () {
     // Dashboard principal
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', function() {
+        return view('dashboard.index');
+    })->name('dashboard');
     
     // Rutas de cursos
     Route::resource('cursos', CursoController::class);
