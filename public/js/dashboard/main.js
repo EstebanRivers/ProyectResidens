@@ -156,3 +156,5 @@ class DashboardManager {
 // Initialize dashboard when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     window.dashboard = new DashboardManager();
+}
+)
