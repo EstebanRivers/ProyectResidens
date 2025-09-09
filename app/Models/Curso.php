@@ -48,22 +48,14 @@ class Curso extends Model
         return $this->hasMany(Contenido::class, 'curso_id');
     }
 
-    public function actividades(): HasMany
+    public function actividades(): HasManyThrough
     {
         return $this->hasMany(Actividad::class);
     }
 
     public function progreso(): HasManyThrough
     {
-        // Assuming ProgresoCurso is reached through Actividad
-        return $this->hasManyThrough(
-            ProgresoCurso::class,
-            Actividad::class,
-            'curso_id',           // Foreign key on Actividad table...
-            'actividad_id',       // Foreign key on ProgresoCurso table...
-            'id',                 // Local key on Curso table...
-            'id'                  // Local key on Actividad table...
-        );
+        return $this->hasMany(ProgresoCurso::class);
     }
 
 

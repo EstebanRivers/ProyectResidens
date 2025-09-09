@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="{{ asset('css/dashboard/main.css') }}">
     <link rel="stylesheet" href="{{ asset('css/dashboard/courses.css') }}">
     <link rel="stylesheet" href="{{ asset('css/dashboard/forms.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/dashboard/wizard.css') }}">
     
     @stack('styles')
 </head>
@@ -23,12 +24,10 @@
         
         <!-- Main Content -->
         <div class="main-content">
-            @hasSection('page-title')
-                <div class="content-header">
-                    <h1 class="page-title">@yield('page-title')</h1>
-                    <p class="page-subtitle">@yield('page-subtitle')</p>
-                </div>
-            @endif
+            <div class="content-header">
+                <h1 class="page-title">@yield('page-title', 'Dashboard')</h1>
+                <p class="page-subtitle">@yield('page-subtitle', 'Panel de control')</p>
+            </div>
             
             <div class="content-body">
                 @if(session('success'))

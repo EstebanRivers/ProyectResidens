@@ -5,7 +5,7 @@
 @section('page-subtitle', 'Curso: ' . $curso->nombre)
 
 @section('content')
-<div class="form-container" style="max-width: 800px; margin: 0 auto;">
+<div class="form-container">
     <form method="POST" action="{{ route('contenidos.store', $curso) }}" enctype="multipart/form-data">
         @csrf
         

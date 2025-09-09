@@ -1,124 +1,184 @@
 // Dashboard Main JavaScript
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('Dashboard JavaScript loaded');
-    
-    // Elementos del DOM
-    const navItems = document.querySelectorAll('.nav-item[data-section]');
-    const sections = document.querySelectorAll('.section-content');
-    const welcomeSection = document.querySelector('.welcome-section');
-    
-    console.log('Nav items found:', navItems.length);
-    console.log('Sections found:', sections.length);
+class DashboardManager {
+    constructor() {
+        this.currentSection = 'mi-informacion';
+        this.init();
+    }
 
-    // Función para mostrar una sección específica
-    function showSection(sectionId) {
-        console.log('Showing section:', sectionId);
+    init() {
+        this.bindEvents();
+        this.loadSavedSection();
+    }
+
+    bindEvents() {
+        // Navigation items
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const section = item.getAttribute('data-section');
+                if (section) {
+                    this.showSection(section);
+                }
+            });
+        });
+
+        // Settings tabs
+        document.querySelectorAll('.ajustes-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                this.showSettingsTab(tab.getAttribute('data-tab'));
+            });
+        });
         
-        // Ocultar la sección de bienvenida
-        if (welcomeSection) {
-            welcomeSection.style.display = 'none';
-        }
-        
-        // Ocultar todas las secciones
-        sections.forEach(section => {
+        // Course content tabs
+        document.querySelectorAll('.content-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                this.showContentTab(tab.getAttribute('data-tab'));
+            });
+        });
+    }
+
+    showSection(sectionId) {
+        // Hide all sections
+        document.querySelectorAll('.section-content, .welcome-section').forEach(section => {
+            section.classList.remove('active');
             section.style.display = 'none';
         });
-        
-        // Mostrar la sección seleccionada
+
+        // Show target section
         const targetSection = document.getElementById(sectionId);
         if (targetSection) {
+            targetSection.classList.add('active');
             targetSection.style.display = 'block';
-            console.log('Section displayed:', sectionId);
         } else {
-            console.error('Section not found:', sectionId);
+            // If section doesn't exist, show welcome
+            const welcomeSection = document.querySelector('.welcome-section');
+            if (welcomeSection) {
+                welcomeSection.classList.add('active');
+                welcomeSection.style.display = 'flex';
+            }
         }
-        
-        // Actualizar navegación activa
-        navItems.forEach(item => {
+
+        // Update navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
             item.classList.remove('active');
         });
-        
-        // Marcar el elemento de navegación como activo
+
         const activeNavItem = document.querySelector(`[data-section="${sectionId}"]`);
         if (activeNavItem) {
             activeNavItem.classList.add('active');
         }
-        
-        // Guardar la sección actual en localStorage
+
+        // Save current section
+        this.currentSection = sectionId;
         localStorage.setItem('currentSection', sectionId);
     }
 
-    // Función para mostrar la página de bienvenida
-    function showWelcome() {
-        console.log('Showing welcome section');
-        
-        sections.forEach(section => {
+    showWelcome() {
+        document.querySelectorAll('.section-content').forEach(section => {
+            section.classList.remove('active');
             section.style.display = 'none';
         });
-        
+
+        const welcomeSection = document.querySelector('.welcome-section');
         if (welcomeSection) {
+            welcomeSection.classList.add('active');
             welcomeSection.style.display = 'flex';
         }
-        
-        navItems.forEach(item => {
+
+        document.querySelectorAll('.nav-item').forEach(item => {
             item.classList.remove('active');
         });
-        
+
+        this.currentSection = 'welcome';
         localStorage.removeItem('currentSection');
     }
 
-    // Event listeners para navegación
-    navItems.forEach(item => {
-        item.addEventListener('click', function(e) {
-            e.preventDefault();
-            const sectionId = this.getAttribute('data-section');
-            console.log('Nav item clicked:', sectionId);
-            
-            if (sectionId) {
-                showSection(sectionId);
-            }
+    showSettingsTab(tabId) {
+        // Remove active class from all tabs and sections
+        document.querySelectorAll('.ajustes-tab').forEach(tab => {
+            tab.classList.remove('active');
+            tab.style.color = '#666';
+            tab.style.borderBottomColor = 'transparent';
         });
-    });
-
-    // Funcionalidad para ajustes (tabs)
-    const ajustesTabs = document.querySelectorAll('.ajustes-tab');
-    const ajustesSections = document.querySelectorAll('.ajustes-section');
-
-    ajustesTabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-            const targetTab = this.getAttribute('data-tab');
-            
-            // Remover clase activa de todos los tabs
-            ajustesTabs.forEach(t => t.classList.remove('active'));
-            ajustesSections.forEach(s => s.classList.remove('active'));
-            
-            // Activar el tab seleccionado
-            this.classList.add('active');
-            const targetSection = document.getElementById(targetTab);
-            if (targetSection) {
-                targetSection.classList.add('active');
-            }
+        document.querySelectorAll('.ajustes-section').forEach(section => {
+            section.classList.remove('active');
+            section.style.display = 'none';
         });
-    });
 
-    // Restaurar la sección guardada o mostrar bienvenida por defecto
-    const savedSection = localStorage.getItem('currentSection');
-    if (savedSection && document.getElementById(savedSection)) {
-        showSection(savedSection);
-    } else {
-        showWelcome();
+        // Activate selected tab
+        const activeTab = document.querySelector(`[data-tab="${tabId}"]`);
+        const activeSection = document.getElementById(tabId);
+
+        if (activeTab) {
+            activeTab.classList.add('active');
+            activeTab.style.color = '#ffa726';
+            activeTab.style.borderBottomColor = '#ffa726';
+        }
+        if (activeSection) {
+            activeSection.classList.add('active');
+            activeSection.style.display = 'block';
+        }
+    }
+    
+    showContentTab(tabId) {
+        // Remove active class from all tabs and sections
+        document.querySelectorAll('.content-tab').forEach(tab => {
+            tab.style.color = '#6c757d';
+            tab.style.borderBottomColor = 'transparent';
+        });
+        document.querySelectorAll('.content-section').forEach(section => {
+            section.style.display = 'none';
+        });
+
+        // Activate selected tab
+        const activeTab = document.querySelector(`[data-tab="${tabId}"]`);
+        const activeSection = document.getElementById(tabId);
+
+        if (activeTab) {
+            activeTab.style.color = '#ffa726';
+            activeTab.style.borderBottomColor = '#ffa726';
+        }
+        if (activeSection) {
+            activeSection.style.display = 'block';
+        }
     }
 
-    // Manejar formularios
-    const forms = ['perfil-form', 'seguridad-form', 'notificaciones-form'];
-    
-    forms.forEach(formId => {
-        const form = document.getElementById(formId);
-        if (form) {
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                alert('Configuración guardada exitosamente');
-            });
+    loadSavedSection() {
+        const savedSection = localStorage.getItem('currentSection');
+        if (savedSection && document.getElementById(savedSection)) {
+            this.showSection(savedSection);
+        } else {
+            this.showSection('mi-informacion');
         }
-    });
+    }
+}
+
+// Initialize dashboard when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    window.dashboard = new DashboardManager();
 });
+
+// Utility functions for course management
+window.courseUtils = {
+    enrollInCourse(courseId) {
+        if (confirm('¿Estás seguro de que quieres inscribirte en este curso?')) {
+            // Redirect to enrollment
+            window.location.href = `/cursos/${courseId}/inscribir`;
+        }
+    },
+
+    previewCourse(courseId) {
+        window.location.href = `/cursos/${courseId}`;
+    },
+
+    continueCourse(courseId) {
+        window.location.href = `/cursos/${courseId}`;
+    },
+
+    viewGrades(courseId) {
+        window.location.href = `/alumno/calificaciones`;
+    }
+};
+
+// Make functions globally available
+Object.assign(window, window.courseUtils);

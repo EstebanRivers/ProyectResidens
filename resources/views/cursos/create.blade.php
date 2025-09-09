@@ -5,7 +5,7 @@
 @section('page-subtitle', 'Configuración inicial del curso')
 
 @section('content')
-<div class="form-container" style="max-width: 800px; margin: 0 auto;">
+<div class="form-container">
     <form method="POST" action="{{ route('cursos.store') }}">
         @csrf
         
