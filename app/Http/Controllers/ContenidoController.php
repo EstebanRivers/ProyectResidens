@@ -3,111 +3,77 @@
 namespace App\Http\Controllers;
 
 use App\Models\Contenido;
-use App\Models\ProgresoCurso;
+use App\Models\Curso;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ContenidoController extends Controller
 {
-    public function show(Contenido $contenido)
+    public function show($id)
     {
-        // Verificar autenticación
-        if (!auth()->check()) {
-            return redirect()->route('login');
-        }
-        
-        // Verificar que el usuario esté inscrito en el curso
-        $curso = $contenido->curso;
-        $estudiante = Auth::user();
+        try {
+            // Buscar el contenido por ID
+            $contenido = Contenido::findOrFail($id);
+            
+            // Verificar que el usuario esté inscrito en el curso
+            $curso = $contenido->curso;
+            
+            if (!$curso->estudiantes()->where('user_id', Auth::id())->exists()) {
+                return redirect()->route('cursos.show', $curso->id)
+                    ->with('error', 'Debes estar inscrito en el curso para acceder a este contenido.');
+            }
 
-        if (!$estudiante->isAlumno()) {
+            // Obtener todos los contenidos del curso para navegación
+            $contenidos = $curso->contenidos()->activos()->orderBy('orden')->get();
+            
+            // Obtener progreso del usuario
+            $progreso = $contenido->progresoDelUsuario(Auth::id());
+            
+            // Calcular progreso general del curso
+            $totalContenidos = $contenidos->count();
+            $completados = $curso->contenidos()
+                ->whereHas('progresos', function($query) {
+                    $query->where('user_id', Auth::id())
+                          ->where('completado', true);
+                })
+                ->count();
+            
+            $porcentajeProgreso = $totalContenidos > 0 ? round(($completados / $totalContenidos) * 100) : 0;
+
+            return view('contenidos.show', compact(
+                'contenido', 
+                'curso', 
+                'contenidos', 
+                'progreso', 
+                'porcentajeProgreso'
+            ));
+
+        } catch (\Exception $e) {
             return redirect()->route('cursos.index')
-                ->with('error', 'Solo los estudiantes pueden acceder a los contenidos.');
+                ->with('error', 'No se pudo cargar el contenido.');
         }
-
-        $inscrito = $curso->estudiantes()->where('estudiante_id', $estudiante->id)->exists();
-        
-        if (!$inscrito) {
-            return redirect()->route('cursos.show', $curso)
-                ->with('error', 'Debes estar inscrito en el curso para acceder a este contenido.');
-        }
-
-        // Obtener o crear progreso
-        $progreso = ProgresoCurso::firstOrCreate([
-            'estudiante_id' => $estudiante->id,
-            'curso_id' => $curso->id,
-            'contenido_id' => $contenido->id,
-        ], [
-            'completado' => false,
-            'tiempo_dedicado' => 0,
-        ]);
-
-        // Obtener todos los contenidos del curso para navegación
-        $contenidos = $curso->contenidos()->orderBy('orden')->get();
-        
-        // Calcular progreso general del curso
-        $totalContenidos = $contenidos->count();
-        $contenidosCompletados = ProgresoCurso::where('estudiante_id', $estudiante->id)
-            ->where('curso_id', $curso->id)
-            ->where('completado', true)
-            ->distinct('contenido_id')
-            ->count();
-        
-        $porcentajeProgreso = $totalContenidos > 0 ? round(($contenidosCompletados / $totalContenidos) * 100) : 0;
-
-        return view('contenidos.show', compact(
-            'contenido', 
-            'curso', 
-            'progreso', 
-            'contenidos', 
-            'porcentajeProgreso',
-            'contenidosCompletados',
-            'totalContenidos'
-        ));
     }
 
-    public function marcarCompletado(Request $request, Contenido $contenido)
+    public function marcarCompletado(Request $request, $id)
     {
-        // Verificar autenticación
-        if (!auth()->check()) {
-            return response()->json(['error' => 'No autenticado'], 401);
+        try {
+            $contenido = Contenido::findOrFail($id);
+            
+            // Verificar inscripción
+            if (!$contenido->curso->estudiantes()->where('user_id', Auth::id())->exists()) {
+                return response()->json(['error' => 'No tienes acceso a este contenido'], 403);
+            }
+
+            // Marcar como completado
+            $contenido->marcarCompletado(Auth::id());
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Contenido marcado como completado'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al marcar contenido'], 500);
         }
-        
-        $estudiante = Auth::user();
-        $curso = $contenido->curso;
-
-        // Verificar inscripción
-        if (!$curso->estudiantes()->where('estudiante_id', $estudiante->id)->exists()) {
-            return response()->json(['error' => 'No estás inscrito en este curso'], 403);
-        }
-
-        // Actualizar progreso
-        $progreso = ProgresoCurso::updateOrCreate([
-            'estudiante_id' => $estudiante->id,
-            'curso_id' => $curso->id,
-            'contenido_id' => $contenido->id,
-        ], [
-            'completado' => true,
-            'fecha_completado' => now(),
-            'tiempo_dedicado' => $request->input('tiempo_dedicado', 0),
-        ]);
-
-        // Calcular nuevo progreso del curso
-        $totalContenidos = $curso->contenidos()->count();
-        $contenidosCompletados = ProgresoCurso::where('estudiante_id', $estudiante->id)
-            ->where('curso_id', $curso->id)
-            ->where('completado', true)
-            ->distinct('contenido_id')
-            ->count();
-        
-        $porcentajeProgreso = $totalContenidos > 0 ? round(($contenidosCompletados / $totalContenidos) * 100) : 0;
-
-        return response()->json([
-            'success' => true,
-            'mensaje' => 'Contenido marcado como completado',
-            'progreso' => $porcentajeProgreso,
-            'completados' => $contenidosCompletados,
-            'total' => $totalContenidos
-        ]);
     }
 }

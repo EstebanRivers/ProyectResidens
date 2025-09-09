@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Actividad extends Model
 {
@@ -13,112 +15,79 @@ class Actividad extends Model
 
     protected $fillable = [
         'curso_id',
-        'contenido_id',
         'titulo',
         'descripcion',
         'tipo',
         'pregunta',
         'opciones',
         'respuesta_correcta',
-        'explicacion',
         'puntos',
-        'orden',
-        'activo'
+        'activo',
+        'orden'
     ];
 
     protected $casts = [
-        'pregunta' => 'array',
         'opciones' => 'array',
         'respuesta_correcta' => 'array',
+        'activo' => 'boolean',
         'puntos' => 'integer',
-        'orden' => 'integer',
-        'activo' => 'boolean'
+        'orden' => 'integer'
     ];
 
-    // Relación con Curso
+    // Relación con curso
     public function curso(): BelongsTo
     {
         return $this->belongsTo(Curso::class);
     }
 
-    // Relación con Contenido
-    public function contenido(): BelongsTo
-    {
-        return $this->belongsTo(Contenido::class);
-    }
-
-    // Relación con Respuestas de Actividad
+    // Relación con respuestas
     public function respuestas(): HasMany
     {
-        return $this->hasMany(RespuestaActividad::class, 'actividad_id');
+        return $this->hasMany(RespuestaActividad::class);
     }
 
-    // Relación con progreso
-    public function progreso(): HasMany
-    {
-        return $this->hasMany(ProgresoCurso::class, 'actividad_id');
-    }
-
-    // Scopes
-    public function scopeActivas($query)
+    // Scope para actividades activas
+    public function scopeActivos($query)
     {
         return $query->where('activo', true);
     }
 
-    public function scopeOrdenadas($query)
+    // Verificar si el usuario ya respondió
+    public function yaRespondidaPor($userId)
     {
-        return $query->orderBy('orden');
+        return $this->respuestas()->where('user_id', $userId)->exists();
     }
 
-    // Accessor para icono según tipo
-    public function getIconoTipoAttribute()
+    // Obtener respuesta del usuario
+    public function respuestaDelUsuario($userId)
     {
-        return match($this->tipo) {
-            'opcion_multiple' => '☑️',
-            'verdadero_falso' => '✅',
-            'respuesta_corta' => '✏️',
-            'ensayo' => '📝',
-            default => '📝'
-        };
+        return $this->respuestas()->where('user_id', $userId)->first();
     }
 
-    // Obtener respuesta de un estudiante específico
-    public function respuestaEstudiante($estudianteId)
+    // Verificar respuesta correcta
+    public function verificarRespuesta($respuestaUsuario)
     {
-        return $this->respuestas()
-            ->where('estudiante_id', $estudianteId)
-            ->first();
-    }
-
-    // Verificar si un estudiante ya respondió
-    public function yaRespondidaPor($estudianteId)
-    {
-        return $this->respuestas()
-            ->where('estudiante_id', $estudianteId)
-            ->exists();
-    }
-
-    // Calcular puntuación de un estudiante
-    public function puntuacionEstudiante($estudianteId)
-    {
-        $respuesta = $this->respuestaEstudiante($estudianteId);
-        return $respuesta ? $respuesta->puntos_obtenidos : 0;
-    }
-
-    // Verificar si una respuesta es correcta
-    public function verificarRespuesta($respuestaEstudiante)
-    {
-        $respuestasCorrectas = $this->respuesta_correcta;
-        
-        if ($this->tipo === 'opcion_multiple') {
-            return in_array($respuestaEstudiante, $respuestasCorrectas);
-        } elseif ($this->tipo === 'verdadero_falso') {
-            return strtolower($respuestaEstudiante) === strtolower($respuestasCorrectas[0]);
-        } elseif ($this->tipo === 'respuesta_corta') {
-            return in_array(strtolower(trim($respuestaEstudiante)), 
-                           array_map('strtolower', array_map('trim', $respuestasCorrectas)));
+        if (!is_array($respuestaUsuario)) {
+            $respuestaUsuario = [$respuestaUsuario];
         }
+
+        $correctas = $this->respuesta_correcta ?? [];
         
+        if (empty($correctas)) {
+            return false;
+        }
+
+        // Para respuestas múltiples, verificar que coincidan exactamente
+        if (count($respuestaUsuario) === count($correctas)) {
+            return empty(array_diff($respuestaUsuario, $correctas));
+        }
+
         return false;
+    }
+
+    // Calcular puntuación
+    public function calcularPuntuacion($respuestaUsuario)
+    {
+        return $this->verificarRespuesta($respuestaUsuario) ? $this->puntos : 0;
     }
 }
