@@ -10,32 +10,64 @@ class Contenido extends Model
     use HasFactory;
 
     protected $fillable = [
+        'curso_id',
         'titulo',
         'descripcion',
         'tipo',
-        'contenido',
-        'url_video',
-        'archivo',
+        'archivo_url',
+        'contenido_texto',
         'orden',
-        'curso_id'
+        'activo',
+        'metadata'
     ];
 
     protected $casts = [
+        'activo' => 'boolean',
         'orden' => 'integer',
+        'metadata' => 'array'
     ];
 
     // Relación con Curso
-    public function curso()
+    public function curso(): BelongsTo
     {
         return $this->belongsTo(Curso::class);
     }
 
     // Relación con ProgresoCurso
-    public function progresos()
+    public function progresos(): HasMany
     {
         return $this->hasMany(ProgresoCurso::class, 'contenido_id');
     }
 
+    // Relación con actividades
+    public function actividades(): HasMany
+    {
+        return $this->hasMany(Actividad::class);
+    }
+
+    // Scopes
+    public function scopeActivos($query)
+    {
+        return $query->where('activo', true);
+    }
+
+    public function scopeOrdenados($query)
+    {
+        return $query->orderBy('orden');
+    }
+
+    // Accessor para icono según tipo
+    public function getIconoTipoAttribute()
+    {
+        return match($this->tipo) {
+            'video' => '🎥',
+            'texto' => '📄',
+            'pdf' => '📋',
+            'imagen' => '🖼️',
+            'audio' => '🎵',
+            default => '📄'
+        };
+    }
     // Verificar si un estudiante completó este contenido
     public function completadoPorEstudiante($estudianteId)
     {

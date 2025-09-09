@@ -27,7 +27,7 @@ class CursoController extends Controller
             return view('cursos.index', compact('cursos'));
         } else {
             // Para alumnos, mostrar cursos disponibles y sus cursos inscritos
-            $cursosDisponibles = Curso::activos()
+            $cursosDisponibles = Curso::where('activo', true)
                 ->whereDoesntHave('estudiantes', function($query) use ($user) {
                     $query->where('estudiante_id', $user->id);
                 })

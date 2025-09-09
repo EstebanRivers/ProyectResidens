@@ -61,10 +61,6 @@ class Curso extends Model
         return $this->hasMany(Calificacion::class);
     }
 
-    public function scopeActivos($query)
-    {
-        return $query->where('activo', true);
-    }
 
     public function getEstudiantesInscritos()
     {
@@ -74,5 +70,21 @@ class Curso extends Model
     public function tieneCupoDisponible()
     {
         return $this->getEstudiantesInscritos() < $this->cupo_maximo;
+    }
+
+    // Scopes
+    public function scopeActivos($query)
+    {
+        return $query->where('activo', true);
+    }
+
+    public function scopeConMaestro($query)
+    {
+        return $query->with('maestro');
+    }
+
+    public function scopeConEstudiantes($query)
+    {
+        return $query->with('estudiantes');
     }
 }
