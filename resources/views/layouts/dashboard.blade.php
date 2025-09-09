@@ -13,7 +13,6 @@
     <link rel="stylesheet" href="{{ asset('css/dashboard/main.css') }}">
     <link rel="stylesheet" href="{{ asset('css/dashboard/courses.css') }}">
     <link rel="stylesheet" href="{{ asset('css/dashboard/forms.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/dashboard/wizard.css') }}">
     
     @stack('styles')
 </head>
