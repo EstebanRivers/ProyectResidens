@@ -36,20 +36,17 @@ class DashboardManager {
         // Hide welcome section
         const welcomeSection = document.querySelector('.welcome-section');
         if (welcomeSection) {
-            welcomeSection.classList.remove('active');
             welcomeSection.style.display = 'none';
         }
 
         // Hide all sections
         document.querySelectorAll('.section-content').forEach(section => {
-            section.classList.remove('active');
             section.style.display = 'none';
         });
 
         // Show target section
         const targetSection = document.getElementById(sectionId);
         if (targetSection) {
-            targetSection.classList.add('active');
             targetSection.style.display = 'block';
         }
 
@@ -66,6 +63,24 @@ class DashboardManager {
         // Save current section
         this.currentSection = sectionId;
         localStorage.setItem('currentSection', sectionId);
+    }
+
+    showWelcome() {
+        // Hide all sections
+        document.querySelectorAll('.section-content').forEach(section => {
+            section.style.display = 'none';
+        });
+        
+        // Show welcome section
+        const welcomeSection = document.querySelector('.welcome-section');
+        if (welcomeSection) {
+            welcomeSection.style.display = 'flex';
+        }
+        
+        // Clear active navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.classList.remove('active');
+        });
     }
 
     showAjustesTab(tabId) {
@@ -96,12 +111,7 @@ class DashboardManager {
         if (savedSection && document.getElementById(savedSection)) {
             this.showSection(savedSection);
         } else {
-            // Show welcome by default
-            const welcomeSection = document.querySelector('.welcome-section');
-            if (welcomeSection) {
-                welcomeSection.classList.add('active');
-                welcomeSection.style.display = 'flex';
-            }
+            this.showWelcome();
         }
     }
 }

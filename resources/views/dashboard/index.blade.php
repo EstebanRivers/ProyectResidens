@@ -1,95 +1,92 @@
 @extends('layouts.dashboard')
 
 @section('title', 'Dashboard - ' . ucfirst(Auth::user()->role))
-@section('page-title', 'Dashboard')
-@section('page-subtitle', 'Panel de control - ' . ucfirst(Auth::user()->role))
 
 @section('content')
-<div class="dashboard-sections">
-    <!-- Welcome Section (Default) -->
-    <div class="welcome-section active">
-        <div class="welcome-content">
-            <img src="{{ asset('images/uhta-logo.png') }}" alt="UHTA" class="welcome-logo">
-            <p class="welcome-text">¡Bienvenido(a) {{ Auth::user()->name }}!</p>
-        </div>
+<!-- Welcome Section (Default) -->
+<div class="welcome-section active">
+    <div class="welcome-content">
+        <img src="{{ asset('images/uhta-logo.png') }}" alt="UHTA" class="welcome-logo">
+        <p class="welcome-text">¡Bienvenido(a) {{ Auth::user()->name }}!</p>
     </div>
+</div>
 
-    <!-- Mi Información Section -->
-    <div id="mi-informacion" class="section-content">
-        <div class="info-grid">
-            <div class="info-card">
-                <h3>Datos Personales</h3>
-                <div class="info-items">
-                    <div class="info-item">
-                        <span class="info-label">Nombre:</span>
-                        <span class="info-value">{{ Auth::user()->name }}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Email:</span>
-                        <span class="info-value">{{ Auth::user()->email }}</span>
-                    </div>
-                    <div class="info-item">
-                        <span class="info-label">Rol:</span>
-                        <span class="info-value">{{ ucfirst(Auth::user()->role) }}</span>
-                    </div>
-                    @if(Auth::user()->matricula)
-                    <div class="info-item">
-                        <span class="info-label">Matrícula:</span>
-                        <span class="info-value">{{ Auth::user()->matricula }}</span>
-                    </div>
-                    @endif
+<!-- Mi Información Section -->
+<div id="mi-informacion" class="section-content">
+    <div class="info-grid">
+        <div class="info-card">
+            <h3>Datos Personales</h3>
+            <div class="info-items">
+                <div class="info-item">
+                    <span class="info-label">Nombre:</span>
+                    <span class="info-value">{{ Auth::user()->name }}</span>
                 </div>
-            </div>
-
-            @if(Auth::user()->isAdmin())
-            <div class="info-card">
-                <h3>Estadísticas del Sistema</h3>
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <div class="stat-number">{{ \App\Models\User::alumnos()->count() }}</div>
-                        <div class="stat-label">Estudiantes</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number">{{ \App\Models\User::maestros()->count() }}</div>
-                        <div class="stat-label">Maestros</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number">{{ \App\Models\Curso::activos()->count() }}</div>
-                        <div class="stat-label">Cursos Activos</div>
-                    </div>
+                <div class="info-item">
+                    <span class="info-label">Email:</span>
+                    <span class="info-value">{{ Auth::user()->email }}</span>
                 </div>
-            </div>
-            @elseif(Auth::user()->isMaestro())
-            <div class="info-card">
-                <h3>Mis Estadísticas</h3>
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <div class="stat-number">{{ Auth::user()->cursosComoMaestro()->count() }}</div>
-                        <div class="stat-label">Mis Cursos</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number">{{ Auth::user()->cursosComoMaestro()->withCount('estudiantes')->get()->sum('estudiantes_count') }}</div>
-                        <div class="stat-label">Estudiantes</div>
-                    </div>
+                <div class="info-item">
+                    <span class="info-label">Rol:</span>
+                    <span class="info-value">{{ ucfirst(Auth::user()->role) }}</span>
                 </div>
-            </div>
-            @else
-            <div class="info-card">
-                <h3>Mi Progreso Académico</h3>
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <div class="stat-number">{{ Auth::user()->cursosComoEstudiante()->count() }}</div>
-                        <div class="stat-label">Cursos Inscritos</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-number">{{ Auth::user()->calificaciones()->count() }}</div>
-                        <div class="stat-label">Calificaciones</div>
-                    </div>
+                @if(Auth::user()->matricula)
+                <div class="info-item">
+                    <span class="info-label">Matrícula:</span>
+                    <span class="info-value">{{ Auth::user()->matricula }}</span>
                 </div>
+                @endif
             </div>
-            @endif
         </div>
+
+        @if(Auth::user()->isAdmin())
+        <div class="info-card">
+            <h3>Estadísticas del Sistema</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">{{ \App\Models\User::alumnos()->count() }}</div>
+                    <div class="stat-label">Estudiantes</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">{{ \App\Models\User::maestros()->count() }}</div>
+                    <div class="stat-label">Maestros</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">{{ \App\Models\Curso::activos()->count() }}</div>
+                    <div class="stat-label">Cursos Activos</div>
+                </div>
+            </div>
+        </div>
+        @elseif(Auth::user()->isMaestro())
+        <div class="info-card">
+            <h3>Mis Estadísticas</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">{{ Auth::user()->cursosComoMaestro()->count() }}</div>
+                    <div class="stat-label">Mis Cursos</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">{{ Auth::user()->cursosComoMaestro()->withCount('estudiantes')->get()->sum('estudiantes_count') }}</div>
+                    <div class="stat-label">Estudiantes</div>
+                </div>
+            </div>
+        </div>
+        @else
+        <div class="info-card">
+            <h3>Mi Progreso Académico</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">{{ Auth::user()->cursosComoEstudiante()->count() }}</div>
+                    <div class="stat-label">Cursos Inscritos</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">{{ Auth::user()->calificaciones()->count() }}</div>
+                    <div class="stat-label">Calificaciones</div>
+                </div>
+            </div>
+        </div>
+        @endif
     </div>
+</div>
 
     <!-- Cursos Section -->
     <div id="cursos" class="section-content">

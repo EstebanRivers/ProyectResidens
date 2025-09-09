@@ -23,10 +23,12 @@
         
         <!-- Main Content -->
         <div class="main-content">
-            <div class="content-header">
-                <h1 class="page-title">@yield('page-title', 'Dashboard')</h1>
-                <p class="page-subtitle">@yield('page-subtitle', 'Panel de control')</p>
-            </div>
+            @hasSection('page-title')
+                <div class="content-header">
+                    <h1 class="page-title">@yield('page-title')</h1>
+                    <p class="page-subtitle">@yield('page-subtitle')</p>
+                </div>
+            @endif
             
             <div class="content-body">
                 @if(session('success'))
