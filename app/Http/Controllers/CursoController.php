@@ -122,27 +122,28 @@ class CursoController extends Controller
 
     public function inscribir(Request $request, $id)
     {
-        // Verificar que el usuario esté autenticado
-        if (!auth()->check()) {
+        if (!Auth::check()) {
             return redirect()->route('login')->with('error', 'Debes iniciar sesión para inscribirte');
         }
 
-        // Verificar que el usuario sea estudiante
-        if (auth()->user()->rol !== 'estudiante') {
+        if (!Auth::user()->isAlumno()) {
             return redirect()->back()->with('error', 'Solo los estudiantes pueden inscribirse a cursos');
         }
 
         $curso = Curso::findOrFail($id);
-        $estudiante = auth()->user();
+        $estudiante = Auth::user();
 
-        // Verificar si ya está inscrito
-        if ($curso->estudiantes()->where('user_id', $estudiante->id)->exists()) {
+        if ($curso->estudiantes()->where('estudiante_id', $estudiante->id)->exists()) {
             return redirect()->route('cursos.show', $curso->id)->with('info', 'Ya estás inscrito en este curso');
         }
 
-        // Inscribir al estudiante
+        if (!$curso->tieneCupoDisponible()) {
+            return redirect()->back()->with('error', 'El curso no tiene cupo disponible');
+        }
+
         $curso->estudiantes()->attach($estudiante->id, [
-            'fecha_inscripcion' => now()
+            'fecha_inscripcion' => now(),
+            'estado' => 'inscrito'
         ]);
 
         return redirect()->route('cursos.show', $curso->id)->with('success', 'Te has inscrito exitosamente al curso');
@@ -151,14 +152,12 @@ class CursoController extends Controller
     public function desinscribir($id)
     {
         $curso = Curso::findOrFail($id);
-        $estudiante = auth()->user();
+        $estudiante = Auth::user();
 
-        // Verificar que esté inscrito
-        if (!$curso->estudiantes()->where('user_id', $estudiante->id)->exists()) {
+        if (!$curso->estudiantes()->where('estudiante_id', $estudiante->id)->exists()) {
             return redirect()->back()->with('error', 'No estás inscrito en este curso');
         }
 
-        // Desinscribir al estudiante
         $curso->estudiantes()->detach($estudiante->id);
 
         return redirect()->route('cursos.index')->with('success', 'Te has desinscrito del curso exitosamente');

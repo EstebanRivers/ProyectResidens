@@ -46,11 +46,11 @@
                                 <strong>Profesor:</strong> {{ $curso->maestro->name }}
                             </div>
                             <div class="course-actions">
-                                <form method="POST" action="{{ route('cursos.inscribir', $curso) }}" style="display: inline;">
+                                <form method="POST" action="{{ route('cursos.inscribir', $curso->id) }}" style="display: inline;">
                                     @csrf
                                     <button type="submit" class="btn-primary btn-small">📚 Inscribirse</button>
                                 </form>
-                                <a href="{{ route('cursos.show', $curso) }}" class="btn-outline btn-small">👁️ Vista Previa</a>
+                                <a href="{{ route('cursos.show', $curso->id) }}" class="btn-outline btn-small">👁️ Vista Previa</a>
                             </div>
                         </div>
                     @empty

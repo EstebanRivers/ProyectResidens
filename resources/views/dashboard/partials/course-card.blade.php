@@ -70,7 +70,10 @@
             <button class="btn btn-primary btn-small" onclick="showCourseContent()">Gestionar Contenido</button>
             <a href="{{ route('cursos.edit', $course->id) }}" class="btn btn-outline btn-small">Editar</a>
         @elseif(isset($course->available))
-            <button class="btn btn-primary btn-small" onclick="enrollInCourse({{ $course->id ?? 1 }})">Inscribirse</button>
+            <form method="POST" action="{{ route('cursos.inscribir', $course->id) }}" style="display: inline;">
+                @csrf
+                <button type="submit" class="btn btn-primary btn-small">Inscribirse</button>
+            </form>
             <a href="{{ route('cursos.show', $course->id) }}" class="btn btn-outline btn-small">Vista Previa</a>
         @elseif(isset($course->enrolled))
             <a href="{{ route('cursos.show', $course->id) }}" class="btn btn-primary btn-small">Continuar</a>

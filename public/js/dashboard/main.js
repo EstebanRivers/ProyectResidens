@@ -156,29 +156,3 @@ class DashboardManager {
 // Initialize dashboard when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     window.dashboard = new DashboardManager();
-});
-
-// Utility functions for course management
-window.courseUtils = {
-    enrollInCourse(courseId) {
-        if (confirm('¿Estás seguro de que quieres inscribirte en este curso?')) {
-            // Redirect to enrollment
-            window.location.href = `/cursos/${courseId}/inscribir`;
-        }
-    },
-
-    previewCourse(courseId) {
-        window.location.href = `/cursos/${courseId}`;
-    },
-
-    continueCourse(courseId) {
-        window.location.href = `/cursos/${courseId}`;
-    },
-
-    viewGrades(courseId) {
-        window.location.href = `/alumno/calificaciones`;
-    }
-};
-
-// Make functions globally available
-Object.assign(window, window.courseUtils);

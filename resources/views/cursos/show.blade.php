@@ -49,7 +49,7 @@
                 <a href="{{ route('cursos.edit', $curso) }}" class="btn-outline">✏️ Editar Curso</a>
             @elseif(Auth::user()->isAlumno())
                 @if(!Auth::user()->cursosComoEstudiante()->where('curso_id', $curso->id)->exists())
-                    <form method="POST" action="{{ route('cursos.inscribir', $curso) }}" style="display: inline;">
+                    <form method="POST" action="{{ route('cursos.inscribir', $curso->id) }}" style="display: inline;">
                         @csrf
                         <button type="submit" class="btn-primary">📚 Inscribirse</button>
                     </form>
