@@ -10,16 +10,15 @@ return new class extends Migration
     {
         Schema::create('contenidos', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('curso_id')->constrained()->onDelete('cascade');
             $table->string('titulo');
             $table->text('descripcion')->nullable();
             $table->enum('tipo', ['video', 'texto', 'pdf', 'imagen', 'audio'])->default('texto');
-            $table->text('contenido')->nullable(); // Para texto
-            $table->string('archivo')->nullable(); // Para archivos
-            $table->string('url')->nullable(); // Para URLs externas
-            $table->integer('duracion_minutos')->default(0);
+            $table->text('contenido_texto')->nullable(); // Para contenido de texto directo
+            $table->string('archivo_url')->nullable(); // URL del archivo
             $table->integer('orden')->default(0);
-            $table->foreignId('curso_id')->constrained()->onDelete('cascade');
             $table->boolean('activo')->default(true);
+            $table->integer('duracion')->nullable(); // duración en minutos
             $table->timestamps();
         });
     }

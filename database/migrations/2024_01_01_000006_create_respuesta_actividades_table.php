@@ -10,17 +10,16 @@ return new class extends Migration
     {
         Schema::create('respuesta_actividades', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('actividad_id')->constrained()->onDelete('cascade');
             $table->foreignId('estudiante_id')->constrained('users')->onDelete('cascade');
-            $table->json('respuesta'); // Respuesta del estudiante en JSON
+            $table->foreignId('actividad_id')->constrained()->onDelete('cascade');
+            $table->json('respuesta'); // Respuesta del estudiante
             $table->integer('puntos_obtenidos')->default(0);
-            $table->integer('puntos_totales')->default(0);
             $table->boolean('es_correcta')->default(false);
-            $table->timestamp('fecha_respuesta')->useCurrent();
-            $table->integer('tiempo_empleado')->nullable(); // En segundos
+            $table->boolean('completada')->default(false);
+            $table->timestamp('fecha_completado')->nullable();
             $table->timestamps();
             
-            $table->unique(['actividad_id', 'estudiante_id']);
+            $table->unique(['estudiante_id', 'actividad_id']);
         });
     }
 

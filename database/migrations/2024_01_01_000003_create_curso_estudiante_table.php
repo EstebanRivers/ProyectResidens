@@ -13,9 +13,8 @@ return new class extends Migration
             $table->foreignId('curso_id')->constrained()->onDelete('cascade');
             $table->foreignId('estudiante_id')->constrained('users')->onDelete('cascade');
             $table->timestamp('fecha_inscripcion')->useCurrent();
-            $table->decimal('progreso', 5, 2)->default(0);
-            $table->boolean('completado')->default(false);
-            $table->timestamp('fecha_completado')->nullable();
+            $table->decimal('calificacion_final', 5, 2)->nullable();
+            $table->enum('estado', ['inscrito', 'aprobado', 'reprobado', 'retirado'])->default('inscrito');
             $table->timestamps();
             
             $table->unique(['curso_id', 'estudiante_id']);

@@ -10,16 +10,16 @@ return new class extends Migration
     {
         Schema::create('progreso_contenidos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('contenido_id')->constrained()->onDelete('cascade');
-            $table->foreignId('estudiante_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('contenido_id')->constrained('contenidos')->onDelete('cascade');
             $table->boolean('completado')->default(false);
-            $table->integer('tiempo_dedicado')->default(0); // En segundos
-            $table->decimal('porcentaje_visto', 5, 2)->default(0);
+            $table->integer('tiempo_dedicado')->default(0); // en minutos
             $table->timestamp('fecha_inicio')->nullable();
             $table->timestamp('fecha_completado')->nullable();
             $table->timestamps();
             
-            $table->unique(['contenido_id', 'estudiante_id']);
+            $table->unique(['user_id', 'contenido_id']);
+            $table->index(['user_id', 'completado']);
         });
     }
 

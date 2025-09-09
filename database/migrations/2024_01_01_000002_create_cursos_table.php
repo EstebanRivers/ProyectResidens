@@ -10,14 +10,14 @@ return new class extends Migration
     {
         Schema::create('cursos', function (Blueprint $table) {
             $table->id();
-            $table->string('titulo');
-            $table->text('descripcion');
-            $table->string('imagen')->nullable();
+            $table->string('nombre');
+            $table->text('descripcion')->nullable();
+            $table->string('codigo')->unique();
+            $table->integer('creditos')->default(3);
             $table->foreignId('maestro_id')->constrained('users')->onDelete('cascade');
-            $table->decimal('precio', 10, 2)->default(0);
-            $table->integer('duracion_horas')->default(0);
-            $table->enum('nivel', ['principiante', 'intermedio', 'avanzado'])->default('principiante');
             $table->boolean('activo')->default(true);
+            $table->integer('cupo_maximo')->default(30);
+            $table->string('periodo_academico');
             $table->timestamps();
         });
     }

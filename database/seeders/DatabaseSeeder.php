@@ -16,14 +16,14 @@ class DatabaseSeeder extends Seeder
         // Crear usuarios de prueba
         $admin = User::create([
             'name' => 'Administrador',
-            'email' => 'admin@uhta.edu',
+            'email' => 'admin@uhta.edu.mx',
             'password' => Hash::make('password'),
-            'role' => 'admin',
+            'role' => 'administrador',
         ]);
 
         $maestro = User::create([
             'name' => 'Prof. Juan Pérez',
-            'email' => 'maestro@uhta.edu',
+            'email' => 'maestro@uhta.edu.mx',
             'password' => Hash::make('password'),
             'role' => 'maestro',
             'biografia' => 'Profesor con 10 años de experiencia en programación.',
@@ -31,14 +31,112 @@ class DatabaseSeeder extends Seeder
 
         $estudiante = User::create([
             'name' => 'María González',
-            'email' => 'estudiante@uhta.edu',
+            'email' => 'estudiante@uhta.edu.mx',
             'password' => Hash::make('password'),
-            'role' => 'estudiante',
+            'role' => 'alumno',
         ]);
 
         // Crear curso de prueba
-        $curso = Curso::create([
-            'titulo' => 'Introducción a la Programación',
+        $cursos = [
+            [
+                'nombre' => 'Introducción a la Programación',
+                'codigo' => 'PRG101',
+                'descripcion' => 'Aprende los fundamentos de la programación con ejemplos prácticos.',
+                'creditos' => 4,
+                'cupo_maximo' => 30,
+                'periodo_academico' => '2025-1',
+                'maestro_id' => $maestro->id,
+            ],
+            [
+                'nombre' => 'Matemáticas I',
+                'codigo' => 'MAT101',
+                'descripcion' => 'Curso fundamental de matemáticas básicas.',
+                'creditos' => 4,
+                'cupo_maximo' => 25,
+                'periodo_academico' => '2025-1',
+                'maestro_id' => $maestro->id,
+            ]
+        ];
+
+        foreach ($cursos as $cursoData) {
+            $curso = Curso::create($cursoData);
+            
+            // Inscribir estudiante al curso
+            $curso->estudiantes()->attach($estudiante->id, [
+                'fecha_inscripcion' => now(),
+                'estado' => 'inscrito'
+            ]);
+        }
+
+        // Obtener el primer curso para crear contenido
+        $curso = Curso::first();
+
+        // Crear contenidos
+        $contenidos = [
+            [
+                'titulo' => 'Introducción al Curso',
+                'descripcion' => 'Bienvenida y objetivos del curso',
+                'tipo' => 'texto',
+                'contenido_texto' => '<h2>Bienvenido al Curso</h2><p>En este curso aprenderás los fundamentos de la programación...</p>',
+                'orden' => 1,
+                'curso_id' => $curso->id,
+            ],
+            [
+                'titulo' => 'Variables y Tipos de Datos',
+                'descripcion' => 'Conceptos básicos de variables',
+                'tipo' => 'texto',
+                'contenido_texto' => '<h2>Variables en Programación</h2><p>Una variable es un espacio en memoria que almacena un valor...</p>',
+                'orden' => 2,
+                'curso_id' => $curso->id,
+            ],
+        ];
+
+        foreach ($contenidos as $contenidoData) {
+            Contenido::create($contenidoData);
+        }
+
+        // Crear actividades
+        $actividades = [
+            [
+                'curso_id' => $curso->id,
+                'titulo' => 'Quiz: Variables y Tipos de Datos',
+                'descripcion' => 'Evalúa tu conocimiento sobre variables',
+                'tipo' => 'opcion_multiple',
+                'pregunta' => [
+                    'texto' => '¿Cuál es el tipo de dato correcto para almacenar un número entero?'
+                ],
+                'opciones' => [
+                    'string',
+                    'int',
+                    'float',
+                    'boolean'
+                ],
+                'respuesta_correcta' => [1], // índice de la respuesta correcta
+                'explicacion' => 'El tipo int se usa para números enteros.',
+                'puntos' => 10,
+                'orden' => 1,
+            ],
+            [
+                'curso_id' => $curso->id,
+                'titulo' => 'Verdadero o Falso: Operadores',
+                'descripcion' => 'Verifica tu comprensión de operadores',
+                'tipo' => 'verdadero_falso',
+                'pregunta' => [
+                    'texto' => 'El operador == compara tanto el valor como el tipo de dato'
+                ],
+                'opciones' => ['Verdadero', 'Falso'],
+                'respuesta_correcta' => ['Falso'],
+                'explicacion' => 'El operador == solo compara valores, === compara valor y tipo.',
+                'puntos' => 5,
+                'orden' => 2,
+            ],
+        ];
+
+        foreach ($actividades as $actividadData) {
+            Actividad::create($actividadData);
+        }
+    }
+}
             'descripcion' => 'Aprende los fundamentos de la programación con ejemplos prácticos.',
             'maestro_id' => $maestro->id,
             'precio' => 99.99,
