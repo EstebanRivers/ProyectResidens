@@ -23,6 +23,7 @@ class RespuestaActividad extends Model
     ];
 
     protected $casts = [
+        'respuesta' => 'array',
         'es_correcta' => 'boolean',
         'completada' => 'boolean',
         'puntos_obtenidos' => 'integer',

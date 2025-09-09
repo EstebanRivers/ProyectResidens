@@ -17,12 +17,14 @@ class ProgresoContenido extends Model
         'contenido_id',
         'completado',
         'tiempo_dedicado',
+        'fecha_inicio',
         'fecha_completado'
     ];
 
     protected $casts = [
         'completado' => 'boolean',
         'tiempo_dedicado' => 'integer',
+        'fecha_inicio' => 'datetime',
         'fecha_completado' => 'datetime'
     ];
 
@@ -36,5 +38,16 @@ class ProgresoContenido extends Model
     public function contenido(): BelongsTo
     {
         return $this->belongsTo(Contenido::class);
+    }
+
+    // Scopes
+    public function scopeCompletados($query)
+    {
+        return $query->where('completado', true);
+    }
+
+    public function scopePendientes($query)
+    {
+        return $query->where('completado', false);
     }
 }

@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('estudiante_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('actividad_id')->constrained('actividades')->onDelete('cascade');
-            $table->text('respuesta'); // La respuesta del estudiante
+            $table->json('respuesta'); // La respuesta del estudiante en formato JSON
             $table->integer('puntos_obtenidos')->default(0);
             $table->boolean('es_correcta')->default(false);
             $table->boolean('completada')->default(false);
