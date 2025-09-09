@@ -78,17 +78,11 @@ class ActividadController extends Controller
                         ->with('success', 'Actividad creada exitosamente');
     }
 
-    public function show($cursoId, $actividadId)
+    public function show($actividadId)
     {
         try {
-            $curso = Curso::findOrFail($cursoId);
             $actividad = Actividad::findOrFail($actividadId);
-            
-            // Verificar que la actividad pertenece al curso
-            if ($actividad->curso_id !== $curso->id) {
-                return redirect()->route('cursos.show', $curso->id)
-                    ->with('error', 'La actividad no pertenece a este curso.');
-            }
+            $curso = $actividad->curso;
             
             // Verificar que el usuario esté inscrito en el curso (solo para alumnos)
             if (Auth::user()->isAlumno()) {
@@ -127,11 +121,11 @@ class ActividadController extends Controller
         }
     }
 
-    public function responder(Request $request, $cursoId, $actividadId)
+    public function responder(Request $request, $actividadId)
     {
         try {
-            $curso = Curso::findOrFail($cursoId);
             $actividad = Actividad::findOrFail($actividadId);
+            $curso = $actividad->curso;
             
             // Verificar que es alumno
             if (!Auth::user()->isAlumno()) {

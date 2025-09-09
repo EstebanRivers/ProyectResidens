@@ -17,7 +17,7 @@
                 <div class="card-body p-0">
                     <div class="list-group list-group-flush">
                         @foreach($actividades as $item)
-                            <a href="{{ route('actividades.show', $item->id) }}" 
+                            <a href="{{ route('actividades.show', $item) }}" 
                                class="list-group-item list-group-item-action {{ $item->id == $actividad->id ? 'active' : '' }}">
                                 <div class="d-flex justify-content-between align-items-center">
                                     <div>

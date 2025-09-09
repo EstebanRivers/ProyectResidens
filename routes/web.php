@@ -31,7 +31,7 @@ Route::middleware('auth')->group(function () {
     // Rutas de contenidos
     Route::get('/cursos/{curso}/contenidos/create', [ContenidoController::class, 'create'])->name('contenidos.create');
     Route::post('/cursos/{curso}/contenidos', [ContenidoController::class, 'store'])->name('contenidos.store');
-    Route::get('/cursos/{curso}/contenidos/{contenido}', [ContenidoController::class, 'show'])->name('contenidos.show');
+    Route::get('/contenidos/{contenido}', [ContenidoController::class, 'show'])->name('contenidos.show');
     Route::get('/cursos/{curso}/contenidos/{contenido}/edit', [ContenidoController::class, 'edit'])->name('contenidos.edit');
     Route::put('/cursos/{curso}/contenidos/{contenido}', [ContenidoController::class, 'update'])->name('contenidos.update');
     Route::delete('/cursos/{curso}/contenidos/{contenido}', [ContenidoController::class, 'destroy'])->name('contenidos.destroy');
@@ -41,8 +41,8 @@ Route::middleware('auth')->group(function () {
     // Rutas de actividades
     Route::get('/cursos/{curso}/actividades/create', [ActividadController::class, 'create'])->name('actividades.create');
     Route::post('/cursos/{curso}/actividades', [ActividadController::class, 'store'])->name('actividades.store');
-    Route::get('/cursos/{curso}/actividades/{actividad}', [ActividadController::class, 'show'])->name('actividades.show');
-    Route::post('/cursos/{curso}/actividades/{actividad}/responder', [ActividadController::class, 'responder'])->name('actividades.responder');
+    Route::get('/actividades/{actividad}', [ActividadController::class, 'show'])->name('actividades.show');
+    Route::post('/actividades/{actividad}/responder', [ActividadController::class, 'responder'])->name('actividades.responder');
     Route::post('/actividades/{id}/responder', [ActividadController::class, 'responder'])->name('actividades.responder');
     
     // Rutas específicas por rol
