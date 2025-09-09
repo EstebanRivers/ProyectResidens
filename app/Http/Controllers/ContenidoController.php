@@ -86,7 +86,7 @@ class ContenidoController extends Controller
             }
 
             // Obtener todos los contenidos del curso para navegación
-            $contenidos = $curso->contenidos()->where('activo', true)->orderBy('orden')->get();
+            $contenidos = $curso->contenidos()->activos()->ordenados()->get();
             
             // Obtener progreso del usuario (solo para alumnos)
             $progreso = null;

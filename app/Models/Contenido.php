@@ -49,6 +49,11 @@ class Contenido extends Model
         return $query->where('activo', true);
     }
 
+    public function scopeOrdenados($query)
+    {
+        return $query->orderBy('orden');
+    }
+
     // Verificar si está completado por un usuario
     public function completadoPor($userId)
     {

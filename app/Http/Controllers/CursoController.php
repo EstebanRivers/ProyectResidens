@@ -73,9 +73,9 @@ class CursoController extends Controller
         $this->authorize('view', $curso);
         
         $curso->load(['maestro', 'estudiantes', 'contenidos' => function($query) {
-            $query->activos()->ordenados();
+            $query->where('activo', true)->orderBy('orden');
         }, 'actividades' => function($query) {
-            $query->activas()->ordenadas();
+            $query->where('activo', true)->orderBy('orden');
         }]);
         
         // Obtener progreso si es alumno inscrito

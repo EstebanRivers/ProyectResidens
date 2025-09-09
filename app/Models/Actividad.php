@@ -52,6 +52,11 @@ class Actividad extends Model
         return $query->where('activo', true);
     }
 
+    public function scopeOrdenadas($query)
+    {
+        return $query->orderBy('orden');
+    }
+
     // Verificar si el usuario ya respondió
     public function yaRespondidaPor($userId)
     {

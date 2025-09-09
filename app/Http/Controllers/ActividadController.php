@@ -100,7 +100,7 @@ class ActividadController extends Controller
             }
 
             // Obtener todas las actividades del curso para navegación
-            $actividades = $curso->actividades()->where('activo', true)->orderBy('orden')->get();
+            $actividades = $curso->actividades()->activos()->ordenadas()->get();
             
             // Verificar si ya respondió (solo para alumnos)
             $yaRespondida = false;

@@ -75,7 +75,21 @@
                 @forelse($curso->contenidos as $contenido)
                     @if(Auth::user()->isAlumno() && !$estaInscrito)
                         <div class="content-item locked" style="display: flex; align-items: center; padding: 1rem; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef; opacity: 0.6; cursor: not-allowed;">
-                            <div class="content-icon" style="font-size: 1.5rem; margin-right: 1rem; width: 40px; text-align: center;">🔒</div>
+                            <div class="content-icon" style="font-size: 1.5rem; margin-right: 1rem; width: 40px; text-align: center;">
+                                @if($contenido->tipo === 'video')
+                                    🎥
+                                @elseif($contenido->tipo === 'texto')
+                                    📄
+                                @elseif($contenido->tipo === 'pdf')
+                                    📋
+                                @elseif($contenido->tipo === 'imagen')
+                                    🖼️
+                                @elseif($contenido->tipo === 'audio')
+                                    🎵
+                                @else
+                                    📄
+                                @endif
+                            </div>
                             <div class="content-info" style="flex: 1;">
                                 <div class="content-title" style="font-weight: 600; color: #6c757d; margin-bottom: 0.25rem;">{{ $contenido->titulo }}</div>
                                 <div class="content-description" style="font-size: 0.9rem; color: #6c757d;">Debes inscribirte para acceder</div>
@@ -83,7 +97,21 @@
                         </div>
                     @else
                         <a href="{{ route('contenidos.show', [$curso, $contenido]) }}" class="content-item" style="display: flex; align-items: center; padding: 1rem; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef; transition: all 0.3s ease; text-decoration: none; color: inherit;">
-                            <div class="content-icon" style="font-size: 1.5rem; margin-right: 1rem; width: 40px; text-align: center;">{{ $contenido->icono_tipo }}</div>
+                            <div class="content-icon" style="font-size: 1.5rem; margin-right: 1rem; width: 40px; text-align: center;">
+                                @if($contenido->tipo === 'video')
+                                    🎥
+                                @elseif($contenido->tipo === 'texto')
+                                    📄
+                                @elseif($contenido->tipo === 'pdf')
+                                    📋
+                                @elseif($contenido->tipo === 'imagen')
+                                    🖼️
+                                @elseif($contenido->tipo === 'audio')
+                                    🎵
+                                @else
+                                    📄
+                                @endif
+                            </div>
                             <div class="content-info" style="flex: 1;">
                                 <div class="content-title" style="font-weight: 600; color: #2c3e50; margin-bottom: 0.25rem;">{{ $contenido->titulo }}</div>
                                 <div class="content-description" style="font-size: 0.9rem; color: #6c757d;">{{ $contenido->descripcion }}</div>
@@ -126,7 +154,19 @@
                         </div>
                     @else
                         <a href="{{ route('actividades.show', [$curso, $actividad]) }}" class="content-item" style="display: flex; align-items: center; padding: 1rem; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef; transition: all 0.3s ease; text-decoration: none; color: inherit;">
-                            <div class="content-icon" style="font-size: 1.5rem; margin-right: 1rem; width: 40px; text-align: center;">{{ $actividad->icono_tipo }}</div>
+                            <div class="content-icon" style="font-size: 1.5rem; margin-right: 1rem; width: 40px; text-align: center;">
+                                @if($actividad->tipo === 'opcion_multiple')
+                                    ☑️
+                                @elseif($actividad->tipo === 'verdadero_falso')
+                                    ✅
+                                @elseif($actividad->tipo === 'respuesta_corta')
+                                    ✏️
+                                @elseif($actividad->tipo === 'ensayo')
+                                    📝
+                                @else
+                                    📝
+                                @endif
+                            </div>
                             <div class="content-info" style="flex: 1;">
                                 <div class="content-title" style="font-weight: 600; color: #2c3e50; margin-bottom: 0.25rem;">{{ $actividad->titulo }}</div>
                                 <div class="content-description" style="font-size: 0.9rem; color: #6c757d;">{{ $actividad->descripcion }}</div>
