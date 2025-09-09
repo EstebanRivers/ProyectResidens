@@ -6,27 +6,27 @@
 
     <!-- Navegación -->
     <nav class="sidebar-nav">
-        <a href="#" class="nav-item" data-section="mi-informacion">
+        <a href="javascript:void(0)" class="nav-item" data-section="mi-informacion">
             <span class="nav-icon">👤</span>
             Mi información
         </a>
         
-        <a href="#" class="nav-item" data-section="cursos">
+        <a href="javascript:void(0)" class="nav-item" data-section="cursos">
             <span class="nav-icon">💻</span>
             Cursos
         </a>
         
-        <a href="#" class="nav-item" data-section="facturacion">
+        <a href="javascript:void(0)" class="nav-item" data-section="facturacion">
             <span class="nav-icon">📷</span>
             Facturación
         </a>
         
-        <a href="#" class="nav-item" data-section="control-administrativo">
+        <a href="javascript:void(0)" class="nav-item" data-section="control-administrativo">
             <span class="nav-icon">📋</span>
             Control Administrativo
         </a>
         
-        <a href="#" class="nav-item" data-section="ajustes">
+        <a href="javascript:void(0)" class="nav-item" data-section="ajustes">
             <span class="nav-icon">👥</span>
             Ajustes
         </a>
