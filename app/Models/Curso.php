@@ -48,7 +48,7 @@ class Curso extends Model
         return $this->hasMany(Contenido::class, 'curso_id');
     }
 
-    public function actividades(): HasManyThrough
+    public function actividades(): HasMany
     {
         return $this->hasMany(Actividad::class);
     }
