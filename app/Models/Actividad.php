@@ -4,8 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Actividad extends Model
 {
@@ -14,65 +12,60 @@ class Actividad extends Model
     protected $table = 'actividades';
 
     protected $fillable = [
-        'curso_id',
-        'contenido_id',
         'titulo',
         'descripcion',
         'tipo',
-        'pregunta',
-        'opciones',
-        'respuesta_correcta',
-        'explicacion',
-        'puntos',
-        'orden',
-        'activo'
+        'contenido',
+        'puntos_maximos',
+        'tiempo_limite',
+        'intentos_maximos',
+        'curso_id'
     ];
 
     protected $casts = [
-        'pregunta' => 'array',
-        'opciones' => 'array',
-        'respuesta_correcta' => 'array',
-        'activo' => 'boolean'
+        'puntos_maximos' => 'integer',
+        'tiempo_limite' => 'integer',
+        'intentos_maximos' => 'integer',
     ];
 
-    public function curso(): BelongsTo
+    // Relación con Curso
+    public function curso()
     {
         return $this->belongsTo(Curso::class);
     }
 
-    public function contenido(): BelongsTo
+    // Relación con Preguntas
+    public function preguntas()
     {
-        return $this->belongsTo(Contenido::class);
+        return $this->hasMany(Pregunta::class);
     }
 
-    public function respuestas(): HasMany
+    // Relación con Respuestas de Actividad
+    public function respuestas()
     {
         return $this->hasMany(RespuestaActividad::class);
     }
 
-    public function progreso(): HasMany
+    // Obtener respuesta de un estudiante específico
+    public function respuestaEstudiante($estudianteId)
     {
-        return $this->hasMany(ProgresoCurso::class);
+        return $this->respuestas()
+            ->where('estudiante_id', $estudianteId)
+            ->first();
     }
 
-    public function scopeActivas($query)
+    // Verificar si un estudiante ya respondió
+    public function yaRespondidaPor($estudianteId)
     {
-        return $query->where('activo', true);
+        return $this->respuestas()
+            ->where('estudiante_id', $estudianteId)
+            ->exists();
     }
 
-    public function scopeOrdenadas($query)
+    // Calcular puntuación de un estudiante
+    public function puntuacionEstudiante($estudianteId)
     {
-        return $query->orderBy('orden');
-    }
-
-    public function getIconoTipoAttribute()
-    {
-        return match($this->tipo) {
-            'opcion_multiple' => '☑️',
-            'verdadero_falso' => '✅',
-            'respuesta_corta' => '✏️',
-            'ensayo' => '📝',
-            default => '❓'
-        };
+        $respuesta = $this->respuestaEstudiante($estudianteId);
+        return $respuesta ? $respuesta->puntuacion : 0;
     }
 }

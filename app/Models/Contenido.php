@@ -4,64 +4,71 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Contenido extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'curso_id',
         'titulo',
         'descripcion',
         'tipo',
-        'archivo_url',
-        'contenido_texto',
+        'contenido',
+        'url_video',
+        'archivo',
         'orden',
-        'activo',
-        'metadata'
+        'curso_id'
     ];
 
     protected $casts = [
-        'activo' => 'boolean',
-        'metadata' => 'array'
+        'orden' => 'integer',
     ];
 
-    public function curso(): BelongsTo
+    // Relación con Curso
+    public function curso()
     {
         return $this->belongsTo(Curso::class);
     }
 
-    public function actividades(): HasMany
+    // Relación con ProgresoCurso
+    public function progresos()
     {
-        return $this->hasMany(Actividad::class);
+        return $this->hasMany(ProgresoCurso::class, 'contenido_id');
     }
 
-    public function progreso(): HasMany
+    // Verificar si un estudiante completó este contenido
+    public function completadoPorEstudiante($estudianteId)
     {
-        return $this->hasMany(ProgresoCurso::class);
+        return $this->progresos()
+            ->where('estudiante_id', $estudianteId)
+            ->where('completado', true)
+            ->exists();
     }
 
-    public function scopeActivos($query)
+    // Obtener progreso de un estudiante específico
+    public function progresoEstudiante($estudianteId)
     {
-        return $query->where('activo', true);
+        return $this->progresos()
+            ->where('estudiante_id', $estudianteId)
+            ->first();
     }
 
-    public function scopeOrdenados($query)
+    // Marcar como completado para un estudiante
+    public function marcarCompletado($estudianteId)
     {
-        return $query->orderBy('orden');
-    }
-
-    public function getIconoTipoAttribute()
-    {
-        return match($this->tipo) {
-            'video' => '🎥',
-            'texto' => '📄',
-            'pdf' => '📋',
-            'imagen' => '🖼️',
-            'audio' => '🎵',
-            default => '📄'
-        };
+        return $this->progresos()->updateOrCreate(
+            [
+                'estudiante_id' => $estudianteId,
+                'contenido_id' => $this->id,
+                'curso_id' => $this->curso_id
+            ],
+            [
+                'completado' => true,
+                'fecha_completado' => now(),
+                'tiempo_dedicado' => $this->progresos()
+                    ->where('estudiante_id', $estudianteId)
+                    ->value('tiempo_dedicado') ?? 0
+            ]
+        );
     }
 }
