@@ -30,15 +30,12 @@ Route::middleware('auth')->group(function () {
     
     // Rutas de contenidos
     Route::get('/cursos/{curso}/contenidos/create', [ContenidoController::class, 'create'])->name('contenidos.create');
-    Route::post('contenidos/{contenido}/completar', [ContenidoController::class, 'marcarCompletado'])->name('contenidos.completar');
-    Route::post('contenidos/{contenido}/completar', [ContenidoController::class, 'marcarCompletado'])->name('contenidos.completar');
     Route::post('/cursos/{curso}/contenidos', [ContenidoController::class, 'store'])->name('contenidos.store');
     Route::get('/cursos/{curso}/contenidos/{contenido}', [ContenidoController::class, 'show'])->name('contenidos.show');
     Route::get('/cursos/{curso}/contenidos/{contenido}/edit', [ContenidoController::class, 'edit'])->name('contenidos.edit');
     Route::put('/cursos/{curso}/contenidos/{contenido}', [ContenidoController::class, 'update'])->name('contenidos.update');
     Route::delete('/cursos/{curso}/contenidos/{contenido}', [ContenidoController::class, 'destroy'])->name('contenidos.destroy');
-    Route::post('/cursos/{curso}/contenidos/{contenido}/completado', [ContenidoController::class, 'marcarCompletado'])->name('contenidos.marcar-completado');
-    Route::post('/cursos/{curso}/contenidos/{contenido}/progreso', [ContenidoController::class, 'actualizarProgreso'])->name('contenidos.actualizar-progreso');
+    Route::post('/contenidos/{contenido}/marcar-completado', [ContenidoController::class, 'marcarCompletado'])->name('contenidos.marcar-completado');
     
     // Rutas de actividades
     Route::get('/cursos/{curso}/actividades/create', [ActividadController::class, 'create'])->name('actividades.create');

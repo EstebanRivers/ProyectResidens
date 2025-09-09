@@ -9,13 +9,13 @@ use Illuminate\Support\Facades\Auth;
 
 class ContenidoController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
     public function show(Contenido $contenido)
     {
+        // Verificar autenticación
+        if (!auth()->check()) {
+            return redirect()->route('login');
+        }
+        
         // Verificar que el usuario esté inscrito en el curso
         $curso = $contenido->curso;
         $estudiante = Auth::user();
@@ -68,6 +68,11 @@ class ContenidoController extends Controller
 
     public function marcarCompletado(Request $request, Contenido $contenido)
     {
+        // Verificar autenticación
+        if (!auth()->check()) {
+            return response()->json(['error' => 'No autenticado'], 401);
+        }
+        
         $estudiante = Auth::user();
         $curso = $contenido->curso;
 
