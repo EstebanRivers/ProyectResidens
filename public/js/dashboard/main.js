@@ -158,3 +158,62 @@ document.addEventListener('DOMContentLoaded', () => {
     window.dashboard = new DashboardManager();
 }
 )
+
+// Funciones para modales de inscripción
+function showInscriptionModal(courseId, courseName) {
+    const modal = document.getElementById('inscriptionModal');
+    const form = document.getElementById('inscriptionForm');
+    const courseNameSpan = document.getElementById('courseNameInscription');
+    
+    courseNameSpan.textContent = courseName;
+    form.action = `/cursos/${courseId}/inscribir`;
+    
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function closeInscriptionModal() {
+    const modal = document.getElementById('inscriptionModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+
+function showUnsubscribeModal(courseId, courseName) {
+    const modal = document.getElementById('unsubscribeModal');
+    const form = document.getElementById('unsubscribeForm');
+    const courseNameSpan = document.getElementById('courseNameUnsubscribe');
+    
+    courseNameSpan.textContent = courseName;
+    form.action = `/cursos/${courseId}/desinscribir`;
+    
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function closeUnsubscribeModal() {
+    const modal = document.getElementById('unsubscribeModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+
+// Cerrar modales al hacer clic fuera de ellos
+document.addEventListener('click', function(event) {
+    const inscriptionModal = document.getElementById('inscriptionModal');
+    const unsubscribeModal = document.getElementById('unsubscribeModal');
+    
+    if (event.target === inscriptionModal) {
+        closeInscriptionModal();
+    }
+    
+    if (event.target === unsubscribeModal) {
+        closeUnsubscribeModal();
+    }
+});
+
+// Cerrar modales con la tecla Escape
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeInscriptionModal();
+        closeUnsubscribeModal();
+    }
+});

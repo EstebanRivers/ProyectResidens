@@ -46,10 +46,8 @@
                                 <strong>Profesor:</strong> {{ $curso->maestro->name }}
                             </div>
                             <div class="course-actions">
-                                <form method="POST" action="{{ route('cursos.inscribir', $curso->id) }}" style="display: inline;">
-                                    @csrf
-                                    <button type="submit" class="btn-primary btn-small">📚 Inscribirse</button>
-                                </form>
+                                <button onclick="showInscriptionModal({{ $curso->id }}, '{{ $curso->nombre }}')" 
+                                        class="btn-primary btn-small">📚 Inscribirse</button>
                                 <a href="{{ route('cursos.show', $curso->id) }}" class="btn-outline btn-small">👁️ Vista Previa</a>
                             </div>
                         </div>

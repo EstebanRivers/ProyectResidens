@@ -100,22 +100,17 @@
                                 <div class="content-description" style="font-size: 0.9rem; color: #6c757d;">{{ $contenido->descripcion }}</div>
                             </div>
                             <div class="content-status">
-                                @if(Auth::user()->isAlumno())
-                                    @php
-                                        $progreso = $curso->progreso()->where('estudiante_id', Auth::id())->where('contenido_id', $contenido->id)->first();
-                                    @endphp
-                                    @if($progreso && $progreso->completado)
-                                        <span class="status-badge status-completed" style="padding: 0.25rem 0.75rem; background: #d4edda; color: #155724; border-radius: 20px; font-size: 0.8rem; font-weight: 500;">✅ Completado</span>
-                            
+                                <button onclick="showUnsubscribeModal({{ $curso->id }}, '{{ $curso->nombre }}')" 
+                                        class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                                    Desinscribirse
+                                </button>
                             <!-- Botón para desinscribirse -->
                             <form action="{{ route('cursos.desinscribir', $curso->id) }}" method="POST" class="d-inline" 
-                                  onsubmit="return confirm('¿Estás seguro de que quieres desinscribirte de este curso?')">
-                                @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-outline-danger btn-sm">
-                                    <i class="fas fa-sign-out-alt"></i> Desinscribirse
-                                </button>
-                            </form>
+                            <button onclick="showInscriptionModal({{ $curso->id }}, '{{ $curso->nombre }}')" 
+                                    class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                                📚 Inscribirse a este curso
+                            </button>
                                     @else
                                         <span class="status-badge status-pending" style="padding: 0.25rem 0.75rem; background: #fff3cd; color: #856404; border-radius: 20px; font-size: 0.8rem; font-weight: 500;">⏳ Pendiente</span>
                                     @endif
