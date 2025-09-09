@@ -42,8 +42,6 @@ Route::middleware('auth')->group(function () {
     
     // Rutas de actividades
     Route::get('/cursos/{curso}/actividades/create', [ActividadController::class, 'create'])->name('actividades.create');
-    Route::post('actividades/{actividad}/responder', [ActividadController::class, 'responder'])->name('actividades.responder');
-    Route::post('actividades/{actividad}/responder', [ActividadController::class, 'responder'])->name('actividades.responder');
     Route::post('/cursos/{curso}/actividades', [ActividadController::class, 'store'])->name('actividades.store');
     Route::get('/cursos/{curso}/actividades/{actividad}', [ActividadController::class, 'show'])->name('actividades.show');
     Route::post('/cursos/{curso}/actividades/{actividad}/responder', [ActividadController::class, 'responder'])->name('actividades.responder');
