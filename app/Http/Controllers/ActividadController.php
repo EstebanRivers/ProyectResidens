@@ -90,62 +90,75 @@ class ActividadController extends Controller
                         ->with('success', 'Actividad creada exitosamente');
     }
 
-    public function show(Curso $curso, Actividad $actividad)
+    public function show($id)
     {
-        $this->authorize('view', $curso);
-        
-        $respuestaUsuario = null;
-        if (Auth::user()->isAlumno()) {
-            $respuestaUsuario = RespuestaActividad::where('actividad_id', $actividad->id)
-                                                  ->where('estudiante_id', Auth::id())
-                                                  ->first();
+        $actividad = Actividad::with(['contenido.curso', 'preguntas.opciones'])->findOrFail($id);
+        $user = auth()->user();
+        $curso = $actividad->contenido->curso;
+
+        // Verificar acceso del estudiante
+        if ($user->rol === 'estudiante') {
+            $estaInscrito = $curso->estudiantes()->where('user_id', $user->id)->exists();
+            if (!$estaInscrito) {
+                return redirect()->route('cursos.show', $curso->id)->with('error', 'Debes inscribirte al curso para acceder a esta actividad');
+            }
         }
-        
-        return view('actividades.show', compact('curso', 'actividad', 'respuestaUsuario'));
+
+        // Obtener respuestas del estudiante si las hay
+        $respuestasEstudiante = [];
+        if ($user->rol === 'estudiante') {
+            $respuestasEstudiante = RespuestaActividad::where([
+                'actividad_id' => $actividad->id,
+                'estudiante_id' => $user->id
+            ])->get()->keyBy('pregunta_id');
+        }
+
+        return view('actividades.show', compact('actividad', 'respuestasEstudiante'));
     }
 
-    public function responder(Request $request, Curso $curso, Actividad $actividad)
+    public function responder(Request $request, $id)
     {
-        if (!Auth::user()->isAlumno()) {
-            return back()->with('error', 'Solo los alumnos pueden responder actividades');
+        $actividad = Actividad::findOrFail($id);
+        $user = auth()->user();
+
+        if ($user->rol !== 'estudiante') {
+            return redirect()->back()->with('error', 'Solo los estudiantes pueden responder actividades');
         }
 
-        // Verificar que el alumno esté inscrito en el curso
-        if (!Auth::user()->cursosComoEstudiante()->where('curso_id', $curso->id)->exists()) {
-            return back()->with('error', 'Debes estar inscrito en el curso para responder actividades');
+        // Verificar que esté inscrito
+        $estaInscrito = $actividad->contenido->curso->estudiantes()->where('user_id', $user->id)->exists();
+        if (!$estaInscrito) {
+            return redirect()->back()->with('error', 'No estás inscrito en este curso');
         }
 
-        // Verificar si ya respondió
-        $respuestaExistente = RespuestaActividad::where('actividad_id', $actividad->id)
-                                               ->where('estudiante_id', Auth::id())
-                                               ->first();
+        $respuestas = $request->input('respuestas', []);
+        $puntajeTotal = 0;
+        $totalPreguntas = $actividad->preguntas->count();
 
-        if ($respuestaExistente) {
-            return back()->with('error', 'Ya has respondido esta actividad');
+        foreach ($respuestas as $preguntaId => $opcionId) {
+            $pregunta = $actividad->preguntas->find($preguntaId);
+            $opcionCorrecta = $pregunta->opciones->where('es_correcta', true)->first();
+            $esCorrecta = $opcionCorrecta && $opcionCorrecta->id == $opcionId;
+
+            if ($esCorrecta) {
+                $puntajeTotal++;
+            }
+
+            // Guardar o actualizar respuesta
+            RespuestaActividad::updateOrCreate([
+                'actividad_id' => $actividad->id,
+                'estudiante_id' => $user->id,
+                'pregunta_id' => $preguntaId
+            ], [
+                'opcion_id' => $opcionId,
+                'es_correcta' => $esCorrecta,
+                'fecha_respuesta' => now()
+            ]);
         }
 
-        $validated = $request->validate([
-            'respuesta' => 'required'
-        ]);
+        $porcentaje = $totalPreguntas > 0 ? ($puntajeTotal / $totalPreguntas) * 100 : 0;
 
-        // Evaluar respuesta
-        $esCorrecta = $this->evaluarRespuesta($actividad, $validated['respuesta']);
-        $puntosObtenidos = $esCorrecta ? $actividad->puntos : 0;
-
-        RespuestaActividad::create([
-            'actividad_id' => $actividad->id,
-            'estudiante_id' => Auth::id(),
-            'respuesta' => is_array($validated['respuesta']) ? $validated['respuesta'] : [$validated['respuesta']],
-            'es_correcta' => $esCorrecta,
-            'puntos_obtenidos' => $puntosObtenidos,
-            'fecha_respuesta' => now()
-        ]);
-
-        $mensaje = $esCorrecta ? 
-            "¡Correcto! Has obtenido {$puntosObtenidos} puntos." : 
-            "Respuesta incorrecta. La respuesta correcta era: " . implode(', ', $actividad->respuesta_correcta);
-
-        return back()->with($esCorrecta ? 'success' : 'info', $mensaje);
+        return redirect()->back()->with('success', "Actividad completada. Puntaje: {$puntajeTotal}/{$totalPreguntas} ({$porcentaje}%)");
     }
 
     private function evaluarRespuesta(Actividad $actividad, $respuestaUsuario)

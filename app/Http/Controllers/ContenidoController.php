@@ -46,11 +46,63 @@ class ContenidoController extends Controller
                         ->with('success', 'Contenido agregado exitosamente');
     }
 
-    public function show(Curso $curso, Contenido $contenido)
+    public function show($id)
     {
-        $this->authorize('view', $curso);
-        
-        return view('contenidos.show', compact('curso', 'contenido'));
+        $contenido = Contenido::with(['curso', 'actividades'])->findOrFail($id);
+        $curso = $contenido->curso;
+        $user = auth()->user();
+
+        // Verificar acceso del estudiante
+        if ($user->rol === 'estudiante') {
+            $estaInscrito = $curso->estudiantes()->where('user_id', $user->id)->exists();
+            if (!$estaInscrito) {
+                return redirect()->route('cursos.show', $curso->id)->with('error', 'Debes inscribirte al curso para acceder a este contenido');
+            }
+        }
+
+        // Obtener progreso del estudiante si está inscrito
+        $progreso = null;
+        if ($user->rol === 'estudiante') {
+            $progreso = ProgresoCurso::where([
+                'curso_id' => $curso->id,
+                'estudiante_id' => $user->id,
+                'contenido_id' => $contenido->id
+            ])->first();
+        }
+
+        return view('contenidos.show', compact('contenido', 'progreso'));
+    }
+
+    public function marcarCompletado($id)
+    {
+        $contenido = Contenido::findOrFail($id);
+        $user = auth()->user();
+
+        if ($user->rol !== 'estudiante') {
+            return response()->json(['error' => 'Solo los estudiantes pueden marcar contenido como completado'], 403);
+        }
+
+        // Verificar que esté inscrito
+        $estaInscrito = $contenido->curso->estudiantes()->where('user_id', $user->id)->exists();
+        if (!$estaInscrito) {
+            return response()->json(['error' => 'No estás inscrito en este curso'], 403);
+        }
+
+        // Crear o actualizar progreso
+        $progreso = ProgresoCurso::updateOrCreate([
+            'curso_id' => $contenido->curso_id,
+            'estudiante_id' => $user->id,
+            'contenido_id' => $contenido->id
+        ], [
+            'completado' => true,
+            'fecha_completado' => now(),
+            'tiempo_dedicado' => request('tiempo_dedicado', 0)
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Contenido marcado como completado'
+        ]);
     }
 
     public function edit(Curso $curso, Contenido $contenido)
@@ -107,33 +159,6 @@ class ContenidoController extends Controller
         
         return redirect()->route('cursos.show', $curso)
                         ->with('success', 'Contenido eliminado exitosamente');
-    }
-    
-    public function marcarCompletado(Curso $curso, Contenido $contenido)
-    {
-        if (!Auth::user()->isAlumno()) {
-            return back()->with('error', 'Solo los alumnos pueden marcar contenido como completado');
-        }
-        
-        if (!Auth::user()->cursosComoEstudiante()->where('curso_id', $curso->id)->exists()) {
-            return back()->with('error', 'Debes estar inscrito en el curso');
-        }
-        
-        $progreso = \App\Models\ProgresoCurso::updateOrCreate(
-            [
-                'curso_id' => $curso->id,
-                'estudiante_id' => Auth::id(),
-                'contenido_id' => $contenido->id,
-                'tipo' => 'contenido'
-            ],
-            [
-                'completado' => true,
-                'fecha_completado' => now(),
-                'tiempo_dedicado' => 5 // minutos mínimo
-            ]
-        );
-        
-        return back()->with('success', 'Contenido marcado como completado');
     }
     
     public function actualizarProgreso(Request $request, Curso $curso, Contenido $contenido)

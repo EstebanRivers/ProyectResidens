@@ -55,6 +55,16 @@
                     </form>
                 @else
                     <span class="status-badge status-completed">✅ Inscrito</span>
+                    
+                    <!-- Botón para desinscribirse -->
+                    <form action="{{ route('cursos.desinscribir', $curso->id) }}" method="POST" class="d-inline" 
+                          onsubmit="return confirm('¿Estás seguro de que quieres desinscribirte de este curso?')">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                            <i class="fas fa-sign-out-alt"></i> Desinscribirse
+                        </button>
+                    </form>
                 @endif
             @endif
         </div>
@@ -108,118 +118,4 @@
                 @empty
                     <div class="empty-content" style="text-align: center; padding: 2rem; color: #6c757d;">
                         <p>No hay contenido disponible aún.</p>
-                        @if(Auth::user()->isAdmin() || (Auth::user()->isMaestro() && $curso->maestro_id === Auth::id()))
-                            <a href="{{ route('contenidos.create', $curso) }}" class="btn-primary" style="margin-top: 1rem; display: inline-block; padding: 0.75rem 1.5rem; background: #1976d2; color: white; text-decoration: none; border-radius: 8px;">Agregar Primer Contenido</a>
-                        @endif
-                    </div>
-                @endforelse
-            </div>
-        </div>
-
-        <!-- Actividades Tab -->
-        <div id="actividades" class="content-section" style="display: none;">
-            <div class="content-list" style="display: grid; gap: 1rem;">
-                @forelse($curso->actividades()->activas()->ordenadas()->get() as $actividad)
-                    @if(Auth::user()->isAlumno() && !Auth::user()->cursosComoEstudiante()->where('curso_id', $curso->id)->exists())
-                        <div class="content-item locked" style="display: flex; align-items: center; padding: 1rem; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef; opacity: 0.6; cursor: not-allowed;">
-                            <div class="content-icon" style="font-size: 1.5rem; margin-right: 1rem; width: 40px; text-align: center;">🔒</div>
-                            <div class="content-info" style="flex: 1;">
-                                <div class="content-title" style="font-weight: 600; color: #6c757d; margin-bottom: 0.25rem;">{{ $actividad->titulo }}</div>
-                                <div class="content-description" style="font-size: 0.9rem; color: #6c757d;">Debes inscribirte para acceder</div>
-                            </div>
-                        </div>
-                    @else
-                        <a href="{{ route('actividades.show', [$curso, $actividad]) }}" class="content-item" style="display: flex; align-items: center; padding: 1rem; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef; transition: all 0.3s ease; text-decoration: none; color: inherit;">
-                            <div class="content-icon" style="font-size: 1.5rem; margin-right: 1rem; width: 40px; text-align: center;">{{ $actividad->icono_tipo }}</div>
-                            <div class="content-info" style="flex: 1;">
-                                <div class="content-title" style="font-weight: 600; color: #2c3e50; margin-bottom: 0.25rem;">{{ $actividad->titulo }}</div>
-                                <div class="content-description" style="font-size: 0.9rem; color: #6c757d;">{{ $actividad->descripcion }}</div>
-                            </div>
-                            <div class="content-status">
-                                @if(Auth::user()->isAlumno())
-                                    @php
-                                        $respuesta = $actividad->respuestas()->where('estudiante_id', Auth::id())->first();
-                                    @endphp
-                                    @if($respuesta)
-                                        <span class="status-badge {{ $respuesta->es_correcta ? 'status-completed' : 'status-pending' }}" style="padding: 0.25rem 0.75rem; background: {{ $respuesta->es_correcta ? '#d4edda' : '#f8d7da' }}; color: {{ $respuesta->es_correcta ? '#155724' : '#721c24' }}; border-radius: 20px; font-size: 0.8rem; font-weight: 500;">
-                                            {{ $respuesta->es_correcta ? '✅ Correcto' : '❌ Incorrecto' }}
-                                        </span>
-                                    @else
-                                        <span class="status-badge status-locked" style="padding: 0.25rem 0.75rem; background: #fff3cd; color: #856404; border-radius: 20px; font-size: 0.8rem; font-weight: 500;">📝 Sin responder</span>
-                                    @endif
-                                @else
-                                    <span class="status-badge status-completed" style="padding: 0.25rem 0.75rem; background: #d4edda; color: #155724; border-radius: 20px; font-size: 0.8rem; font-weight: 500;">{{ $actividad->puntos }} pts</span>
-                                @endif
-                            </div>
-                        </a>
-                    @endif
-                @empty
-                    <div class="empty-content" style="text-align: center; padding: 2rem; color: #6c757d;">
-                        <p>No hay actividades disponibles aún.</p>
-                        @if(Auth::user()->isAdmin() || (Auth::user()->isMaestro() && $curso->maestro_id === Auth::id()))
-                            <a href="{{ route('actividades.create', $curso) }}" class="btn-primary" style="margin-top: 1rem; display: inline-block; padding: 0.75rem 1.5rem; background: #1976d2; color: white; text-decoration: none; border-radius: 8px;">Crear Primera Actividad</a>
-                        @endif
-                    </div>
-                @endforelse
-            </div>
-        </div>
-
-        <!-- Estudiantes Tab (Solo para Admin/Maestro) -->
-        @if(Auth::user()->isAdmin() || (Auth::user()->isMaestro() && $curso->maestro_id === Auth::id()))
-        <div id="estudiantes" class="content-section" style="display: none;">
-            <div class="students-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem;">
-                @forelse($curso->estudiantes as $estudiante)
-                    <div class="student-card" style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; border: 1px solid #e9ecef;">
-                        <div class="student-avatar" style="width: 50px; height: 50px; background: #1976d2; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; margin-bottom: 1rem;">{{ substr($estudiante->name, 0, 1) }}</div>
-                        <div class="student-info">
-                            <h4 style="color: #2c3e50; margin-bottom: 0.5rem;">{{ $estudiante->name }}</h4>
-                            <p style="color: #6c757d; font-size: 0.9rem;">{{ $estudiante->email }}</p>
-                            <p style="color: #6c757d; font-size: 0.9rem;">Matrícula: {{ $estudiante->matricula ?? 'N/A' }}</p>
-                        </div>
-                        <div class="student-stats" style="margin-top: 1rem;">
-                            @php
-                                $progresoEstudiante = $curso->progreso()->where('estudiante_id', $estudiante->id)->where('completado', true)->count();
-                                $totalContenido = $curso->contenidos->count() + $curso->actividades->count();
-                                $porcentaje = $totalContenido > 0 ? round(($progresoEstudiante / $totalContenido) * 100) : 0;
-                            @endphp
-                            <div class="progress-circle" style="text-align: center; padding: 0.5rem; background: #e3f2fd; color: #1976d2; border-radius: 8px; font-weight: bold;">{{ $porcentaje }}% completado</div>
-                        </div>
-                    </div>
-                @empty
-                    <div class="empty-content" style="text-align: center; padding: 2rem; color: #6c757d;">
-                        <p>No hay estudiantes inscritos en este curso.</p>
-                    </div>
-                @endforelse
-            </div>
-        </div>
-        @endif
-    </div>
-</div>
-
-@push('scripts')
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Tab functionality
-    document.querySelectorAll('.content-tab').forEach(tab => {
-        tab.addEventListener('click', function() {
-            const targetTab = this.getAttribute('data-tab');
-            
-            // Remove active class from all tabs and sections
-            document.querySelectorAll('.content-tab').forEach(t => {
-                t.style.color = '#6c757d';
-                t.style.borderBottomColor = 'transparent';
-            });
-            document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
-            
-            // Activate selected tab
-            this.style.color = '#ffa726';
-            this.style.borderBottomColor = '#ffa726';
-            const targetSection = document.getElementById(targetTab);
-            if (targetSection) {
-                targetSection.style.display = 'block';
-            }
-        });
-    });
-});
-</script>
-@endpush
+                        @if(Auth::user()->isAdmin() || (Auth::user()->isMaestro() && $curso->maestro_id === Auth::

@@ -120,27 +120,47 @@ class CursoController extends Controller
                         ->with('success', 'Curso eliminado exitosamente');
     }
 
-    public function inscribir(Request $request, Curso $curso)
+    public function inscribir(Request $request, $id)
     {
-        $user = Auth::user();
-        
-        if (!$user->isAlumno()) {
-            return back()->with('error', 'Solo los alumnos pueden inscribirse en cursos');
+        // Verificar que el usuario esté autenticado
+        if (!auth()->check()) {
+            return redirect()->route('login')->with('error', 'Debes iniciar sesión para inscribirte');
         }
-        
-        if (!$curso->tieneCupoDisponible()) {
-            return back()->with('error', 'El curso no tiene cupo disponible');
+
+        // Verificar que el usuario sea estudiante
+        if (auth()->user()->rol !== 'estudiante') {
+            return redirect()->back()->with('error', 'Solo los estudiantes pueden inscribirse a cursos');
         }
-        
-        if ($user->cursosComoEstudiante()->where('curso_id', $curso->id)->exists()) {
-            return back()->with('error', 'Ya estás inscrito en este curso');
+
+        $curso = Curso::findOrFail($id);
+        $estudiante = auth()->user();
+
+        // Verificar si ya está inscrito
+        if ($curso->estudiantes()->where('user_id', $estudiante->id)->exists()) {
+            return redirect()->route('cursos.show', $curso->id)->with('info', 'Ya estás inscrito en este curso');
         }
-        
-        $user->cursosComoEstudiante()->attach($curso->id, [
-            'fecha_inscripcion' => now(),
-            'estado' => 'inscrito'
+
+        // Inscribir al estudiante
+        $curso->estudiantes()->attach($estudiante->id, [
+            'fecha_inscripcion' => now()
         ]);
-        
-        return back()->with('success', 'Te has inscrito exitosamente en el curso');
+
+        return redirect()->route('cursos.show', $curso->id)->with('success', 'Te has inscrito exitosamente al curso');
+    }
+
+    public function desinscribir($id)
+    {
+        $curso = Curso::findOrFail($id);
+        $estudiante = auth()->user();
+
+        // Verificar que esté inscrito
+        if (!$curso->estudiantes()->where('user_id', $estudiante->id)->exists()) {
+            return redirect()->back()->with('error', 'No estás inscrito en este curso');
+        }
+
+        // Desinscribir al estudiante
+        $curso->estudiantes()->detach($estudiante->id);
+
+        return redirect()->route('cursos.index')->with('success', 'Te has desinscrito del curso exitosamente');
     }
 }

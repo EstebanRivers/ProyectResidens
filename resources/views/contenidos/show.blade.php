@@ -1,145 +1,245 @@
-@extends('layouts.dashboard')
+@extends('layouts.app')
 
 @section('title', $contenido->titulo)
-@section('page-title', $contenido->titulo)
-@section('page-subtitle', 'Curso: ' . $curso->nombre)
 
 @section('content')
-<div class="content-detail">
-    @if(Auth::user()->isAlumno() && Auth::user()->cursosComoEstudiante()->where('curso_id', $curso->id)->exists())
-        <!-- Marcar como completado automáticamente para alumnos inscritos -->
-        @php
-            $progreso = $curso->progreso()->where('estudiante_id', Auth::id())->where('contenido_id', $contenido->id)->first();
-            if (!$progreso) {
-                \App\Models\ProgresoCurso::create([
-                    'curso_id' => $curso->id,
-                    'estudiante_id' => Auth::id(),
-                    'contenido_id' => $contenido->id,
-                    'tipo' => 'contenido',
-                    'completado' => false,
-                    'fecha_inicio' => now()
-                ]);
-            }
-        @endphp
-    @endif
-    
-    <!-- Content Header -->
-    <div class="content-header" style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 2rem;">
-        <div class="content-info">
-            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
-                <span style="font-size: 2rem;">{{ $contenido->icono_tipo }}</span>
-                <div>
-                    <h1 style="color: #2c3e50; margin: 0;">{{ $contenido->titulo }}</h1>
-                    @if($contenido->descripcion)
-                        <p style="color: #6c757d; margin: 0;">{{ $contenido->descripcion }}</p>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('cursos.index') }}">Cursos</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('cursos.show', $contenido->curso->id) }}">{{ $contenido->curso->nombre }}</a></li>
+                    <li class="breadcrumb-item active">{{ $contenido->titulo }}</li>
+                </ol>
+            </nav>
+
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">{{ $contenido->titulo }}</h4>
+                    
+                    @if(auth()->user()->rol === 'estudiante' && isset($progreso))
+                        <div class="d-flex align-items-center">
+                            @if($progreso && $progreso->completado)
+                                <span class="badge badge-success me-2">
+                                    <i class="fas fa-check"></i> Completado
+                                </span>
+                            @else
+                                <button type="button" class="btn btn-success btn-sm" id="marcarCompletado">
+                                    <i class="fas fa-check"></i> Marcar como Completado
+                                </button>
+                            @endif
+                        </div>
                     @endif
                 </div>
-            </div>
-            
-            <div class="content-meta" style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                <span style="padding: 0.5rem 1rem; background: #e3f2fd; color: #1976d2; border-radius: 20px; font-size: 0.9rem;">📝 {{ ucfirst($contenido->tipo) }}</span>
-                <span style="padding: 0.5rem 1rem; background: #f3e5f5; color: #7b1fa2; border-radius: 20px; font-size: 0.9rem;">📊 Orden: {{ $contenido->orden }}</span>
-                <span style="padding: 0.5rem 1rem; background: {{ $contenido->activo ? '#d4edda' : '#f8d7da' }}; color: {{ $contenido->activo ? '#155724' : '#721c24' }}; border-radius: 20px; font-size: 0.9rem;">
-                    {{ $contenido->activo ? '✅ Activo' : '❌ Inactivo' }}
-                </span>
+
+                <div class="card-body">
+                    <!-- Información del contenido -->
+                    <div class="row mb-4">
+                        <div class="col-md-8">
+                            <p class="text-muted mb-2">
+                                <i class="fas fa-book"></i> Curso: {{ $contenido->curso->nombre }}
+                            </p>
+                            @if($contenido->descripcion)
+                                <p class="mb-3">{{ $contenido->descripcion }}</p>
+                            @endif
+                        </div>
+                        <div class="col-md-4">
+                            @if(auth()->user()->rol === 'estudiante' && isset($progreso) && $progreso)
+                                <div class="card bg-light">
+                                    <div class="card-body p-3">
+                                        <h6 class="card-title mb-2">Tu Progreso</h6>
+                                        <p class="mb-1">
+                                            <small class="text-muted">Estado:</small>
+                                            @if($progreso->completado)
+                                                <span class="badge badge-success">Completado</span>
+                                            @else
+                                                <span class="badge badge-warning">En progreso</span>
+                                            @endif
+                                        </p>
+                                        @if($progreso->fecha_completado)
+                                            <p class="mb-1">
+                                                <small class="text-muted">Completado:</small>
+                                                {{ $progreso->fecha_completado->format('d/m/Y H:i') }}
+                                            </p>
+                                        @endif
+                                        @if($progreso->tiempo_dedicado > 0)
+                                            <p class="mb-0">
+                                                <small class="text-muted">Tiempo:</small>
+                                                {{ gmdate('H:i:s', $progreso->tiempo_dedicado) }}
+                                            </p>
+                                        @endif
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Contenido principal -->
+                    <div class="content-area mb-4">
+                        @if($contenido->tipo === 'video' && $contenido->url)
+                            <div class="video-container mb-3">
+                                <div class="embed-responsive embed-responsive-16by9">
+                                    @if(str_contains($contenido->url, 'youtube.com') || str_contains($contenido->url, 'youtu.be'))
+                                        @php
+                                            $videoId = '';
+                                            if (str_contains($contenido->url, 'youtube.com/watch?v=')) {
+                                                $videoId = substr($contenido->url, strpos($contenido->url, 'v=') + 2);
+                                            } elseif (str_contains($contenido->url, 'youtu.be/')) {
+                                                $videoId = substr($contenido->url, strrpos($contenido->url, '/') + 1);
+                                            }
+                                            if (str_contains($videoId, '&')) {
+                                                $videoId = substr($videoId, 0, strpos($videoId, '&'));
+                                            }
+                                        @endphp
+                                        <iframe class="embed-responsive-item" 
+                                                src="https://www.youtube.com/embed/{{ $videoId }}" 
+                                                allowfullscreen id="videoPlayer"></iframe>
+                                    @else
+                                        <video controls class="w-100" id="videoPlayer">
+                                            <source src="{{ $contenido->url }}" type="video/mp4">
+                                            Tu navegador no soporta el elemento de video.
+                                        </video>
+                                    @endif
+                                </div>
+                            </div>
+                        @elseif($contenido->tipo === 'documento' && $contenido->url)
+                            <div class="document-container mb-3">
+                                <a href="{{ $contenido->url }}" target="_blank" class="btn btn-outline-primary">
+                                    <i class="fas fa-file-download"></i> Descargar Documento
+                                </a>
+                            </div>
+                        @endif
+
+                        @if($contenido->contenido)
+                            <div class="content-text">
+                                {!! nl2br(e($contenido->contenido)) !!}
+                            </div>
+                        @endif
+                    </div>
+
+                    <!-- Actividades relacionadas -->
+                    @if($contenido->actividades->count() > 0)
+                        <div class="activities-section">
+                            <h5 class="mb-3">
+                                <i class="fas fa-tasks"></i> Actividades
+                            </h5>
+                            <div class="row">
+                                @foreach($contenido->actividades as $actividad)
+                                    <div class="col-md-6 mb-3">
+                                        <div class="card border-left-primary">
+                                            <div class="card-body">
+                                                <h6 class="card-title">{{ $actividad->titulo }}</h6>
+                                                @if($actividad->descripcion)
+                                                    <p class="card-text text-muted small">{{ Str::limit($actividad->descripcion, 100) }}</p>
+                                                @endif
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <small class="text-muted">
+                                                        <i class="fas fa-question-circle"></i> 
+                                                        {{ $actividad->preguntas->count() }} preguntas
+                                                    </small>
+                                                    <a href="{{ route('actividades.show', $actividad->id) }}" class="btn btn-primary btn-sm">
+                                                        <i class="fas fa-play"></i> Realizar
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
+                    <!-- Botones de acción -->
+                    <div class="mt-4 d-flex justify-content-between">
+                        <a href="{{ route('cursos.show', $contenido->curso->id) }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Volver al Curso
+                        </a>
+                        
+                        @if(auth()->user()->rol === 'admin' || (auth()->user()->rol === 'maestro' && $contenido->curso->maestro_id === auth()->id()))
+                            <div>
+                                <a href="{{ route('contenidos.edit', $contenido->id) }}" class="btn btn-warning">
+                                    <i class="fas fa-edit"></i> Editar
+                                </a>
+                                <form action="{{ route('contenidos.destroy', $contenido->id) }}" method="POST" class="d-inline"
+                                      onsubmit="return confirm('¿Estás seguro de eliminar este contenido?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger">
+                                        <i class="fas fa-trash"></i> Eliminar
+                                    </button>
+                                </form>
+                            </div>
+                        @endif
+                    </div>
+                </div>
             </div>
         </div>
-        
-        @if(Auth::user()->isAdmin() || (Auth::user()->isMaestro() && $curso->maestro_id === Auth::id()))
-            <div class="content-actions" style="margin-top: 1rem; display: flex; gap: 1rem; flex-wrap: wrap;">
-                <a href="{{ route('contenidos.edit', [$curso, $contenido]) }}" class="btn-primary">✏️ Editar Contenido</a>
-                <form method="POST" action="{{ route('contenidos.destroy', [$curso, $contenido]) }}" style="display: inline;" onsubmit="return confirm('¿Estás seguro de que quieres eliminar este contenido?')">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn-secondary">🗑️ Eliminar</button>
-                </form>
-            </div>
-        @endif
-    </div>
-
-    <!-- Content Body -->
-    <div class="content-body" style="background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); padding: 2rem;">
-        @if($contenido->tipo === 'texto')
-            <div class="text-content" style="line-height: 1.8; color: #2c3e50;">
-                {!! nl2br(e($contenido->contenido_texto)) !!}
-            </div>
-        @elseif($contenido->tipo === 'video' && $contenido->archivo_url)
-            <div class="video-content" style="text-align: center;">
-                <video controls style="width: 100%; max-width: 800px; border-radius: 8px;">
-                    <source src="{{ $contenido->archivo_url }}" type="video/mp4">
-                    Tu navegador no soporta el elemento de video.
-                </video>
-            </div>
-        @elseif($contenido->tipo === 'imagen' && $contenido->archivo_url)
-            <div class="image-content" style="text-align: center;">
-                <img src="{{ $contenido->archivo_url }}" alt="{{ $contenido->titulo }}" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-            </div>
-        @elseif($contenido->tipo === 'audio' && $contenido->archivo_url)
-            <div class="audio-content" style="text-align: center;">
-                <audio controls style="width: 100%; max-width: 600px;">
-                    <source src="{{ $contenido->archivo_url }}" type="audio/mpeg">
-                    Tu navegador no soporta el elemento de audio.
-                </audio>
-            </div>
-        @elseif($contenido->tipo === 'pdf' && $contenido->archivo_url)
-            <div class="pdf-content" style="text-align: center;">
-                <div style="margin-bottom: 1rem;">
-                    <a href="{{ $contenido->archivo_url }}" target="_blank" style="padding: 1rem 2rem; background: #dc3545; color: white; text-decoration: none; border-radius: 8px; display: inline-block;">
-                        📄 Abrir PDF en nueva ventana
-                    </a>
-                </div>
-                <iframe src="{{ $contenido->archivo_url }}" style="width: 100%; height: 600px; border: none; border-radius: 8px;"></iframe>
-            </div>
-        @else
-            <div class="no-content" style="text-align: center; padding: 2rem; color: #6c757d;">
-                <p>No hay contenido disponible para mostrar.</p>
-            </div>
-        @endif
-    </div>
-    
-    <!-- Navigation -->
-    <div style="margin-top: 2rem; display: flex; justify-content: space-between; align-items: center;">
-        @if(Auth::user()->isAlumno() && Auth::user()->cursosComoEstudiante()->where('curso_id', $curso->id)->exists())
-            @php
-                $progreso = $curso->progreso()->where('estudiante_id', Auth::id())->where('contenido_id', $contenido->id)->first();
-            @endphp
-            @if(!$progreso || !$progreso->completado)
-                <form method="POST" action="{{ route('contenidos.marcar-completado', [$curso, $contenido]) }}" style="display: inline;">
-                    @csrf
-                    <button type="submit" style="padding: 0.75rem 1.5rem; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#218838'" onmouseout="this.style.backgroundColor='#28a745'">
-                        ✅ Marcar como Completado
-                    </button>
-                </form>
-            @else
-                <span style="padding: 0.75rem 1.5rem; background: #d4edda; color: #155724; border-radius: 8px; font-weight: 500;">
-                    ✅ Completado el {{ $progreso->fecha_completado->format('d/m/Y') }}
-                </span>
-            @endif
-        @endif
-        
-        <a href="{{ route('cursos.show', $curso) }}" style="padding: 0.75rem 1.5rem; background: #6c757d; color: white; text-decoration: none; border-radius: 8px; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#5a6268'" onmouseout="this.style.backgroundColor='#6c757d'">
-            ← Volver al Curso
-        </a>
     </div>
 </div>
 
-@if(Auth::user()->isAlumno() && Auth::user()->cursosComoEstudiante()->where('curso_id', $curso->id)->exists())
+@if(auth()->user()->rol === 'estudiante')
 <script>
-// Marcar progreso automáticamente después de cierto tiempo
+let tiempoInicio = Date.now();
+let tiempoTotal = 0;
+
+// Marcar como completado manualmente
+document.getElementById('marcarCompletado')?.addEventListener('click', function() {
+    marcarComoCompletado();
+});
+
+// Marcar como completado automáticamente después de 5 minutos
 setTimeout(function() {
-    @if(!$progreso || !$progreso->completado)
-        fetch('{{ route("contenidos.actualizar-progreso", [$curso, $contenido]) }}', {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                tiempo_dedicado: 5 // 5 minutos mínimo
-            })
-        });
+    @if(!isset($progreso) || !$progreso || !$progreso->completado)
+        marcarComoCompletado();
     @endif
 }, 300000); // 5 minutos
+
+// Seguimiento de tiempo para videos
+const videoPlayer = document.getElementById('videoPlayer');
+if (videoPlayer) {
+    videoPlayer.addEventListener('play', function() {
+        tiempoInicio = Date.now();
+    });
+    
+    videoPlayer.addEventListener('pause', function() {
+        tiempoTotal += (Date.now() - tiempoInicio) / 1000;
+    });
+    
+    videoPlayer.addEventListener('ended', function() {
+        tiempoTotal += (Date.now() - tiempoInicio) / 1000;
+        marcarComoCompletado();
+    });
+}
+
+function marcarComoCompletado() {
+    const tiempoFinal = tiempoTotal + (Date.now() - tiempoInicio) / 1000;
+    
+    fetch('{{ route("contenidos.completar", $contenido->id) }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({
+            tiempo_dedicado: Math.round(tiempoFinal)
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+// Actualizar tiempo al salir de la página
+window.addEventListener('beforeunload', function() {
+    tiempoTotal += (Date.now() - tiempoInicio) / 1000;
+});
 </script>
 @endif
 @endsection
