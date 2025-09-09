@@ -237,6 +237,56 @@
     justify-content: center;
 }
 
+/* Locked Content */
+.content-item.locked {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background: #f8f9fa !important;
+}
+
+.content-item.locked:hover {
+    background: #f8f9fa !important;
+    transform: none !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+}
+
+/* Progress Indicators */
+.progress-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 1rem 0;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.progress-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.8rem;
+}
+
+.progress-circle.completed {
+    background: #d4edda;
+    color: #155724;
+}
+
+.progress-circle.pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.progress-circle.locked {
+    background: #f8d7da;
+    color: #721c24;
+}
+
 /* Create Course Card */
 .create-course-card {
     border: 2px dashed #ddd;

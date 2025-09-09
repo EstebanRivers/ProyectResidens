@@ -33,6 +33,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/cursos/{curso}/contenidos/{contenido}/edit', [ContenidoController::class, 'edit'])->name('contenidos.edit');
     Route::put('/cursos/{curso}/contenidos/{contenido}', [ContenidoController::class, 'update'])->name('contenidos.update');
     Route::delete('/cursos/{curso}/contenidos/{contenido}', [ContenidoController::class, 'destroy'])->name('contenidos.destroy');
+    Route::post('/cursos/{curso}/contenidos/{contenido}/completado', [ContenidoController::class, 'marcarCompletado'])->name('contenidos.marcar-completado');
+    Route::post('/cursos/{curso}/contenidos/{contenido}/progreso', [ContenidoController::class, 'actualizarProgreso'])->name('contenidos.actualizar-progreso');
     
     // Rutas de actividades
     Route::get('/cursos/{curso}/actividades/create', [ActividadController::class, 'create'])->name('actividades.create');

@@ -91,6 +91,11 @@
                 <form method="POST" action="{{ route('actividades.responder', [$curso, $actividad]) }}" style="margin-bottom: 2rem;">
                     @csrf
                     
+                    @if(!Auth::user()->cursosComoEstudiante()->where('curso_id', $curso->id)->exists())
+                        <div style="background: #f8d7da; color: #721c24; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; text-align: center;">
+                            <strong>⚠️ Debes inscribirte en el curso para responder esta actividad</strong>
+                        </div>
+                    @else
                     <div class="answer-section" style="margin-bottom: 2rem;">
                         <h3 style="color: #2c3e50; margin-bottom: 1rem;">Tu Respuesta:</h3>
                         
@@ -126,6 +131,7 @@
                             📤 Enviar Respuesta
                         </button>
                     </div>
+                    @endif
                 </form>
             @endif
         @else

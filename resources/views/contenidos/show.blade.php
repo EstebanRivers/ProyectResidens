@@ -6,6 +6,23 @@
 
 @section('content')
 <div class="content-detail">
+    @if(Auth::user()->isAlumno() && Auth::user()->cursosComoEstudiante()->where('curso_id', $curso->id)->exists())
+        <!-- Marcar como completado automáticamente para alumnos inscritos -->
+        @php
+            $progreso = $curso->progreso()->where('estudiante_id', Auth::id())->where('contenido_id', $contenido->id)->first();
+            if (!$progreso) {
+                \App\Models\ProgresoCurso::create([
+                    'curso_id' => $curso->id,
+                    'estudiante_id' => Auth::id(),
+                    'contenido_id' => $contenido->id,
+                    'tipo' => 'contenido',
+                    'completado' => false,
+                    'fecha_inicio' => now()
+                ]);
+            }
+        @endphp
+    @endif
+    
     <!-- Content Header -->
     <div class="content-header" style="background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 2rem;">
         <div class="content-info">
@@ -81,10 +98,48 @@
     </div>
     
     <!-- Navigation -->
-    <div style="margin-top: 2rem; text-align: center;">
+    <div style="margin-top: 2rem; display: flex; justify-content: space-between; align-items: center;">
+        @if(Auth::user()->isAlumno() && Auth::user()->cursosComoEstudiante()->where('curso_id', $curso->id)->exists())
+            @php
+                $progreso = $curso->progreso()->where('estudiante_id', Auth::id())->where('contenido_id', $contenido->id)->first();
+            @endphp
+            @if(!$progreso || !$progreso->completado)
+                <form method="POST" action="{{ route('contenidos.marcar-completado', [$curso, $contenido]) }}" style="display: inline;">
+                    @csrf
+                    <button type="submit" style="padding: 0.75rem 1.5rem; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#218838'" onmouseout="this.style.backgroundColor='#28a745'">
+                        ✅ Marcar como Completado
+                    </button>
+                </form>
+            @else
+                <span style="padding: 0.75rem 1.5rem; background: #d4edda; color: #155724; border-radius: 8px; font-weight: 500;">
+                    ✅ Completado el {{ $progreso->fecha_completado->format('d/m/Y') }}
+                </span>
+            @endif
+        @endif
+        
         <a href="{{ route('cursos.show', $curso) }}" style="padding: 0.75rem 1.5rem; background: #6c757d; color: white; text-decoration: none; border-radius: 8px; transition: background-color 0.3s;" onmouseover="this.style.backgroundColor='#5a6268'" onmouseout="this.style.backgroundColor='#6c757d'">
             ← Volver al Curso
         </a>
     </div>
 </div>
+
+@if(Auth::user()->isAlumno() && Auth::user()->cursosComoEstudiante()->where('curso_id', $curso->id)->exists())
+<script>
+// Marcar progreso automáticamente después de cierto tiempo
+setTimeout(function() {
+    @if(!$progreso || !$progreso->completado)
+        fetch('{{ route("contenidos.actualizar-progreso", [$curso, $contenido]) }}', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                tiempo_dedicado: 5 // 5 minutos mínimo
+            })
+        });
+    @endif
+}, 300000); // 5 minutos
+</script>
+@endif
 @endsection
