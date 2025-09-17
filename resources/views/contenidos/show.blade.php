@@ -131,7 +131,7 @@
 
                         <div>
                             @if($prevContenido)
-                                <a href="{{ route('contenidos.show', $prevContenido) }}" 
+                                <a href="{{ route('contenidos.show', $prevContenido->id) }}" 
                                    class="btn btn-outline-secondary">
                                     <i class="fas fa-chevron-left"></i> Anterior
                                 </a>
@@ -147,7 +147,7 @@
 
                         <div>
                             @if($nextContenido)
-                                <a href="{{ route('contenidos.show', $nextContenido) }}" 
+                                <a href="{{ route('contenidos.show', $nextContenido->id) }}" 
                                    class="btn btn-outline-secondary">
                                     Siguiente <i class="fas fa-chevron-right"></i>
                                 </a>

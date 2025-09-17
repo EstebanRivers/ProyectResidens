@@ -96,7 +96,7 @@
                             </div>
                         </div>
                     @else
-                        <a href="{{ route('contenidos.show', $contenido) }}" class="content-item" style="display: flex; align-items: center; padding: 1rem; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef; transition: all 0.3s ease; text-decoration: none; color: inherit;">
+                        <a href="{{ route('contenidos.show', [$curso, $contenido]) }}" class="content-item" style="display: flex; align-items: center; padding: 1rem; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef; transition: all 0.3s ease; text-decoration: none; color: inherit;">
                             <div class="content-icon" style="font-size: 1.5rem; margin-right: 1rem; width: 40px; text-align: center;">
                                 @if($contenido->tipo === 'video')
                                     🎥
@@ -153,7 +153,7 @@
                             </div>
                         </div>
                     @else
-                        <a href="{{ route('actividades.show', $actividad) }}" class="content-item" style="display: flex; align-items: center; padding: 1rem; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef; transition: all 0.3s ease; text-decoration: none; color: inherit;">
+                        <a href="{{ route('actividades.show', [$curso, $actividad]) }}" class="content-item" style="display: flex; align-items: center; padding: 1rem; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef; transition: all 0.3s ease; text-decoration: none; color: inherit;">
                             <div class="content-icon" style="font-size: 1.5rem; margin-right: 1rem; width: 40px; text-align: center;">
                                 @if($actividad->tipo === 'opcion_multiple')
                                     ☑️

@@ -64,11 +64,17 @@ class ContenidoController extends Controller
                         ->with('success', 'Contenido creado exitosamente');
     }
 
-    public function show($contenidoId)
+    public function show($cursoId, $contenidoId)
     {
         try {
+            $curso = Curso::findOrFail($cursoId);
             $contenido = Contenido::findOrFail($contenidoId);
-            $curso = $contenido->curso;
+            
+            // Verificar que el contenido pertenece al curso
+            if ($contenido->curso_id !== $curso->id) {
+                return redirect()->route('cursos.show', $curso->id)
+                    ->with('error', 'El contenido no pertenece a este curso.');
+            }
             
             // Verificar que el usuario esté inscrito en el curso (solo para alumnos)
             if (Auth::user()->isAlumno()) {
