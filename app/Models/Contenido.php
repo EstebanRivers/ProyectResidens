@@ -11,38 +11,39 @@ class Contenido extends Model
 {
     use HasFactory;
 
+    protected $table = 'contenidos';
+
     protected $fillable = [
         'curso_id',
         'titulo',
         'descripcion',
         'tipo',
+        'contenido',
         'archivo_url',
-        'contenido_texto',
-        'orden',
+        'duracion',
         'activo',
-        'metadata'
+        'orden'
     ];
 
     protected $casts = [
         'activo' => 'boolean',
-        'metadata' => 'array'
+        'duracion' => 'integer',
+        'orden' => 'integer'
     ];
 
+    // Relación con curso
     public function curso(): BelongsTo
     {
         return $this->belongsTo(Curso::class);
     }
 
-    public function actividades(): HasMany
+    // Relación con progreso de contenidos
+    public function progresos(): HasMany
     {
-        return $this->hasMany(Actividad::class);
+        return $this->hasMany(ProgresoContenido::class);
     }
 
-    public function progreso(): HasMany
-    {
-        return $this->hasMany(ProgresoCurso::class);
-    }
-
+    // Scope para contenidos activos
     public function scopeActivos($query)
     {
         return $query->where('activo', true);
@@ -53,15 +54,33 @@ class Contenido extends Model
         return $query->orderBy('orden');
     }
 
-    public function getIconoTipoAttribute()
+    // Verificar si está completado por un usuario
+    public function completadoPor($userId)
     {
-        return match($this->tipo) {
-            'video' => '🎥',
-            'texto' => '📄',
-            'pdf' => '📋',
-            'imagen' => '🖼️',
-            'audio' => '🎵',
-            default => '📄'
-        };
+        return $this->progresos()
+            ->where('user_id', $userId)
+            ->where('completado', true)
+            ->exists();
+    }
+
+    // Obtener progreso del usuario
+    public function progresoDelUsuario($userId)
+    {
+        return $this->progresos()
+            ->where('user_id', $userId)
+            ->first();
+    }
+
+    // Marcar como completado
+    public function marcarCompletado($userId)
+    {
+        return $this->progresos()->updateOrCreate(
+            ['user_id' => $userId],
+            [
+                'completado' => true,
+                'fecha_completado' => now(),
+                'tiempo_dedicado' => $this->duracion ?? 0
+            ]
+        );
     }
 }

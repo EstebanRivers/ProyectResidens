@@ -30,23 +30,20 @@ Route::middleware('auth')->group(function () {
     
     // Rutas de contenidos
     Route::get('/cursos/{curso}/contenidos/create', [ContenidoController::class, 'create'])->name('contenidos.create');
-    Route::post('contenidos/{contenido}/completar', [ContenidoController::class, 'marcarCompletado'])->name('contenidos.completar');
-    Route::post('contenidos/{contenido}/completar', [ContenidoController::class, 'marcarCompletado'])->name('contenidos.completar');
     Route::post('/cursos/{curso}/contenidos', [ContenidoController::class, 'store'])->name('contenidos.store');
-    Route::get('/cursos/{curso}/contenidos/{contenido}', [ContenidoController::class, 'show'])->name('contenidos.show');
+    Route::get('/contenidos/{contenido}', [ContenidoController::class, 'show'])->name('contenidos.show');
     Route::get('/cursos/{curso}/contenidos/{contenido}/edit', [ContenidoController::class, 'edit'])->name('contenidos.edit');
     Route::put('/cursos/{curso}/contenidos/{contenido}', [ContenidoController::class, 'update'])->name('contenidos.update');
     Route::delete('/cursos/{curso}/contenidos/{contenido}', [ContenidoController::class, 'destroy'])->name('contenidos.destroy');
-    Route::post('/cursos/{curso}/contenidos/{contenido}/completado', [ContenidoController::class, 'marcarCompletado'])->name('contenidos.marcar-completado');
-    Route::post('/cursos/{curso}/contenidos/{contenido}/progreso', [ContenidoController::class, 'actualizarProgreso'])->name('contenidos.actualizar-progreso');
+    Route::post('/contenidos/{contenido}/marcar-completado', [ContenidoController::class, 'marcarCompletado'])->name('contenidos.marcar-completado');
+    Route::post('/contenidos/{id}/completar', [ContenidoController::class, 'marcarCompletado'])->name('contenidos.completar');
     
     // Rutas de actividades
     Route::get('/cursos/{curso}/actividades/create', [ActividadController::class, 'create'])->name('actividades.create');
-    Route::post('actividades/{actividad}/responder', [ActividadController::class, 'responder'])->name('actividades.responder');
-    Route::post('actividades/{actividad}/responder', [ActividadController::class, 'responder'])->name('actividades.responder');
     Route::post('/cursos/{curso}/actividades', [ActividadController::class, 'store'])->name('actividades.store');
-    Route::get('/cursos/{curso}/actividades/{actividad}', [ActividadController::class, 'show'])->name('actividades.show');
-    Route::post('/cursos/{curso}/actividades/{actividad}/responder', [ActividadController::class, 'responder'])->name('actividades.responder');
+    Route::get('/actividades/{actividad}', [ActividadController::class, 'show'])->name('actividades.show');
+    Route::post('/actividades/{actividad}/responder', [ActividadController::class, 'responder'])->name('actividades.responder');
+    Route::post('/actividades/{id}/responder', [ActividadController::class, 'responder'])->name('actividades.responder');
     
     // Rutas específicas por rol
     Route::middleware('role:administrador')->group(function () {

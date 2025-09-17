@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class RespuestaActividad extends Model
 {
@@ -12,36 +13,55 @@ class RespuestaActividad extends Model
     protected $table = 'respuesta_actividades';
 
     protected $fillable = [
-        'actividad_id',
         'estudiante_id',
-        'pregunta_id',
-        'opcion_id',
+        'actividad_id',
+        'respuesta',
+        'puntos_obtenidos',
         'es_correcta',
-        'fecha_respuesta'
+        'completada',
+        'fecha_completado'
     ];
 
     protected $casts = [
+        'respuesta' => 'array',
         'es_correcta' => 'boolean',
-        'fecha_respuesta' => 'datetime'
+        'completada' => 'boolean',
+        'puntos_obtenidos' => 'integer',
+        'fecha_completado' => 'datetime'
     ];
 
-    public function actividad()
-    {
-        return $this->belongsTo(Actividad::class);
-    }
-
-    public function estudiante()
+    // Relación con Estudiante
+    public function estudiante(): BelongsTo
     {
         return $this->belongsTo(User::class, 'estudiante_id');
     }
 
-    public function pregunta()
+    // Relación con Actividad
+    public function actividad(): BelongsTo
     {
-        return $this->belongsTo(Pregunta::class);
+        return $this->belongsTo(Actividad::class);
     }
 
-    public function opcion()
+    // Scopes
+    public function scopeCorrectas($query)
     {
-        return $this->belongsTo(OpcionPregunta::class, 'opcion_id');
+        return $query->where('es_correcta', true);
+    }
+
+    public function scopeIncorrectas($query)
+    {
+        return $query->where('es_correcta', false);
+    }
+
+    public function scopeCompletadas($query)
+    {
+        return $query->where('completada', true);
+    }
+
+    // Accessor para porcentaje de puntos
+    public function getPorcentajePuntosAttribute()
+    {
+        $puntosMaximos = $this->actividad->puntos;
+        return $puntosMaximos > 0 ? round(($this->puntos_obtenidos / $puntosMaximos) * 100, 1) : 0;
     }
 }

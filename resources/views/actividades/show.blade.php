@@ -5,22 +5,62 @@
 @section('content')
 <div class="container-fluid">
     <div class="row">
-        <div class="col-md-12">
-            <!-- Breadcrumb -->
-            <nav aria-label="breadcrumb" class="mb-4">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('cursos.index') }}">Cursos</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('cursos.show', $actividad->contenido->curso->id) }}">{{ $actividad->contenido->curso->nombre }}</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('contenidos.show', $actividad->contenido->id) }}">{{ $actividad->contenido->titulo }}</a></li>
-                    <li class="breadcrumb-item active">{{ $actividad->titulo }}</li>
-                </ol>
-            </nav>
-
+        <!-- Sidebar de navegación -->
+        <div class="col-md-3">
             <div class="card">
                 <div class="card-header">
-                    <h4 class="mb-0">{{ $actividad->titulo }}</h4>
-                    <p class="text-muted mb-0">{{ $actividad->contenido->titulo }} - {{ $actividad->contenido->curso->nombre }}</p>
+                    <h6 class="mb-0">
+                        <i class="fas fa-tasks"></i>
+                        Actividades del Curso
+                    </h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        @foreach($actividades as $item)
+                            <a href="{{ route('actividades.show', $item) }}" 
+                               class="list-group-item list-group-item-action {{ $item->id == $actividad->id ? 'active' : '' }}">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        @if($item->yaRespondidaPor(Auth::id()))
+                                            <i class="fas fa-check-circle text-success"></i>
+                                        @else
+                                            <i class="fas fa-circle text-muted"></i>
+                                        @endif
+                                        <span class="ms-2">{{ $item->titulo }}</span>
+                                    </div>
+                                    <small class="badge bg-primary">{{ $item->puntos }} pts</small>
+                                </div>
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenido principal -->
+        <div class="col-md-9">
+            <div class="card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="mb-0">{{ $actividad->titulo }}</h4>
+                            <small class="text-muted">
+                                <i class="fas fa-star"></i>
+                                {{ $actividad->puntos }} puntos
+                            </small>
+                        </div>
+                        <div>
+                            @if($yaRespondida)
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check"></i> Completada
+                                </span>
+                            @else
+                                <span class="badge bg-warning">
+                                    <i class="fas fa-clock"></i> Pendiente
+                                </span>
+                            @endif
+                        </div>
+                    </div>
                 </div>
 
                 <div class="card-body">
@@ -31,191 +71,112 @@
                         </div>
                     @endif
 
-                    @if(auth()->user()->rol === 'estudiante')
-                        <!-- Formulario para estudiantes -->
-                        <form action="{{ route('actividades.responder', $actividad->id) }}" method="POST" id="actividadForm">
-                            @csrf
-                            
-                            @foreach($actividad->preguntas as $index => $pregunta)
-                                <div class="question-card mb-4">
-                                    <div class="card">
-                                        <div class="card-header">
-                                            <h6 class="mb-0">
-                                                Pregunta {{ $index + 1 }}
-                                                @if(isset($respuestasEstudiante[$pregunta->id]))
-                                                    @if($respuestasEstudiante[$pregunta->id]->es_correcta)
-                                                        <span class="badge badge-success float-right">
-                                                            <i class="fas fa-check"></i> Correcta
-                                                        </span>
-                                                    @else
-                                                        <span class="badge badge-danger float-right">
-                                                            <i class="fas fa-times"></i> Incorrecta
-                                                        </span>
-                                                    @endif
-                                                @else
-                                                    <span class="badge badge-secondary float-right">
-                                                        <i class="fas fa-clock"></i> Sin responder
-                                                    </span>
-                                                @endif
-                                            </h6>
-                                        </div>
-                                        <div class="card-body">
-                                            <p class="question-text mb-3">{{ $pregunta->pregunta }}</p>
-                                            
-                                            <div class="options">
-                                                @foreach($pregunta->opciones as $opcion)
-                                                    <div class="form-check mb-2">
-                                                        <input class="form-check-input" 
-                                                               type="radio" 
-                                                               name="respuestas[{{ $pregunta->id }}]" 
-                                                               id="opcion_{{ $opcion->id }}" 
-                                                               value="{{ $opcion->id }}"
-                                                               @if(isset($respuestasEstudiante[$pregunta->id]) && $respuestasEstudiante[$pregunta->id]->opcion_id == $opcion->id) checked @endif>
-                                                        <label class="form-check-label" for="opcion_{{ $opcion->id }}">
-                                                            {{ $opcion->opcion }}
-                                                            @if(isset($respuestasEstudiante[$pregunta->id]))
-                                                                @if($opcion->es_correcta)
-                                                                    <i class="fas fa-check text-success ml-2"></i>
-                                                                @elseif($respuestasEstudiante[$pregunta->id]->opcion_id == $opcion->id && !$opcion->es_correcta)
-                                                                    <i class="fas fa-times text-danger ml-2"></i>
-                                                                @endif
-                                                            @endif
-                                                        </label>
-                                                    </div>
-                                                @endforeach
+                    <!-- Mostrar resultado si ya respondió -->
+                    @if($yaRespondida && $respuestaUsuario)
+                        <div class="alert {{ $respuestaUsuario->es_correcta ? 'alert-success' : 'alert-danger' }}">
+                            <h5>
+                                @if($respuestaUsuario->es_correcta)
+                                    <i class="fas fa-check-circle"></i> ¡Respuesta Correcta!
+                                @else
+                                    <i class="fas fa-times-circle"></i> Respuesta Incorrecta
+                                @endif
+                            </h5>
+                            <p class="mb-2">
+                                <strong>Tu respuesta:</strong> 
+                                {{ is_array($respuestaUsuario->respuesta) ? implode(', ', $respuestaUsuario->respuesta) : $respuestaUsuario->respuesta }}
+                            </p>
+                            <p class="mb-2">
+                                <strong>Respuesta correcta:</strong> 
+                                {{ is_array($actividad->respuesta_correcta) ? implode(', ', $actividad->respuesta_correcta) : $actividad->respuesta_correcta }}
+                            </p>
+                            <p class="mb-0">
+                                <strong>Puntuación:</strong> {{ $respuestaUsuario->puntuacion }}/{{ $actividad->puntos }} puntos
+                            </p>
+                        </div>
+                    @endif
+
+                    <!-- Pregunta -->
+                    <div class="question-container">
+                        <h5 class="mb-4">{{ $actividad->pregunta }}</h5>
+
+                        @if(!$yaRespondida)
+                            <form action="{{ route('actividades.responder', $actividad->id) }}" 
+                                  method="POST" 
+                                  onsubmit="return confirmarEnvio()">
+                                @csrf
+
+                                @if($actividad->tipo == 'multiple')
+                                    <!-- Opción múltiple -->
+                                    @if($actividad->opciones)
+                                        @foreach($actividad->opciones as $index => $opcion)
+                                            <div class="form-check mb-3">
+                                                <input class="form-check-input" 
+                                                       type="radio" 
+                                                       name="respuesta" 
+                                                       value="{{ $opcion }}" 
+                                                       id="opcion{{ $index }}"
+                                                       required>
+                                                <label class="form-check-label" for="opcion{{ $index }}">
+                                                    <strong>{{ chr(65 + $index) }}.</strong> {{ $opcion }}
+                                                </label>
                                             </div>
+                                        @endforeach
+                                    @endif
 
-                                            @if(isset($respuestasEstudiante[$pregunta->id]))
-                                                <div class="mt-3">
-                                                    <small class="text-muted">
-                                                        <i class="fas fa-clock"></i>
-                                                        Respondida el {{ $respuestasEstudiante[$pregunta->id]->fecha_respuesta->format('d/m/Y H:i') }}
-                                                    </small>
-                                                </div>
-                                            @endif
-                                        </div>
+                                @elseif($actividad->tipo == 'verdadero_falso')
+                                    <!-- Verdadero/Falso -->
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" 
+                                               type="radio" 
+                                               name="respuesta" 
+                                               value="Verdadero" 
+                                               id="verdadero"
+                                               required>
+                                        <label class="form-check-label" for="verdadero">
+                                            <i class="fas fa-check text-success"></i> Verdadero
+                                        </label>
                                     </div>
-                                </div>
-                            @endforeach
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" 
+                                               type="radio" 
+                                               name="respuesta" 
+                                               value="Falso" 
+                                               id="falso"
+                                               required>
+                                        <label class="form-check-label" for="falso">
+                                            <i class="fas fa-times text-danger"></i> Falso
+                                        </label>
+                                    </div>
 
-                            @if($actividad->preguntas->count() > 0)
-                                <div class="text-center mt-4">
-                                    <button type="submit" class="btn btn-primary btn-lg">
-                                        <i class="fas fa-paper-plane"></i>
-                                        @if($respuestasEstudiante->count() > 0)
-                                            Actualizar Respuestas
-                                        @else
-                                            Enviar Respuestas
-                                        @endif
+                                @elseif($actividad->tipo == 'respuesta_corta')
+                                    <!-- Respuesta corta -->
+                                    <div class="mb-3">
+                                        <input type="text" 
+                                               class="form-control" 
+                                               name="respuesta" 
+                                               placeholder="Escribe tu respuesta aquí..."
+                                               required>
+                                    </div>
+
+                                @endif
+
+                                <div class="d-flex justify-content-between mt-4">
+                                    <a href="{{ route('cursos.show', $curso->id) }}" 
+                                       class="btn btn-outline-secondary">
+                                        <i class="fas fa-arrow-left"></i> Volver al curso
+                                    </a>
+                                    
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-paper-plane"></i> Enviar Respuesta
                                     </button>
                                 </div>
-                            @endif
-                        </form>
-
-                        @if($respuestasEstudiante->count() > 0)
-                            <!-- Mostrar estadísticas -->
-                            <div class="mt-4">
-                                <div class="card bg-light">
-                                    <div class="card-body">
-                                        <h6 class="card-title">
-                                            <i class="fas fa-chart-bar"></i> Tus Resultados
-                                        </h6>
-                                        @php
-                                            $correctas = $respuestasEstudiante->where('es_correcta', true)->count();
-                                            $total = $actividad->preguntas->count();
-                                            $porcentaje = $total > 0 ? ($correctas / $total) * 100 : 0;
-                                        @endphp
-                                        <div class="row">
-                                            <div class="col-md-3">
-                                                <div class="text-center">
-                                                    <h4 class="text-success">{{ $correctas }}</h4>
-                                                    <small class="text-muted">Correctas</small>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <div class="text-center">
-                                                    <h4 class="text-danger">{{ $total - $correctas }}</h4>
-                                                    <small class="text-muted">Incorrectas</small>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <div class="text-center">
-                                                    <h4 class="text-primary">{{ $total }}</h4>
-                                                    <small class="text-muted">Total</small>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-3">
-                                                <div class="text-center">
-                                                    <h4 class="@if($porcentaje >= 70) text-success @elseif($porcentaje >= 50) text-warning @else text-danger @endif">
-                                                        {{ number_format($porcentaje, 1) }}%
-                                                    </h4>
-                                                    <small class="text-muted">Puntuación</small>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
-                    @else
-                        <!-- Vista para maestros y administradores -->
-                        <div class="questions-preview">
-                            @foreach($actividad->preguntas as $index => $pregunta)
-                                <div class="question-card mb-4">
-                                    <div class="card">
-                                        <div class="card-header">
-                                            <h6 class="mb-0">Pregunta {{ $index + 1 }}</h6>
-                                        </div>
-                                        <div class="card-body">
-                                            <p class="question-text mb-3">{{ $pregunta->pregunta }}</p>
-                                            
-                                            <div class="options">
-                                                @foreach($pregunta->opciones as $opcion)
-                                                    <div class="form-check mb-2">
-                                                        <input class="form-check-input" type="radio" disabled>
-                                                        <label class="form-check-label">
-                                                            {{ $opcion->opcion }}
-                                                            @if($opcion->es_correcta)
-                                                                <i class="fas fa-check text-success ml-2"></i>
-                                                                <small class="text-success">(Respuesta correcta)</small>
-                                                            @endif
-                                                        </label>
-                                                    </div>
-                                                @endforeach
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    @endif
-
-                    @if($actividad->preguntas->count() === 0)
-                        <div class="alert alert-warning text-center">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            Esta actividad aún no tiene preguntas configuradas.
-                        </div>
-                    @endif
-
-                    <!-- Botones de navegación -->
-                    <div class="mt-4 d-flex justify-content-between">
-                        <a href="{{ route('contenidos.show', $actividad->contenido->id) }}" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left"></i> Volver al Contenido
-                        </a>
-                        
-                        @if(auth()->user()->rol === 'admin' || (auth()->user()->rol === 'maestro' && $actividad->contenido->curso->maestro_id === auth()->id()))
-                            <div>
-                                <a href="{{ route('actividades.edit', $actividad->id) }}" class="btn btn-warning">
-                                    <i class="fas fa-edit"></i> Editar Actividad
+                            </form>
+                        @else
+                            <div class="text-center mt-4">
+                                <a href="{{ route('cursos.show', $curso->id) }}" 
+                                   class="btn btn-outline-primary">
+                                    <i class="fas fa-arrow-left"></i> Volver al curso
                                 </a>
-                                <form action="{{ route('actividades.destroy', $actividad->id) }}" method="POST" class="d-inline"
-                                      onsubmit="return confirm('¿Estás seguro de eliminar esta actividad?')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger">
-                                        <i class="fas fa-trash"></i> Eliminar
-                                    </button>
-                                </form>
                             </div>
                         @endif
                     </div>
@@ -226,16 +187,8 @@
 </div>
 
 <script>
-// Confirmar antes de enviar respuestas
-document.getElementById('actividadForm')?.addEventListener('submit', function(e) {
-    const respuestasCompletas = document.querySelectorAll('input[type="radio"]:checked').length;
-    const totalPreguntas = {{ $actividad->preguntas->count() }};
-    
-    if (respuestasCompletas < totalPreguntas) {
-        if (!confirm(`Has respondido ${respuestasCompletas} de ${totalPreguntas} preguntas. ¿Deseas continuar?`)) {
-            e.preventDefault();
-        }
-    }
-});
+function confirmarEnvio() {
+    return confirm('¿Estás seguro de que quieres enviar tu respuesta? No podrás cambiarla después.');
+}
 </script>
 @endsection

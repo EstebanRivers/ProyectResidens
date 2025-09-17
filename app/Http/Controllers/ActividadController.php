@@ -2,84 +2,72 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Curso;
 use App\Models\Actividad;
+use App\Models\Curso;
 use App\Models\Contenido;
 use App\Models\RespuestaActividad;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class ActividadController extends Controller
 {
-    use AuthorizesRequests;
-
     public function create(Curso $curso)
     {
-        $this->authorize('update', $curso);
-        
-        $contenidos = $curso->contenidos()->activos()->ordenados()->get();
+        // Verificar permisos
+        if (!Auth::user()->isAdmin() && !Auth::user()->isMaestro()) {
+            return redirect()->route('cursos.index')->with('error', 'No tienes permisos para crear actividades.');
+        }
+
+        if (Auth::user()->isMaestro() && $curso->maestro_id !== Auth::id()) {
+            return redirect()->route('cursos.index')->with('error', 'Solo puedes crear actividades en tus propios cursos.');
+        }
+
+        $contenidos = $curso->contenidos()->where('activo', true)->orderBy('orden')->get();
         return view('actividades.create', compact('curso', 'contenidos'));
     }
 
     public function store(Request $request, Curso $curso)
     {
-        $this->authorize('update', $curso);
+        // Verificar permisos
+        if (!Auth::user()->isAdmin() && !Auth::user()->isMaestro()) {
+            return redirect()->route('cursos.index')->with('error', 'No tienes permisos para crear actividades.');
+        }
 
         $validated = $request->validate([
             'titulo' => 'required|string|max:255',
             'descripcion' => 'required|string',
             'tipo' => 'required|in:opcion_multiple,verdadero_falso,respuesta_corta,ensayo',
             'pregunta.texto' => 'required|string',
-            'contenido_id' => 'nullable|exists:contenidos,id',
+            'opciones' => 'nullable|array',
+            'opciones.*' => 'nullable|string',
+            'respuesta_correcta' => 'required|array',
+            'respuestas_cortas' => 'nullable|string',
+            'explicacion' => 'nullable|string',
             'puntos' => 'required|integer|min:1|max:100',
             'orden' => 'required|integer|min:0',
-            'explicacion' => 'nullable|string'
+            'contenido_id' => 'nullable|exists:contenidos,id'
         ]);
 
         // Procesar respuestas según el tipo
-        $respuestaCorrecta = [];
-        $opciones = null;
-
-        switch ($validated['tipo']) {
-            case 'opcion_multiple':
-                $request->validate([
-                    'opciones' => 'required|array|min:2',
-                    'opciones.*' => 'required|string',
-                    'respuesta_correcta' => 'required|array|min:1'
-                ]);
-                $opciones = $request->opciones;
-                $respuestaCorrecta = $request->respuesta_correcta;
-                break;
-
-            case 'verdadero_falso':
-                $request->validate([
-                    'respuesta_correcta' => 'required|array|min:1'
-                ]);
-                $respuestaCorrecta = $request->respuesta_correcta;
-                break;
-
-            case 'respuesta_corta':
-                $request->validate([
-                    'respuestas_cortas' => 'required|string'
-                ]);
-                $respuestaCorrecta = array_filter(explode("\n", $request->respuestas_cortas));
-                break;
-
-            case 'ensayo':
-                // Para ensayos, no hay respuesta correcta predefinida
-                break;
+        $respuestasCorrectas = [];
+        
+        if ($validated['tipo'] === 'opcion_multiple') {
+            $respuestasCorrectas = $validated['respuesta_correcta'];
+        } elseif ($validated['tipo'] === 'verdadero_falso') {
+            $respuestasCorrectas = $validated['respuesta_correcta'];
+        } elseif ($validated['tipo'] === 'respuesta_corta') {
+            $respuestasCorrectas = array_filter(array_map('trim', explode("\n", $validated['respuestas_cortas'] ?? '')));
         }
 
-        $actividad = Actividad::create([
+        Actividad::create([
             'curso_id' => $curso->id,
             'contenido_id' => $validated['contenido_id'],
             'titulo' => $validated['titulo'],
             'descripcion' => $validated['descripcion'],
             'tipo' => $validated['tipo'],
             'pregunta' => ['texto' => $validated['pregunta']['texto']],
-            'opciones' => $opciones,
-            'respuesta_correcta' => $respuestaCorrecta,
+            'opciones' => $validated['opciones'] ?? null,
+            'respuesta_correcta' => $respuestasCorrectas,
             'explicacion' => $validated['explicacion'],
             'puntos' => $validated['puntos'],
             'orden' => $validated['orden'],
@@ -90,101 +78,135 @@ class ActividadController extends Controller
                         ->with('success', 'Actividad creada exitosamente');
     }
 
-    public function show($id)
+    public function show($actividadId)
     {
-        $actividad = Actividad::with(['contenido.curso', 'preguntas.opciones'])->findOrFail($id);
-        $user = auth()->user();
-        $curso = $actividad->contenido->curso;
+        try {
+            $actividad = Actividad::findOrFail($actividadId);
+            $curso = $actividad->curso;
+            
+            // Verificar que el usuario esté inscrito en el curso (solo para alumnos)
+            if (Auth::user()->isAlumno()) {
+                $estaInscrito = $curso->estudiantes()->where('estudiante_id', Auth::id())->exists();
+                if (!$estaInscrito) {
+                    return redirect()->route('cursos.show', $curso->id)
+                        ->with('error', 'Debes estar inscrito en el curso para acceder a esta actividad.');
+                }
+            }
 
-        // Verificar acceso del estudiante
-        if ($user->rol === 'estudiante') {
-            $estaInscrito = $curso->estudiantes()->where('user_id', $user->id)->exists();
+            // Obtener todas las actividades del curso para navegación
+            $actividades = $curso->actividades()->activos()->ordenadas()->get();
+            
+            // Verificar si ya respondió (solo para alumnos)
+            $yaRespondida = false;
+            $respuestaUsuario = null;
+            
+            if (Auth::user()->isAlumno()) {
+                $respuestaUsuario = RespuestaActividad::where('estudiante_id', Auth::id())
+                                                    ->where('actividad_id', $actividad->id)
+                                                    ->first();
+                $yaRespondida = $respuestaUsuario !== null;
+            }
+
+            return view('actividades.show', compact(
+                'actividad', 
+                'curso', 
+                'actividades', 
+                'yaRespondida', 
+                'respuestaUsuario'
+            ));
+
+        } catch (\Exception $e) {
+            return redirect()->route('cursos.index')
+                ->with('error', 'No se pudo cargar la actividad: ' . $e->getMessage());
+        }
+    }
+
+    public function responder(Request $request, $actividadId)
+    {
+        try {
+            $actividad = Actividad::findOrFail($actividadId);
+            $curso = $actividad->curso;
+            
+            // Verificar que es alumno
+            if (!Auth::user()->isAlumno()) {
+                return redirect()->back()->with('error', 'Solo los alumnos pueden responder actividades.');
+            }
+            
+            // Verificar inscripción
+            $estaInscrito = $curso->estudiantes()->where('estudiante_id', Auth::id())->exists();
             if (!$estaInscrito) {
-                return redirect()->route('cursos.show', $curso->id)->with('error', 'Debes inscribirte al curso para acceder a esta actividad');
-            }
-        }
-
-        // Obtener respuestas del estudiante si las hay
-        $respuestasEstudiante = [];
-        if ($user->rol === 'estudiante') {
-            $respuestasEstudiante = RespuestaActividad::where([
-                'actividad_id' => $actividad->id,
-                'estudiante_id' => $user->id
-            ])->get()->keyBy('pregunta_id');
-        }
-
-        return view('actividades.show', compact('actividad', 'respuestasEstudiante'));
-    }
-
-    public function responder(Request $request, $id)
-    {
-        $actividad = Actividad::findOrFail($id);
-        $user = auth()->user();
-
-        if ($user->rol !== 'estudiante') {
-            return redirect()->back()->with('error', 'Solo los estudiantes pueden responder actividades');
-        }
-
-        // Verificar que esté inscrito
-        $estaInscrito = $actividad->contenido->curso->estudiantes()->where('user_id', $user->id)->exists();
-        if (!$estaInscrito) {
-            return redirect()->back()->with('error', 'No estás inscrito en este curso');
-        }
-
-        $respuestas = $request->input('respuestas', []);
-        $puntajeTotal = 0;
-        $totalPreguntas = $actividad->preguntas->count();
-
-        foreach ($respuestas as $preguntaId => $opcionId) {
-            $pregunta = $actividad->preguntas->find($preguntaId);
-            $opcionCorrecta = $pregunta->opciones->where('es_correcta', true)->first();
-            $esCorrecta = $opcionCorrecta && $opcionCorrecta->id == $opcionId;
-
-            if ($esCorrecta) {
-                $puntajeTotal++;
+                return redirect()->route('cursos.show', $curso->id)
+                    ->with('error', 'No tienes acceso a esta actividad.');
             }
 
-            // Guardar o actualizar respuesta
-            RespuestaActividad::updateOrCreate([
-                'actividad_id' => $actividad->id,
-                'estudiante_id' => $user->id,
-                'pregunta_id' => $preguntaId
-            ], [
-                'opcion_id' => $opcionId,
-                'es_correcta' => $esCorrecta,
-                'fecha_respuesta' => now()
+            // Verificar si ya respondió
+            $yaRespondida = RespuestaActividad::where('estudiante_id', Auth::id())
+                                            ->where('actividad_id', $actividad->id)
+                                            ->exists();
+            
+            if ($yaRespondida) {
+                return redirect()->route('actividades.show', [$curso->id, $actividad->id])
+                    ->with('warning', 'Ya has respondido esta actividad.');
+            }
+
+            // Validar respuesta
+            $request->validate([
+                'respuesta' => 'required'
             ]);
-        }
 
-        $porcentaje = $totalPreguntas > 0 ? ($puntajeTotal / $totalPreguntas) * 100 : 0;
+            $respuestaUsuario = $request->input('respuesta');
+            
+            // Asegurar que sea array para consistencia
+            if (!is_array($respuestaUsuario)) {
+                $respuestaUsuario = [$respuestaUsuario];
+            }
 
-        return redirect()->back()->with('success', "Actividad completada. Puntaje: {$puntajeTotal}/{$totalPreguntas} ({$porcentaje}%)");
-    }
+            // Verificar respuesta correcta
+            $respuestasCorrectas = $actividad->respuesta_correcta ?? [];
+            $esCorrecta = false;
+            $puntuacion = 0;
 
-    private function evaluarRespuesta(Actividad $actividad, $respuestaUsuario)
-    {
-        switch ($actividad->tipo) {
-            case 'opcion_multiple':
-                return in_array($respuestaUsuario, $actividad->respuesta_correcta);
-
-            case 'verdadero_falso':
-                return in_array($respuestaUsuario, $actividad->respuesta_correcta);
-
-            case 'respuesta_corta':
-                $respuestaLimpia = strtolower(trim($respuestaUsuario));
-                foreach ($actividad->respuesta_correcta as $correcta) {
-                    if (strtolower(trim($correcta)) === $respuestaLimpia) {
-                        return true;
+            if (!empty($respuestasCorrectas)) {
+                if ($actividad->tipo === 'opcion_multiple') {
+                    // Para opción múltiple, verificar que las respuestas coincidan
+                    $esCorrecta = count(array_intersect($respuestaUsuario, $respuestasCorrectas)) > 0;
+                } elseif ($actividad->tipo === 'verdadero_falso') {
+                    $esCorrecta = in_array($respuestaUsuario[0], $respuestasCorrectas);
+                } elseif ($actividad->tipo === 'respuesta_corta') {
+                    // Para respuesta corta, verificar si alguna respuesta correcta coincide
+                    $respuestaLimpia = strtolower(trim($respuestaUsuario[0]));
+                    foreach ($respuestasCorrectas as $correcta) {
+                        if (strtolower(trim($correcta)) === $respuestaLimpia) {
+                            $esCorrecta = true;
+                            break;
+                        }
                     }
                 }
-                return false;
+                
+                $puntuacion = $esCorrecta ? $actividad->puntos : 0;
+            }
 
-            case 'ensayo':
-                // Los ensayos requieren evaluación manual
-                return false;
+            // Guardar respuesta
+            RespuestaActividad::create([
+                'estudiante_id' => Auth::id(),
+                'actividad_id' => $actividad->id,
+                'respuesta' => $respuestaUsuario,
+                'puntos_obtenidos' => $puntuacion,
+                'es_correcta' => $esCorrecta,
+                'completada' => true,
+                'fecha_completado' => now()
+            ]);
 
-            default:
-                return false;
+            $mensaje = $esCorrecta 
+                ? "¡Respuesta correcta! Has obtenido {$puntuacion} puntos."
+                : "Respuesta incorrecta. Revisa el material del curso.";
+
+            return redirect()->route('actividades.show', [$curso->id, $actividad->id])
+                ->with($esCorrecta ? 'success' : 'error', $mensaje);
+
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Error al procesar la respuesta: ' . $e->getMessage());
         }
     }
 }
