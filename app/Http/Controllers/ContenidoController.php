@@ -2,35 +2,26 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Contenido;
 use App\Models\Curso;
-use App\Models\ProgresoContenido;
+use App\Models\Contenido;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class ContenidoController extends Controller
 {
+    use AuthorizesRequests;
+
     public function create(Curso $curso)
     {
-        // Verificar permisos
-        if (!Auth::user()->isAdmin() && !Auth::user()->isMaestro()) {
-            return redirect()->route('cursos.index')->with('error', 'No tienes permisos para crear contenido.');
-        }
-
-        if (Auth::user()->isMaestro() && $curso->maestro_id !== Auth::id()) {
-            return redirect()->route('cursos.index')->with('error', 'Solo puedes crear contenido en tus propios cursos.');
-        }
-
+        $this->authorize('update', $curso);
+        
         return view('contenidos.create', compact('curso'));
     }
 
     public function store(Request $request, Curso $curso)
     {
-        // Verificar permisos
-        if (!Auth::user()->isAdmin() && !Auth::user()->isMaestro()) {
-            return redirect()->route('cursos.index')->with('error', 'No tienes permisos para crear contenido.');
-        }
+        $this->authorize('update', $curso);
 
         $validated = $request->validate([
             'titulo' => 'required|string|max:255',
@@ -41,117 +32,89 @@ class ContenidoController extends Controller
             'orden' => 'required|integer|min:0'
         ]);
 
-        $archivoUrl = null;
-        
+        // Manejar archivo si existe
         if ($request->hasFile('archivo')) {
             $archivo = $request->file('archivo');
-            $nombreArchivo = time() . '_' . $archivo->getClientOriginalName();
-            $archivoUrl = $archivo->storeAs('contenidos', $nombreArchivo, 'public');
+            $path = $archivo->store('contenidos/' . $curso->id, 'public');
+            $validated['archivo_url'] = Storage::url($path);
         }
 
-        $contenido = Contenido::create([
-            'curso_id' => $curso->id,
-            'titulo' => $validated['titulo'],
-            'descripcion' => $validated['descripcion'],
-            'tipo' => $validated['tipo'],
-            'contenido_texto' => $validated['contenido_texto'],
-            'archivo_url' => $archivoUrl ? Storage::url($archivoUrl) : null,
-            'orden' => $validated['orden'],
-            'activo' => true
-        ]);
+        $validated['curso_id'] = $curso->id;
+        $contenido = Contenido::create($validated);
 
         return redirect()->route('cursos.show', $curso)
-                        ->with('success', 'Contenido creado exitosamente');
+                        ->with('success', 'Contenido agregado exitosamente');
     }
 
-    public function show($cursoId, $contenidoId)
+    public function show($id)
     {
-        try {
-            $curso = Curso::findOrFail($cursoId);
-            $contenido = Contenido::findOrFail($contenidoId);
-            
-            // Verificar que el contenido pertenece al curso
-            if ($contenido->curso_id !== $curso->id) {
-                return redirect()->route('cursos.show', $curso->id)
-                    ->with('error', 'El contenido no pertenece a este curso.');
-            }
-            
-            // Verificar que el usuario esté inscrito en el curso (solo para alumnos)
-            if (Auth::user()->isAlumno()) {
-                $estaInscrito = $curso->estudiantes()->where('estudiante_id', Auth::id())->exists();
-                if (!$estaInscrito) {
-                    return redirect()->route('cursos.show', $curso->id)
-                        ->with('error', 'Debes estar inscrito en el curso para acceder a este contenido.');
-                }
-            }
+        $contenido = Contenido::with(['curso', 'actividades'])->findOrFail($id);
+        $curso = $contenido->curso;
+        $user = auth()->user();
 
-            // Obtener todos los contenidos del curso para navegación
-            $contenidos = $curso->contenidos()->activos()->ordenados()->get();
-            
-            // Obtener progreso del usuario (solo para alumnos)
-            $progreso = null;
-            if (Auth::user()->isAlumno()) {
-                $progreso = ProgresoContenido::where('user_id', Auth::id())
-                                           ->where('contenido_id', $contenido->id)
-                                           ->first();
-                
-                // Crear progreso si no existe
-                if (!$progreso) {
-                    $progreso = ProgresoContenido::create([
-                        'user_id' => Auth::id(),
-                        'contenido_id' => $contenido->id,
-                        'fecha_inicio' => now(),
-                        'completado' => false
-                    ]);
-                }
+        // Verificar acceso del estudiante
+        if ($user->rol === 'estudiante') {
+            $estaInscrito = $curso->estudiantes()->where('user_id', $user->id)->exists();
+            if (!$estaInscrito) {
+                return redirect()->route('cursos.show', $curso->id)->with('error', 'Debes inscribirte al curso para acceder a este contenido');
             }
-            
-            // Calcular progreso general del curso
-            $porcentajeProgreso = 0;
-            if (Auth::user()->isAlumno()) {
-                $totalContenidos = $contenidos->count();
-                $completados = ProgresoContenido::where('user_id', Auth::id())
-                                               ->whereIn('contenido_id', $contenidos->pluck('id'))
-                                               ->where('completado', true)
-                                               ->count();
-                
-                $porcentajeProgreso = $totalContenidos > 0 ? round(($completados / $totalContenidos) * 100) : 0;
-            }
-
-            return view('contenidos.show', compact(
-                'contenido', 
-                'curso', 
-                'contenidos', 
-                'progreso', 
-                'porcentajeProgreso'
-            ));
-
-        } catch (\Exception $e) {
-            return redirect()->route('cursos.index')
-                ->with('error', 'No se pudo cargar el contenido: ' . $e->getMessage());
         }
+
+        // Obtener progreso del estudiante si está inscrito
+        $progreso = null;
+        if ($user->rol === 'estudiante') {
+            $progreso = ProgresoCurso::where([
+                'curso_id' => $curso->id,
+                'estudiante_id' => $user->id,
+                'contenido_id' => $contenido->id
+            ])->first();
+        }
+
+        return view('contenidos.show', compact('contenido', 'progreso'));
+    }
+
+    public function marcarCompletado($id)
+    {
+        $contenido = Contenido::findOrFail($id);
+        $user = auth()->user();
+
+        if ($user->rol !== 'estudiante') {
+            return response()->json(['error' => 'Solo los estudiantes pueden marcar contenido como completado'], 403);
+        }
+
+        // Verificar que esté inscrito
+        $estaInscrito = $contenido->curso->estudiantes()->where('user_id', $user->id)->exists();
+        if (!$estaInscrito) {
+            return response()->json(['error' => 'No estás inscrito en este curso'], 403);
+        }
+
+        // Crear o actualizar progreso
+        $progreso = ProgresoCurso::updateOrCreate([
+            'curso_id' => $contenido->curso_id,
+            'estudiante_id' => $user->id,
+            'contenido_id' => $contenido->id
+        ], [
+            'completado' => true,
+            'fecha_completado' => now(),
+            'tiempo_dedicado' => request('tiempo_dedicado', 0)
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Contenido marcado como completado'
+        ]);
     }
 
     public function edit(Curso $curso, Contenido $contenido)
     {
-        // Verificar permisos
-        if (!Auth::user()->isAdmin() && !Auth::user()->isMaestro()) {
-            return redirect()->route('cursos.index')->with('error', 'No tienes permisos para editar contenido.');
-        }
-
-        if (Auth::user()->isMaestro() && $curso->maestro_id !== Auth::id()) {
-            return redirect()->route('cursos.index')->with('error', 'Solo puedes editar contenido de tus propios cursos.');
-        }
-
+        $this->authorize('update', $curso);
+        
         return view('contenidos.edit', compact('curso', 'contenido'));
     }
 
     public function update(Request $request, Curso $curso, Contenido $contenido)
     {
-        // Verificar permisos
-        if (!Auth::user()->isAdmin() && !Auth::user()->isMaestro()) {
-            return redirect()->route('cursos.index')->with('error', 'No tienes permisos para editar contenido.');
-        }
+        $this->authorize('update', $curso);
 
         $validated = $request->validate([
             'titulo' => 'required|string|max:255',
@@ -163,30 +126,20 @@ class ContenidoController extends Controller
             'activo' => 'boolean'
         ]);
 
-        $archivoUrl = $contenido->archivo_url;
-        
+        // Manejar nuevo archivo si existe
         if ($request->hasFile('archivo')) {
             // Eliminar archivo anterior si existe
             if ($contenido->archivo_url) {
-                $rutaAnterior = str_replace('/storage/', '', $contenido->archivo_url);
-                Storage::disk('public')->delete($rutaAnterior);
+                $oldPath = str_replace('/storage/', '', $contenido->archivo_url);
+                Storage::disk('public')->delete($oldPath);
             }
             
             $archivo = $request->file('archivo');
-            $nombreArchivo = time() . '_' . $archivo->getClientOriginalName();
-            $rutaArchivo = $archivo->storeAs('contenidos', $nombreArchivo, 'public');
-            $archivoUrl = Storage::url($rutaArchivo);
+            $path = $archivo->store('contenidos/' . $curso->id, 'public');
+            $validated['archivo_url'] = Storage::url($path);
         }
 
-        $contenido->update([
-            'titulo' => $validated['titulo'],
-            'descripcion' => $validated['descripcion'],
-            'tipo' => $validated['tipo'],
-            'contenido_texto' => $validated['contenido_texto'],
-            'archivo_url' => $archivoUrl,
-            'orden' => $validated['orden'],
-            'activo' => $validated['activo'] ?? true
-        ]);
+        $contenido->update($validated);
 
         return redirect()->route('cursos.show', $curso)
                         ->with('success', 'Contenido actualizado exitosamente');
@@ -194,57 +147,39 @@ class ContenidoController extends Controller
 
     public function destroy(Curso $curso, Contenido $contenido)
     {
-        // Verificar permisos
-        if (!Auth::user()->isAdmin() && !Auth::user()->isMaestro()) {
-            return redirect()->route('cursos.index')->with('error', 'No tienes permisos para eliminar contenido.');
-        }
-
+        $this->authorize('update', $curso);
+        
         // Eliminar archivo si existe
         if ($contenido->archivo_url) {
-            $rutaArchivo = str_replace('/storage/', '', $contenido->archivo_url);
-            Storage::disk('public')->delete($rutaArchivo);
+            $path = str_replace('/storage/', '', $contenido->archivo_url);
+            Storage::disk('public')->delete($path);
         }
-
+        
         $contenido->delete();
-
+        
         return redirect()->route('cursos.show', $curso)
                         ->with('success', 'Contenido eliminado exitosamente');
     }
-
-    public function marcarCompletado(Request $request, $contenidoId)
+    
+    public function actualizarProgreso(Request $request, Curso $curso, Contenido $contenido)
     {
-        try {
-            $contenido = Contenido::findOrFail($contenidoId);
-            
-            // Verificar que el usuario esté inscrito
-            $estaInscrito = $contenido->curso->estudiantes()
-                                            ->where('estudiante_id', Auth::id())
-                                            ->exists();
-            
-            if (!$estaInscrito) {
-                return response()->json(['error' => 'No tienes acceso a este contenido'], 403);
-            }
-
-            // Marcar como completado
-            ProgresoContenido::updateOrCreate(
-                [
-                    'user_id' => Auth::id(),
-                    'contenido_id' => $contenido->id
-                ],
-                [
-                    'completado' => true,
-                    'fecha_completado' => now(),
-                    'tiempo_dedicado' => $request->input('tiempo_dedicado', 0)
-                ]
-            );
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Contenido marcado como completado'
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Error al marcar contenido: ' . $e->getMessage()], 500);
+        if (!Auth::user()->isAlumno()) {
+            return response()->json(['error' => 'No autorizado'], 403);
         }
+        
+        $progreso = \App\Models\ProgresoCurso::where([
+            'curso_id' => $curso->id,
+            'estudiante_id' => Auth::id(),
+            'contenido_id' => $contenido->id,
+            'tipo' => 'contenido'
+        ])->first();
+        
+        if ($progreso && !$progreso->completado) {
+            $progreso->update([
+                'tiempo_dedicado' => $request->tiempo_dedicado ?? 5
+            ]);
+        }
+        
+        return response()->json(['success' => true]);
     }
 }

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+
 class Curso extends Model
 {
     use HasFactory;
@@ -56,11 +57,16 @@ class Curso extends Model
         return $this->hasMany(ProgresoCurso::class);
     }
 
+
     public function calificaciones(): HasMany
     {
         return $this->hasMany(Calificacion::class);
     }
 
+    public function scopeActivos($query)
+    {
+        return $query->where('activo', true);
+    }
 
     public function getEstudiantesInscritos()
     {
@@ -70,21 +76,5 @@ class Curso extends Model
     public function tieneCupoDisponible()
     {
         return $this->getEstudiantesInscritos() < $this->cupo_maximo;
-    }
-
-    // Scopes
-    public function scopeActivos($query)
-    {
-        return $query->where('activo', true);
-    }
-
-    public function scopeConMaestro($query)
-    {
-        return $query->with('maestro');
-    }
-
-    public function scopeConEstudiantes($query)
-    {
-        return $query->with('estudiantes');
     }
 }

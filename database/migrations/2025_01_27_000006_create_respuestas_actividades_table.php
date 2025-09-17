@@ -8,16 +8,15 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('respuesta_actividades', function (Blueprint $table) {
+        Schema::create('respuestas_actividades', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('actividad_id')->constrained()->onDelete('cascade');
+            $table->foreignId('actividad_id')->constrained('actividades')->onDelete('cascade');
             $table->foreignId('estudiante_id')->constrained('users')->onDelete('cascade');
-            $table->json('respuesta'); // Respuesta del estudiante en JSON
-            $table->integer('puntos_obtenidos')->default(0);
-            $table->integer('puntos_totales')->default(0);
+            $table->json('respuesta'); // Respuesta del estudiante
             $table->boolean('es_correcta')->default(false);
+            $table->integer('puntos_obtenidos')->default(0);
+            $table->text('retroalimentacion')->nullable();
             $table->timestamp('fecha_respuesta')->useCurrent();
-            $table->integer('tiempo_empleado')->nullable(); // En segundos
             $table->timestamps();
             
             $table->unique(['actividad_id', 'estudiante_id']);
@@ -26,6 +25,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('respuesta_actividades');
+        Schema::dropIfExists('respuestas_actividades');
     }
 };

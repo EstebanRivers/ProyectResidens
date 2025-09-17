@@ -15,39 +15,47 @@ class Actividad extends Model
 
     protected $fillable = [
         'curso_id',
+        'contenido_id',
         'titulo',
         'descripcion',
         'tipo',
         'pregunta',
         'opciones',
         'respuesta_correcta',
+        'explicacion',
         'puntos',
-        'activo',
-        'orden'
+        'orden',
+        'activo'
     ];
 
     protected $casts = [
+        'pregunta' => 'array',
         'opciones' => 'array',
         'respuesta_correcta' => 'array',
-        'activo' => 'boolean',
-        'puntos' => 'integer',
-        'orden' => 'integer'
+        'activo' => 'boolean'
     ];
 
-    // Relación con curso
     public function curso(): BelongsTo
     {
         return $this->belongsTo(Curso::class);
     }
 
-    // Relación con respuestas
+    public function contenido(): BelongsTo
+    {
+        return $this->belongsTo(Contenido::class);
+    }
+
     public function respuestas(): HasMany
     {
         return $this->hasMany(RespuestaActividad::class);
     }
 
-    // Scope para actividades activas
-    public function scopeActivos($query)
+    public function progreso(): HasMany
+    {
+        return $this->hasMany(ProgresoCurso::class);
+    }
+
+    public function scopeActivas($query)
     {
         return $query->where('activo', true);
     }
@@ -57,42 +65,14 @@ class Actividad extends Model
         return $query->orderBy('orden');
     }
 
-    // Verificar si el usuario ya respondió
-    public function yaRespondidaPor($userId)
+    public function getIconoTipoAttribute()
     {
-        return $this->respuestas()->where('user_id', $userId)->exists();
-    }
-
-    // Obtener respuesta del usuario
-    public function respuestaDelUsuario($userId)
-    {
-        return $this->respuestas()->where('user_id', $userId)->first();
-    }
-
-    // Verificar respuesta correcta
-    public function verificarRespuesta($respuestaUsuario)
-    {
-        if (!is_array($respuestaUsuario)) {
-            $respuestaUsuario = [$respuestaUsuario];
-        }
-
-        $correctas = $this->respuesta_correcta ?? [];
-        
-        if (empty($correctas)) {
-            return false;
-        }
-
-        // Para respuestas múltiples, verificar que coincidan exactamente
-        if (count($respuestaUsuario) === count($correctas)) {
-            return empty(array_diff($respuestaUsuario, $correctas));
-        }
-
-        return false;
-    }
-
-    // Calcular puntuación
-    public function calcularPuntuacion($respuestaUsuario)
-    {
-        return $this->verificarRespuesta($respuestaUsuario) ? $this->puntos : 0;
+        return match($this->tipo) {
+            'opcion_multiple' => '☑️',
+            'verdadero_falso' => '✅',
+            'respuesta_corta' => '✏️',
+            'ensayo' => '📝',
+            default => '❓'
+        };
     }
 }

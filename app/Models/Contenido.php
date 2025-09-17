@@ -11,39 +11,38 @@ class Contenido extends Model
 {
     use HasFactory;
 
-    protected $table = 'contenidos';
-
     protected $fillable = [
         'curso_id',
         'titulo',
         'descripcion',
         'tipo',
-        'contenido',
         'archivo_url',
-        'duracion',
+        'contenido_texto',
+        'orden',
         'activo',
-        'orden'
+        'metadata'
     ];
 
     protected $casts = [
         'activo' => 'boolean',
-        'duracion' => 'integer',
-        'orden' => 'integer'
+        'metadata' => 'array'
     ];
 
-    // Relación con curso
     public function curso(): BelongsTo
     {
         return $this->belongsTo(Curso::class);
     }
 
-    // Relación con progreso de contenidos
-    public function progresos(): HasMany
+    public function actividades(): HasMany
     {
-        return $this->hasMany(ProgresoContenido::class);
+        return $this->hasMany(Actividad::class);
     }
 
-    // Scope para contenidos activos
+    public function progreso(): HasMany
+    {
+        return $this->hasMany(ProgresoCurso::class);
+    }
+
     public function scopeActivos($query)
     {
         return $query->where('activo', true);
@@ -54,33 +53,15 @@ class Contenido extends Model
         return $query->orderBy('orden');
     }
 
-    // Verificar si está completado por un usuario
-    public function completadoPor($userId)
+    public function getIconoTipoAttribute()
     {
-        return $this->progresos()
-            ->where('user_id', $userId)
-            ->where('completado', true)
-            ->exists();
-    }
-
-    // Obtener progreso del usuario
-    public function progresoDelUsuario($userId)
-    {
-        return $this->progresos()
-            ->where('user_id', $userId)
-            ->first();
-    }
-
-    // Marcar como completado
-    public function marcarCompletado($userId)
-    {
-        return $this->progresos()->updateOrCreate(
-            ['user_id' => $userId],
-            [
-                'completado' => true,
-                'fecha_completado' => now(),
-                'tiempo_dedicado' => $this->duracion ?? 0
-            ]
-        );
+        return match($this->tipo) {
+            'video' => '🎥',
+            'texto' => '📄',
+            'pdf' => '📋',
+            'imagen' => '🖼️',
+            'audio' => '🎵',
+            default => '📄'
+        };
     }
 }

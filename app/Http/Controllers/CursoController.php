@@ -6,7 +6,6 @@ use App\Models\Curso;
 use App\Models\User;
 use App\Models\Contenido;
 use App\Models\Actividad;
-use App\Models\ProgresoCurso;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -27,13 +26,7 @@ class CursoController extends Controller
             return view('cursos.index', compact('cursos'));
         } else {
             // Para alumnos, mostrar cursos disponibles y sus cursos inscritos
-            $cursosDisponibles = Curso::where('activo', true)
-                ->whereDoesntHave('estudiantes', function($query) use ($user) {
-                    $query->where('estudiante_id', $user->id);
-                })
-                ->with(['maestro', 'estudiantes'])
-                ->get();
-                
+            $cursosDisponibles = Curso::activos()->with(['maestro'])->get();
             $cursosInscritos = $user->cursosComoEstudiante()->with(['maestro'])->get();
             
             return view('cursos.index', compact('cursosDisponibles', 'cursosInscritos'));
@@ -72,30 +65,20 @@ class CursoController extends Controller
     {
         $this->authorize('view', $curso);
         
-        $curso->load(['maestro', 'estudiantes', 'contenidos' => function($query) {
-            $query->where('activo', true)->orderBy('orden');
-        }, 'actividades' => function($query) {
-            $query->where('activo', true)->orderBy('orden');
-        }]);
+        $curso->load(['maestro', 'estudiantes', 'contenidos', 'actividades']);
         
-        // Obtener progreso si es alumno inscrito
+        // Obtener progreso si es alumno
         $progreso = null;
-        $estaInscrito = false;
-        
         if (Auth::user()->isAlumno()) {
-            $estaInscrito = $curso->estudiantes()->where('estudiante_id', Auth::id())->exists();
-            
-            if ($estaInscrito) {
-                $progreso = $curso->progreso()
-                                 ->where('estudiante_id', Auth::id())
-                                 ->get()
-                                 ->keyBy(function($item) {
-                                     return $item->tipo . '_' . ($item->contenido_id ?? $item->actividad_id);
-                                 });
-            }
+            $progreso = $curso->progreso()
+                             ->where('estudiante_id', Auth::id())
+                             ->get()
+                             ->keyBy(function($item) {
+                                 return $item->tipo . '_' . ($item->contenido_id ?? $item->actividad_id);
+                             });
         }
         
-        return view('cursos.show', compact('curso', 'progreso', 'estaInscrito'));
+        return view('cursos.show', compact('curso', 'progreso'));
     }
 
     public function edit(Curso $curso)
@@ -137,67 +120,46 @@ class CursoController extends Controller
                         ->with('success', 'Curso eliminado exitosamente');
     }
 
-    public function inscribir(Request $request, $id)
+                return redirect()->back()->with('error', 'Solo los estudiantes pueden inscribirse a cursos.');
     {
-        // Verificar autenticación
         if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Debes iniciar sesión para inscribirte a un curso.');
+            return redirect()->route('login')->with('error', 'Debes iniciar sesión para inscribirte');
         }
-
-        $estudiante = Auth::user();
-        
-        // Verificar que sea alumno
-        if (!$estudiante->isAlumno()) {
-            return redirect()->back()->with('error', 'Solo los estudiantes pueden inscribirse a cursos.');
-        }
+                return redirect()->route('login')->with('error', 'Debes iniciar sesión para inscribirte a un curso.');
+        if (!Auth::user()->isAlumno()) {
+            return redirect()->back()->with('error', 'Solo los estudiantes pueden inscribirse a cursos');
+                return redirect()->back()->with('warning', 'Ya estás inscrito en este curso.');
 
         $curso = Curso::findOrFail($id);
-
-        // Verificar si ya está inscrito
-        if ($curso->estudiantes()->where('estudiante_id', $estudiante->id)->exists()) {
-            return redirect()->back()->with('warning', 'Ya estás inscrito en este curso.');
+        $estudiante = Auth::user();
+                return redirect()->route('login')->with('error', 'Debes iniciar sesión para realizar esta acción.');
+                return redirect()->back()->with('error', 'Lo sentimos, el curso ha alcanzado su cupo máximo.');
+            return redirect()->route('cursos.show', $curso->id)->with('info', 'Ya estás inscrito en este curso');
         }
 
-        // Verificar cupo disponible
-        if (!$curso->tieneCupoDisponible()) {
-            return redirect()->back()->with('error', 'Lo sentimos, el curso ha alcanzado su cupo máximo.');
+                return redirect()->back()->with('error', 'Solo los estudiantes pueden desinscribirse de cursos.');
+            return redirect()->back()->with('error', 'El curso no tiene cupo disponible');
         }
 
-        // Inscribir al estudiante
-        $curso->estudiantes()->attach($estudiante->id, [
+            return redirect()->route('cursos.show', $curso->id)->with('success', '¡Felicidades! Te has inscrito exitosamente al curso "' . $curso->nombre . '".');
             'fecha_inscripcion' => now(),
             'estado' => 'inscrito'
         ]);
-
-        return redirect()->route('cursos.show', $curso->id)
-                        ->with('success', '¡Felicidades! Te has inscrito exitosamente al curso "' . $curso->nombre . '".');
+                return redirect()->back()->with('warning', 'No estás inscrito en este curso.');
+        return redirect()->route('cursos.show', $curso->id)->with('success', 'Te has inscrito exitosamente al curso');
     }
 
-    public function desinscribir(Request $request, $id)
+    public function desinscribir($id)
     {
-        // Verificar autenticación
-        if (!Auth::check()) {
-            return redirect()->route('login')->with('error', 'Debes iniciar sesión para realizar esta acción.');
-        }
-
+            return redirect()->route('cursos.index')->with('success', 'Te has desinscrito exitosamente del curso "' . $curso->nombre . '".');
         $estudiante = Auth::user();
-        
-        // Verificar que sea alumno
-        if (!$estudiante->isAlumno()) {
-            return redirect()->back()->with('error', 'Solo los estudiantes pueden desinscribirse de cursos.');
-        }
 
-        $curso = Curso::findOrFail($id);
-
-        // Verificar si está inscrito
         if (!$curso->estudiantes()->where('estudiante_id', $estudiante->id)->exists()) {
-            return redirect()->back()->with('warning', 'No estás inscrito en este curso.');
+            return redirect()->back()->with('error', 'Ocurrió un error al procesar tu desinscripción. Por favor, inténtalo de nuevo.');
         }
 
-        // Desinscribir al estudiante
         $curso->estudiantes()->detach($estudiante->id);
 
-        return redirect()->route('cursos.index')
-                        ->with('success', 'Te has desinscrito exitosamente del curso "' . $curso->nombre . '".');
+        return redirect()->route('cursos.index')->with('success', 'Te has desinscrito del curso exitosamente');
     }
 }

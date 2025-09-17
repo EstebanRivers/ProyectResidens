@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class RespuestaActividad extends Model
 {
@@ -13,55 +12,36 @@ class RespuestaActividad extends Model
     protected $table = 'respuesta_actividades';
 
     protected $fillable = [
-        'estudiante_id',
         'actividad_id',
-        'respuesta',
-        'puntos_obtenidos',
+        'estudiante_id',
+        'pregunta_id',
+        'opcion_id',
         'es_correcta',
-        'completada',
-        'fecha_completado'
+        'fecha_respuesta'
     ];
 
     protected $casts = [
-        'respuesta' => 'array',
         'es_correcta' => 'boolean',
-        'completada' => 'boolean',
-        'puntos_obtenidos' => 'integer',
-        'fecha_completado' => 'datetime'
+        'fecha_respuesta' => 'datetime'
     ];
 
-    // Relación con Estudiante
-    public function estudiante(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'estudiante_id');
-    }
-
-    // Relación con Actividad
-    public function actividad(): BelongsTo
+    public function actividad()
     {
         return $this->belongsTo(Actividad::class);
     }
 
-    // Scopes
-    public function scopeCorrectas($query)
+    public function estudiante()
     {
-        return $query->where('es_correcta', true);
+        return $this->belongsTo(User::class, 'estudiante_id');
     }
 
-    public function scopeIncorrectas($query)
+    public function pregunta()
     {
-        return $query->where('es_correcta', false);
+        return $this->belongsTo(Pregunta::class);
     }
 
-    public function scopeCompletadas($query)
+    public function opcion()
     {
-        return $query->where('completada', true);
-    }
-
-    // Accessor para porcentaje de puntos
-    public function getPorcentajePuntosAttribute()
-    {
-        $puntosMaximos = $this->actividad->puntos;
-        return $puntosMaximos > 0 ? round(($this->puntos_obtenidos / $puntosMaximos) * 100, 1) : 0;
+        return $this->belongsTo(OpcionPregunta::class, 'opcion_id');
     }
 }
